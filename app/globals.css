@@ -1,26 +1,202 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css");
 @import "tailwindcss";
 
+/* ============================================================
+   Raw Design Tokens — CSS Custom Properties
+   접근법: JS, 인라인 style, @theme 외부 CSS에서 직접 참조 가능
+   ============================================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primary */
+  --pickle-primary-50: #E8F5EE;
+  --pickle-primary-100: #C5E6D4;
+  --pickle-primary-200: #9DD4B5;
+  --pickle-primary-400: #4BA87A;
+  --pickle-primary-500: #2D8A5A;
+  --pickle-primary-600: #237048;
+  --pickle-primary-700: #1A5636;
+  --pickle-primary-800: #113C25;
+  --pickle-primary-900: #0A2416;
+
+  /* Secondary */
+  --pickle-secondary-50: #FDEEEA;
+  --pickle-secondary-100: #F9CCC1;
+  --pickle-secondary-200: #F2A08E;
+  --pickle-secondary-400: #E86040;
+  --pickle-secondary-500: #E0421A;
+  --pickle-secondary-600: #B83515;
+  --pickle-secondary-700: #8F2910;
+  --pickle-secondary-800: #661D0B;
+  --pickle-secondary-900: #3E1107;
+
+  /* Gray */
+  --pickle-gray-50: #FAFAFA;
+  --pickle-gray-100: #F5F5F5;
+  --pickle-gray-200: #EEEEEE;
+  --pickle-gray-300: #E0E0E0;
+  --pickle-gray-400: #BDBDBD;
+  --pickle-gray-500: #9E9E9E;
+  --pickle-gray-600: #757575;
+  --pickle-gray-700: #616161;
+  --pickle-gray-800: #424242;
+  --pickle-gray-900: #212121;
+
+  /* Semantic */
+  --pickle-success: #2D8A5A;
+  --pickle-warning: #FF9500;
+  --pickle-danger: #E0421A;
+  --pickle-info: #007AFF;
+  --pickle-white: #FFFFFF;
+  --pickle-black: #000000;
+  --pickle-kakao: #FEE500;
+  --pickle-naver: #03A94D;
+
+  /* Badge */
+  --pickle-badge-recruiting-bg: #E8F5EE;
+  --pickle-badge-recruiting-text: #237048;
+  --pickle-badge-reserved-bg: #FFF3E0;
+  --pickle-badge-reserved-text: #E65100;
+  --pickle-badge-done-bg: #F5F5F5;
+  --pickle-badge-done-text: #757575;
+  --pickle-badge-soldout-bg: #FDEEEA;
+  --pickle-badge-soldout-text: #B83515;
+  --pickle-badge-caution-bg: #FFF8E1;
+  --pickle-badge-caution-text: #F57F17;
+  --pickle-badge-verified-bg: #2D8A5A;
+  --pickle-badge-verified-text: #FFFFFF;
+
+  /* Component Sizing — Tailwind 유틸리티 없음, var()로 직접 사용 */
+  --sizing-button-default: 44px;
+  --sizing-button-small: 36px;
+  --sizing-button-cta: 52px;
+  --sizing-input: 44px;
+  --sizing-fab: 56px;
+  --sizing-icon-lg: 24px;
+  --sizing-icon-md: 20px;
+  --sizing-icon-sm: 16px;
+  --sizing-app-bar: 56px;
+  --sizing-bottom-nav: 56px;
+  --sizing-screen: 390px;
 }
 
+/* ============================================================
+   Tailwind v4 Theme
+   ============================================================ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Font Family */
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Font Sizes */
+  --text-h1: 1.5rem;       /* 24px */
+  --text-h2: 1.25rem;      /* 20px */
+  --text-h3: 1.125rem;     /* 18px */
+  --text-subtitle: 1rem;   /* 16px */
+  --text-body1: 1rem;      /* 16px */
+  --text-body2: 0.875rem;  /* 14px */
+  --text-caption: 0.75rem; /* 12px */
+  --text-overline: 0.625rem; /* 10px */
+
+  /* Line Heights */
+  --leading-tight: 140%;
+  --leading-normal: 150%;
+
+  /* Letter Spacing */
+  --tracking-normal: 0em;
+  --tracking-wide: 0.05em;
+
+  /* Spacing */
+  --spacing-2xs: 0.25rem; /* 4px  */
+  --spacing-xs: 0.5rem;   /* 8px  */
+  --spacing-sm: 0.75rem;  /* 12px */
+  --spacing-md: 1rem;     /* 16px */
+  --spacing-lg: 1.25rem;  /* 20px */
+  --spacing-xl: 1.5rem;   /* 24px */
+  --spacing-2xl: 2rem;    /* 32px */
+  --spacing-3xl: 3rem;    /* 48px */
+
+  /* Border Radius */
+  --radius-xs: 0.25rem; /* 4px  */
+  --radius-sm: 0.5rem;  /* 8px  */
+  --radius-md: 0.75rem; /* 12px */
+  --radius-lg: 1rem;    /* 16px */
+  --radius-full: 9999px;
+
+  /* Box Shadows */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px 0 rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 8px 24px 0 rgba(0, 0, 0, 0.12);
+  --shadow-focus-primary: 0 0 6px 0 rgba(45, 138, 90, 0.12);
+  --shadow-fab: 0 4px 12px 0 rgba(45, 138, 90, 0.30);
+
+  /* Opacity */
+  --opacity-disabled: 0.4;
+  --opacity-overlay: 0.5;
+
+  /* Colors: Primary */
+  --color-primary-50: #E8F5EE;
+  --color-primary-100: #C5E6D4;
+  --color-primary-200: #9DD4B5;
+  --color-primary-400: #4BA87A;
+  --color-primary-500: #2D8A5A;
+  --color-primary-600: #237048;
+  --color-primary-700: #1A5636;
+  --color-primary-800: #113C25;
+  --color-primary-900: #0A2416;
+
+  /* Colors: Secondary */
+  --color-secondary-50: #FDEEEA;
+  --color-secondary-100: #F9CCC1;
+  --color-secondary-200: #F2A08E;
+  --color-secondary-400: #E86040;
+  --color-secondary-500: #E0421A;
+  --color-secondary-600: #B83515;
+  --color-secondary-700: #8F2910;
+  --color-secondary-800: #661D0B;
+  --color-secondary-900: #3E1107;
+
+  /* Colors: Gray (Tailwind 기본 gray 오버라이드) */
+  --color-gray-50: #FAFAFA;
+  --color-gray-100: #F5F5F5;
+  --color-gray-200: #EEEEEE;
+  --color-gray-300: #E0E0E0;
+  --color-gray-400: #BDBDBD;
+  --color-gray-500: #9E9E9E;
+  --color-gray-600: #757575;
+  --color-gray-700: #616161;
+  --color-gray-800: #424242;
+  --color-gray-900: #212121;
+
+  /* Colors: Semantic */
+  --color-success: #2D8A5A;
+  --color-warning: #FF9500;
+  --color-danger: #E0421A;
+  --color-info: #007AFF;
+  --color-white: #FFFFFF;
+  --color-black: #000000;
+  --color-kakao: #FEE500;
+  --color-naver: #03A94D;
+
+  /* Colors: Badge */
+  --color-badge-recruiting-bg: #E8F5EE;
+  --color-badge-recruiting-text: #237048;
+  --color-badge-reserved-bg: #FFF3E0;
+  --color-badge-reserved-text: #E65100;
+  --color-badge-done-bg: #F5F5F5;
+  --color-badge-done-text: #757575;
+  --color-badge-soldout-bg: #FDEEEA;
+  --color-badge-soldout-text: #B83515;
+  --color-badge-caution-bg: #FFF8E1;
+  --color-badge-caution-text: #F57F17;
+  --color-badge-verified-bg: #2D8A5A;
+  --color-badge-verified-text: #FFFFFF;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  color: var(--pickle-gray-900);
 }
