@@ -1,7 +1,6 @@
 "use client";
 
-import { Input } from "@/shared/ui/input";
-import { Button } from "@/shared/ui/button";
+import { Button, Input } from '@/shared/ui';
 import { useSetNickname } from "../model/useSetNickname";
 
 function NicknameRulesPanel() {
@@ -46,7 +45,7 @@ export function SetNicknameStep({ onNext }: SetNicknameStepProps) {
   const { nickname, setNickname, isValid, handleClear } = useSetNickname();
 
   return (
-    <main className="flex flex-col min-h-svh bg-white max-w-97.5 mx-auto w-full">
+    <main className="flex flex-col min-h-svh bg-white w-full">
       <section className="flex flex-col flex-1 gap-5 px-5 py-3">
         <div className="flex flex-col gap-2">
           <h1 className="text-[26px] font-bold text-gray-900 leading-tight">

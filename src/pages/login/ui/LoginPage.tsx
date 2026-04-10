@@ -3,7 +3,7 @@ import { KakaoLoginButton, NaverLoginButton } from "@/features/social-login";
 
 export function LoginPage() {
   return (
-    <main className="flex flex-col min-h-svh bg-white max-w-[390px] mx-auto w-full">
+    <main className="flex flex-col min-h-svh bg-white w-full">
       {/* Brand Area */}
       <div className="flex flex-col items-center justify-center flex-1 gap-4">
         <Image

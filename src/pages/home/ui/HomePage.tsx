@@ -1,24 +1,15 @@
-"use client";
-
-import { SetNicknameStep } from "@/features/set-nickname";
-import { SetBoundaryStep } from "@/features/set-boundary";
-import { useHomePage } from "../model/useHomePage";
-import type { SelectedLocation } from "@/features/set-boundary";
+import { HomeHeader } from "@/widgets/home-header";
+import { HomeFeed } from "@/widgets/home-feed";
+import { BottomNav } from "@/widgets/bottom-nav";
 
 export function HomePage() {
-  const { step, goToBoundary, goToNickname } = useHomePage();
-
-  function handleBoundaryComplete(location: SelectedLocation) {
-    // TODO: submit nickname + location to server
-    console.log("onboarding complete", location);
-  }
-
   return (
-    <>
-      {step === "nickname" && <SetNicknameStep onNext={goToBoundary} />}
-      {step === "boundary" && (
-        <SetBoundaryStep onPrev={goToNickname} onComplete={handleBoundaryComplete} />
-      )}
-    </>
+    <div className="bg-gray-50 flex flex-col h-dvh">
+      <HomeHeader />
+      <main className="flex flex-col flex-1 overflow-y-auto min-h-0">
+        <HomeFeed />
+      </main>
+      <BottomNav activeTab="home" />
+    </div>
   );
 }

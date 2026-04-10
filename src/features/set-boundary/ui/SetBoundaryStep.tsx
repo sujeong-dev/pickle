@@ -32,7 +32,7 @@ export function SetBoundaryStep({ onPrev, onComplete }: SetBoundaryStepProps) {
   }
 
   return (
-    <main className="flex flex-col h-svh bg-white max-w-97.5 mx-auto w-full">
+    <main className="flex flex-col h-svh bg-white w-full">
       {/* Header */}
       <section className="flex-none px-5 py-3 flex flex-col gap-2">
         <h1 className="text-[26px] font-bold text-gray-900 leading-tight">
