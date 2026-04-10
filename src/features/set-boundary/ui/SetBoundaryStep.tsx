@@ -14,6 +14,8 @@ interface SetBoundaryStepProps {
 export function SetBoundaryStep({ onPrev, onComplete }: SetBoundaryStepProps) {
   const { selectedLocation, setSelectedLocation, clearLocation, isSelected } =
     useSetBoundary();
+  
+  console.log(isSelected, selectedLocation);
 
   function handleLocationChange(location: SelectedLocation) {
     setSelectedLocation(location);
@@ -42,7 +44,7 @@ export function SetBoundaryStep({ onPrev, onComplete }: SetBoundaryStepProps) {
       </section>
 
       {/* Search display */}
-      <div className="flex-none px-5 py-3">
+      {/* <div className="flex-none px-5 py-3">
         <div
           className={cn(
             "flex items-center gap-2 h-13.5 px-4 rounded-sm border",
@@ -51,7 +53,6 @@ export function SetBoundaryStep({ onPrev, onComplete }: SetBoundaryStepProps) {
               : "bg-gray-50 border-gray-300",
           )}
         >
-          {/* Search icon */}
           <svg
             width="20"
             height="20"
@@ -84,7 +85,6 @@ export function SetBoundaryStep({ onPrev, onComplete }: SetBoundaryStepProps) {
             {isSelected ? selectedLocation!.dongName : "동네 이름으로 검색"}
           </span>
 
-          {/* Clear button */}
           {isSelected && (
             <button
               type="button"
@@ -109,13 +109,12 @@ export function SetBoundaryStep({ onPrev, onComplete }: SetBoundaryStepProps) {
             </button>
           )}
         </div>
-      </div>
+      </div> */}
 
       {/* Map */}
       <div className="flex-1 min-h-0 px-5">
         <NaverMap
           onLocationChange={handleLocationChange}
-          showBoundary={isSelected}
         />
       </div>
 
