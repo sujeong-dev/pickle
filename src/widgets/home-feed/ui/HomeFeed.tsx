@@ -1,6 +1,7 @@
 import { DealCard } from "@/entities/post";
 import type { Post } from "@/entities/post";
 import { FeedEmpty } from "./FeedEmpty";
+import { ROUTES } from "@/shared/config/routes";
 
 const mockPosts: Post[] = [
   {
@@ -85,7 +86,7 @@ type HomeFeedProps = {
   isEmpty?: boolean;
 };
 
-export function HomeFeed({ isEmpty = true }: HomeFeedProps) {
+export function HomeFeed({ isEmpty = false }: HomeFeedProps) {
   if (isEmpty) {
     return (
       <div className="flex flex-col flex-1 min-h-0">
@@ -98,11 +99,11 @@ export function HomeFeed({ isEmpty = true }: HomeFeedProps) {
     <div className="flex flex-col">
       <section>
         <SectionHeader icon={<FireIcon />} title="지금 핫한" showMore />
-        <DealCard post={mockPosts[0]} />
+        <DealCard post={mockPosts[0]} href={ROUTES.postDetail(mockPosts[0].id)} />
       </section>
       <section>
         <SectionHeader icon={<ClockIcon />} title="최신 제보" />
-        <DealCard post={mockPosts[1]} />
+        <DealCard post={mockPosts[1]} href={ROUTES.postDetail(mockPosts[1].id)} />
       </section>
     </div>
   );

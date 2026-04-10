@@ -1,9 +1,12 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { Post } from "../model/types";
 import { cn } from "@/shared/lib/utils";
+import { ROUTES } from "@/shared/config/routes";
 
 type DealCardProps = {
   post: Post;
+  href?: string;
   className?: string;
 };
 
@@ -105,11 +108,14 @@ function ReceiptIcon() {
   );
 }
 
-export function DealCard({ post, className }: DealCardProps) {
-  const { author, createdAt, content, product, reviewCount, rating, likeCount, commentCount, relatedPostCount } = post;
+export function DealCard({ post, href, className }: DealCardProps) {
+  const { id, author, createdAt, content, product, reviewCount, rating, likeCount, commentCount, relatedPostCount } = post;
 
   return (
-    <article className={cn("bg-white flex flex-col gap-[2px] w-full", className)}>
+    <article className={cn("bg-white flex flex-col gap-[2px] w-full relative", className)}>
+      {href && (
+        <Link href={href} aria-label="제보 상세보기" className="absolute inset-0 z-0" />
+      )}
       {/* Author row */}
       <div className="flex gap-2.5 items-center px-5 py-3">
         <Avatar name={author.name} avatarUrl={author.avatarUrl} />
@@ -165,7 +171,7 @@ export function DealCard({ post, className }: DealCardProps) {
       </div>
 
       {/* Actions row */}
-      <div className="flex items-center justify-between px-5 py-3">
+      <div className="relative z-10 flex items-center justify-between px-5 py-3">
         <div className="flex gap-5 items-center">
           <div className="flex gap-[6px] items-center">
             <ThumbsUpIcon />
@@ -183,7 +189,7 @@ export function DealCard({ post, className }: DealCardProps) {
 
       {/* Related reports row */}
       {relatedPostCount > 0 && (
-        <div className="flex items-center justify-between px-5 py-3 bg-primary-50">
+        <Link href={ROUTES.relatedReports(id)} className="relative z-10 flex items-center justify-between px-5 py-3 bg-primary-50">
           <div className="flex gap-2 items-center">
             <div className="flex -space-x-[18px]">
               {[0, 1].map((i) => (
@@ -203,7 +209,7 @@ export function DealCard({ post, className }: DealCardProps) {
             <span className="font-medium text-body2 text-primary-500">같은 상품 제보 {relatedPostCount}건 더</span>
           </div>
           <ChevronRightIcon size={16} />
-        </div>
+        </Link>
       )}
     </article>
   );
