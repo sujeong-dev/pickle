@@ -7,6 +7,7 @@ import { ROUTES } from "@/shared/config/routes";
 type DealCardProps = {
   post: Post;
   href?: string;
+  wishlistButton?: React.ReactNode;
   className?: string;
 };
 
@@ -108,7 +109,7 @@ function ReceiptIcon() {
   );
 }
 
-export function DealCard({ post, href, className }: DealCardProps) {
+export function DealCard({ post, href, wishlistButton, className }: DealCardProps) {
   const { id, author, createdAt, content, product, reviewCount, rating, likeCount, commentCount, relatedPostCount } = post;
 
   return (
@@ -182,9 +183,11 @@ export function DealCard({ post, href, className }: DealCardProps) {
             <span className="text-subtitle text-gray-500">{commentCount}</span>
           </div>
         </div>
-        <button type="button" aria-label="찜하기">
-          <HeartIcon />
-        </button>
+        {wishlistButton ?? (
+          <button type="button" aria-label="찜하기">
+            <HeartIcon />
+          </button>
+        )}
       </div>
 
       {/* Related reports row */}

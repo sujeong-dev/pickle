@@ -2,6 +2,7 @@ import { DealCard } from "@/entities/post";
 import type { Post } from "@/entities/post";
 import { FeedEmpty } from "./FeedEmpty";
 import { ROUTES } from "@/shared/config/routes";
+import { WishlistButton } from "@/features/wishlist";
 
 const mockPosts: Post[] = [
   {
@@ -99,11 +100,11 @@ export function HomeFeed({ isEmpty = false }: HomeFeedProps) {
     <div className="flex flex-col">
       <section>
         <SectionHeader icon={<FireIcon />} title="지금 핫한" showMore />
-        <DealCard post={mockPosts[0]} href={ROUTES.postDetail(mockPosts[0].id)} />
+        <DealCard post={mockPosts[0]} href={ROUTES.postDetail(mockPosts[0].id)} wishlistButton={<WishlistButton postId={mockPosts[0].id} />} />
       </section>
       <section>
         <SectionHeader icon={<ClockIcon />} title="최신 제보" />
-        <DealCard post={mockPosts[1]} href={ROUTES.postDetail(mockPosts[1].id)} />
+        <DealCard post={mockPosts[1]} href={ROUTES.postDetail(mockPosts[1].id)} wishlistButton={<WishlistButton postId={mockPosts[1].id} />} />
       </section>
     </div>
   );
