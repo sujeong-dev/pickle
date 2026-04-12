@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { BackHeader } from "@/shared/ui";
+import { cn } from "@/shared/lib/utils";
 import type { Post } from "@/entities/post";
 import { WishlistButton } from "@/features/wishlist";
+import { ReportSoldoutModal, useReportSoldout } from "@/features/report-soldout";
 
 type PostDetailPageProps = {
   post: Post;
@@ -96,6 +98,7 @@ function Avatar() {
 export function PostDetailPage({ post }: PostDetailPageProps) {
   const { author, createdAt, product, reviewCount, rating, likeCount, commentCount } = post;
   const [comment, setComment] = useState("");
+  const { isOpen: isSoldoutOpen, isReported, open: openSoldout, close: closeSoldout, report } = useReportSoldout();
 
   const filledStars = Math.round(rating);
 
@@ -141,13 +144,23 @@ export function PostDetailPage({ post }: PostDetailPageProps) {
               <ThumbsUpIcon />
               <span className="text-subtitle text-gray-500">{likeCount}</span>
             </button>
-            <button type="button" className="flex gap-1 items-center px-2 py-2 rounded bg-secondary-50">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E0421A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <button
+              type="button"
+              onClick={isReported ? undefined : openSoldout}
+              disabled={isReported}
+              className={cn(
+                "flex gap-1 items-center px-2 py-2 rounded",
+                isReported ? "bg-gray-100 cursor-default" : "bg-secondary-50",
+              )}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isReported ? "#BDBDBD" : "#E0421A"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                 <line x1="12" y1="9" x2="12" y2="13" />
                 <line x1="12" y1="17" x2="12.01" y2="17" />
               </svg>
-              <span className="font-semibold text-body2 text-secondary-500">품절 제보하기</span>
+              <span className={cn("font-semibold text-body2", isReported ? "text-gray-400" : "text-secondary-500")}>
+                {isReported ? "제보 완료" : "품절 제보하기"}
+              </span>
             </button>
           </div>
           <div className="flex gap-3 items-center">
@@ -187,6 +200,8 @@ export function PostDetailPage({ post }: PostDetailPageProps) {
           </div>
         </div>
       </div>
+
+      <ReportSoldoutModal open={isSoldoutOpen} onClose={closeSoldout} onReport={report} />
 
       {/* Comment input bar */}
       <div className="flex items-center gap-3 px-5 py-3 border-t border-gray-200 shrink-0">
