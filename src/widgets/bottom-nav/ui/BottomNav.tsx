@@ -104,13 +104,13 @@ export function BottomNav({ activeTab = "home" }: BottomNavProps) {
         active={activeTab === "split"}
       />
       <div className="flex items-center justify-center pt-[3px]">
-        <button
-          type="button"
+        <Link
+          href={ROUTES.report}
           aria-label="제보하기"
           className="size-[42px] rounded-full bg-primary-500 flex items-center justify-center shadow-[var(--shadow-fab)]"
         >
           <PlusIcon />
-        </button>
+        </Link>
       </div>
       <NavItem
         href="#"
