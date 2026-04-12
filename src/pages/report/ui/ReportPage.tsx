@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { cn } from "@/shared/lib/utils";
 import { ReportStep1, useReportStep1 } from "@/features/report-step1-photo";
-import { ReportStep2 } from "@/features/report-step2-info";
+import { ReportStep2, useReportStep2 } from "@/features/report-step2-info";
 import { useState } from "react";
 
 type Step = 1 | 2;
@@ -57,6 +57,23 @@ export function ReportPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
   const { photo, setPhoto } = useReportStep1();
+  const {
+    photos,
+    representativeIdx,
+    productCode,
+    productName,
+    discountPrice,
+    originalPrice,
+    review,
+    addPhoto,
+    removePhoto,
+    setRepresentativeIdx,
+    setProductCode,
+    setProductName,
+    setDiscountPrice,
+    setOriginalPrice,
+    setReview,
+  } = useReportStep2();
 
   const handleBack = () => {
     if (step === 1) router.back();
@@ -65,9 +82,10 @@ export function ReportPage() {
 
   const handleNext = () => {
     if (step === 1) setStep(2);
+    else console.log("제보하기 제출");
   };
 
-  const canNext = step === 1 ? photo !== null : true;
+  const canNext = step === 1 ? photo !== null : photos.length > 0;
 
   return (
     <div className="bg-white flex flex-col h-dvh">
@@ -90,7 +108,25 @@ export function ReportPage() {
         {step === 1 && (
           <ReportStep1 photo={photo} onPhotoChange={setPhoto} onPhotoRemove={() => setPhoto(null)} />
         )}
-        {step === 2 && <ReportStep2 />}
+        {step === 2 && (
+          <ReportStep2
+            photos={photos}
+            representativeIdx={representativeIdx}
+            productCode={productCode}
+            productName={productName}
+            discountPrice={discountPrice}
+            originalPrice={originalPrice}
+            review={review}
+            onAddPhoto={addPhoto}
+            onRemovePhoto={removePhoto}
+            onSetRepresentative={setRepresentativeIdx}
+            onProductCodeChange={setProductCode}
+            onProductNameChange={setProductName}
+            onDiscountPriceChange={setDiscountPrice}
+            onOriginalPriceChange={setOriginalPrice}
+            onReviewChange={setReview}
+          />
+        )}
       </main>
 
       {/* Bottom button */}
@@ -106,7 +142,7 @@ export function ReportPage() {
               : "bg-gray-200 text-gray-400",
           )}
         >
-          다음
+          {step === 1 ? "다음" : "제보하기"}
         </button>
       </div>
     </div>
