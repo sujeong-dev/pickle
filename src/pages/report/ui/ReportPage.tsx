@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/shared/lib/utils";
 import { ReportStep1, useReportStep1 } from "@/features/report-step1-photo";
 import { ReportStep2, useReportStep2 } from "@/features/report-step2-info";
+import { Button } from "@/shared/ui";
+import { ROUTES } from "@/shared/config/routes";
 import { useState } from "react";
 
 type Step = 1 | 2;
@@ -12,6 +14,24 @@ const STEPS: { step: Step; label: string }[] = [
   { step: 1, label: "할인표" },
   { step: 2, label: "상품정보" },
 ];
+
+function CheckmarkIcon() {
+  return (
+    <svg
+      width='28'
+      height='28'
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='#2d8a5a'
+      strokeWidth='2.5'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      aria-hidden='true'
+    >
+      <path d='M20 6L9 17l-5-5' />
+    </svg>
+  );
+}
 
 function ChevronLeftIcon() {
   return (
@@ -56,6 +76,7 @@ function StepIndicator({ currentStep }: { currentStep: Step }) {
 export function ReportPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
+  const [showSuccess, setShowSuccess] = useState(false);
   const { photo, setPhoto } = useReportStep1();
   const {
     photos,
@@ -82,10 +103,31 @@ export function ReportPage() {
 
   const handleNext = () => {
     if (step === 1) setStep(2);
-    else console.log("제보하기 제출");
+    else setShowSuccess(true);
   };
 
   const canNext = step === 1 ? photo !== null : photos.length > 0;
+
+  if (showSuccess) {
+    return (
+      <div className="bg-white flex flex-col h-dvh items-center justify-center px-[31px]">
+        <div className="flex flex-col items-center gap-6 w-full">
+          <div className="bg-primary-50 rounded-full size-[60px] flex items-center justify-center">
+            <CheckmarkIcon />
+          </div>
+          <div className="flex flex-col items-center gap-2 text-center w-full">
+            <p className="font-bold text-[24px] text-gray-900">제보가 완료되었습니다</p>
+            <p className="text-[14px] text-gray-600 leading-[1.3]">
+              할인제보가 등록되었어요.<br />다른 할인상품들도 확인해보세요!
+            </p>
+          </div>
+          <Button onClick={() => router.push(ROUTES.home)}>
+            다른 제보들 보러가기
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white flex flex-col h-dvh">
@@ -131,19 +173,9 @@ export function ReportPage() {
 
       {/* Bottom button */}
       <div className="shrink-0 px-6 pb-8 pt-3">
-        <button
-          type="button"
-          onClick={handleNext}
-          disabled={!canNext}
-          className={cn(
-            "w-full h-[56px] rounded-[10px] flex items-center justify-center font-medium text-[20px]",
-            canNext
-              ? "bg-primary-500 text-white"
-              : "bg-gray-200 text-gray-400",
-          )}
-        >
+        <Button onClick={handleNext} disabled={!canNext}>
           {step === 1 ? "다음" : "제보하기"}
-        </button>
+        </Button>
       </div>
     </div>
   );
