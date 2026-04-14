@@ -1,5 +1,7 @@
 import { HomeHeader } from "@/widgets/home-header";
 import { BottomNav } from "@/widgets/bottom-nav";
+import { ReviewItemRow } from "@/entities/review";
+import type { ReviewItem } from "@/entities/review";
 
 function UserAvatarIcon() {
   return (
@@ -15,14 +17,6 @@ function VerifiedBadgeIcon() {
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D8A5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
       <polyline points="22 4 12 14.01 9 11.01" />
-    </svg>
-  );
-}
-
-function StarIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" strokeWidth="1" aria-hidden="true">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
     </svg>
   );
 }
@@ -44,38 +38,13 @@ function CommentIcon() {
   );
 }
 
-type ReviewItem = {
-  name: string;
-  price: string;
-  rating: number;
-  comment: string;
-};
-
-function ReviewItemRow({ name, price, rating, comment }: ReviewItem) {
-  return (
-    <div className="flex gap-3 items-center border-b border-gray-100 px-5 py-3">
-      <div className="bg-[#e8e8e8] rounded-[6px] shrink-0 size-[60px]" />
-      <div className="flex flex-col gap-1 flex-1 min-w-0">
-        <div className="flex items-center justify-between">
-          <span className="font-semibold text-[16px] text-gray-900 truncate">{name}</span>
-          <span className="font-bold text-[16px] text-black shrink-0 ml-2">{price}</span>
-        </div>
-        <div className="flex gap-0.5 items-center">
-          {Array.from({ length: rating }).map((_, i) => (
-            <StarIcon key={i} />
-          ))}
-        </div>
-        <span className="text-gray-700 text-[12px] leading-none">{comment}</span>
-      </div>
-    </div>
-  );
-}
-
 const MOCK_ITEMS: ReviewItem[] = [
   { name: "커클랜드 물티슈", price: "12,900원", rating: 5, comment: "가성비 최고!" },
   { name: "커클랜드 물티슈", price: "12,900원", rating: 5, comment: "가성비 최고!" },
   { name: "커클랜드 물티슈", price: "12,900원", rating: 5, comment: "가성비 최고!" },
 ];
+
+const MOCK_TOTAL = "33,580원";
 
 type ReviewDetailPageProps = {
   reviewId: string;
@@ -101,12 +70,11 @@ export function ReviewDetailPage({ reviewId: _ }: ReviewDetailPageProps) {
           </div>
         </div>
 
-        {/* 콘텐츠 영역 */}
         <div className="flex flex-col gap-1">
           {/* 요약 바 */}
           <div className="bg-gray-50 flex items-center justify-between px-5 py-3">
             <span className="text-gray-600 text-[16px]">총 {MOCK_ITEMS.length}개 항목</span>
-            <span className="font-bold text-[16px] text-gray-900">33,580원</span>
+            <span className="font-bold text-[16px] text-gray-900">{MOCK_TOTAL}</span>
           </div>
 
           {/* 상품 목록 */}
