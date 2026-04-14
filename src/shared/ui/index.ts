@@ -5,3 +5,5 @@ export { Toast } from "./Toast";
 export { BottomSheet } from "./BottomSheet";
 export { RemoveButton } from "./RemoveButton";
 export { Textarea } from "./Textarea";
+export { PageHeader } from "./PageHeader";
+export { StepIndicator } from "./StepIndicator";

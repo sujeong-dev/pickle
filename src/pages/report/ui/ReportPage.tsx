@@ -1,19 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { cn } from "@/shared/lib/utils";
 import { ReportStep1, useReportStep1 } from "@/features/report-step1-photo";
 import { ReportStep2, useReportStep2 } from "@/features/report-step2-info";
-import { Button } from "@/shared/ui";
+import { Button, PageHeader, StepIndicator } from "@/shared/ui";
 import { ROUTES } from "@/shared/config/routes";
 import { useState } from "react";
 
 type Step = 1 | 2;
 
-const STEPS: { step: Step; label: string }[] = [
-  { step: 1, label: "할인표" },
-  { step: 2, label: "상품정보" },
-];
+const STEP_LABELS = ["할인표", "상품정보"];
 
 function CheckmarkIcon() {
   return (
@@ -30,46 +26,6 @@ function CheckmarkIcon() {
     >
       <path d='M20 6L9 17l-5-5' />
     </svg>
-  );
-}
-
-function ChevronLeftIcon() {
-  return (
-    <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M15 18l-6-6 6-6" />
-    </svg>
-  );
-}
-
-function StepIndicator({ currentStep }: { currentStep: Step }) {
-  return (
-    <div className="flex items-center justify-center gap-1 py-1">
-      {STEPS.map(({ step, label }, idx) => {
-        const active = step <= currentStep;
-        return (
-          <div key={step} className="flex items-center gap-1">
-            {idx > 0 && (
-              <div className="bg-gray-300 h-[2px] rounded-[1px] w-[14px]" />
-            )}
-            <div className="flex items-center gap-1">
-              <div
-                className={cn(
-                  "size-[20px] rounded-full flex items-center justify-center",
-                  active ? "bg-primary-500" : "bg-gray-300",
-                )}
-              >
-                <span className={cn("text-[10px] font-bold leading-none", active ? "text-white" : "text-gray-500")}>
-                  {step}
-                </span>
-              </div>
-              <span className={cn("text-[12px] font-medium", active ? "text-primary-500" : "text-gray-400")}>
-                {label}
-              </span>
-            </div>
-          </div>
-        );
-      })}
-    </div>
   );
 }
 
@@ -131,18 +87,9 @@ export function ReportPage() {
 
   return (
     <div className="bg-white flex flex-col h-dvh">
-      {/* Header */}
-      <header className="flex items-center justify-between h-[50px] px-5 shrink-0">
-        <button type="button" aria-label="뒤로가기" onClick={handleBack}>
-          <ChevronLeftIcon />
-        </button>
-        <span className="font-bold text-[20px] text-gray-900">제보하기</span>
-        <div className="w-[27px]" />
-      </header>
-
-      {/* Step indicator */}
+      <PageHeader title="제보하기" onBack={handleBack} />
       <div className="px-5">
-        <StepIndicator currentStep={step} />
+        <StepIndicator steps={STEP_LABELS} currentStep={step} />
       </div>
 
       {/* Content */}
