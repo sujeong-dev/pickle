@@ -2,15 +2,8 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import { Input } from "@/shared/ui";
+import { Input, StarIcon } from "@/shared/ui";
 
-function StarIcon({ filled }: { filled: boolean }) {
-  return (
-    <svg width="38" height="38" viewBox="0 0 24 24" fill={filled ? "#F59E0B" : "none"} stroke={filled ? "#F59E0B" : "#E0E0E0"} strokeWidth="1.5" aria-hidden="true">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
-  );
-}
 
 function CameraIcon() {
   return (
@@ -158,7 +151,7 @@ export function ReviewStep3({
             <div className="flex items-center justify-center gap-3">
               {Array.from({ length: 5 }).map((_, i) => (
                 <button key={i} type="button" onClick={() => onRatingChange(i + 1)}>
-                  <StarIcon filled={i < rating} />
+                  <StarIcon size={38} filled={i < rating} />
                 </button>
               ))}
             </div>

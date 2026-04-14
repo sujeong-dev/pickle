@@ -1,4 +1,5 @@
 import type { Review } from "../model/types";
+import { StarIcon } from "@/shared/ui";
 
 function UserAvatarIcon() {
   return (
@@ -18,13 +19,6 @@ function VerifiedBadgeIcon() {
   );
 }
 
-function StarIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="#FBBF24" stroke="#FBBF24" strokeWidth="1" aria-hidden="true">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
-  );
-}
 
 function LikeIcon() {
   return (
@@ -70,7 +64,7 @@ export function ReviewCard({ username, timeAgo, content, productName, rating, li
         <div className="flex flex-col gap-1 shrink-0 w-[100px]">
           <div className="bg-gray-200 relative rounded-[8px] size-[100px]">
             <div className="absolute bottom-1 flex gap-[2px] items-center justify-center left-1 bg-gray-600 px-1 py-0.5 rounded-[3px]">
-              <StarIcon />
+              <StarIcon size={12} />
               <span className="font-bold text-[12px] text-white leading-none">{rating.toFixed(1)}</span>
             </div>
           </div>

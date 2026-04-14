@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import { Input, Textarea } from "@/shared/ui";
+import { Input, Textarea, StarIcon } from "@/shared/ui";
 
 function CameraIcon() {
   return (
@@ -13,13 +13,6 @@ function CameraIcon() {
   );
 }
 
-function StarIcon() {
-  return (
-    <svg width="8" height="8" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="1" aria-hidden="true">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
-  );
-}
 
 function CloseIcon() {
   return (
@@ -107,7 +100,7 @@ export function ReportStep2({
               {/* Representative / set representative badge */}
               {idx === representativeIdx ? (
                 <div className='absolute top-1.5 left-1.5 bg-primary-500 rounded-[2px] flex gap-0.5 items-center px-1 py-0.5'>
-                  <StarIcon />
+                  <StarIcon size={8} color="white" />
                   <span className='text-[8px] font-bold text-white'>대표</span>
                 </div>
               ) : (

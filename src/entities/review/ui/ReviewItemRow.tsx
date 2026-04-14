@@ -1,12 +1,5 @@
 import type { ReviewItem } from "../model/types";
-
-function StarIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" strokeWidth="1" aria-hidden="true">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
-  );
-}
+import { StarIcon } from "@/shared/ui";
 
 export function ReviewItemRow({ name, price, rating, comment }: ReviewItem) {
   return (
@@ -19,7 +12,7 @@ export function ReviewItemRow({ name, price, rating, comment }: ReviewItem) {
         </div>
         <div className="flex gap-0.5 items-center">
           {Array.from({ length: rating }).map((_, i) => (
-            <StarIcon key={i} />
+            <StarIcon key={i} size={12} />
           ))}
         </div>
         <span className="text-gray-700 text-[12px] leading-none">{comment}</span>

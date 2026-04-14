@@ -9,7 +9,7 @@ type StepIndicatorProps = {
 
 export function StepIndicator({ steps, currentStep }: StepIndicatorProps) {
   return (
-    <div className="flex items-center justify-center gap-1 py-1">
+    <div className="flex items-center justify-center gap-1 py-2">
       {steps.map((label, idx) => {
         const step = idx + 1;
         const active = step <= currentStep;

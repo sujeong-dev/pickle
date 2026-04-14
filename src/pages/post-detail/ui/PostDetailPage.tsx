@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BackHeader } from "@/shared/ui";
+import { BackHeader, StarIcon } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
 import type { Post } from "@/entities/post";
 import { WishlistButton } from "@/features/wishlist";
@@ -22,13 +22,6 @@ function VerifiedBadge() {
   );
 }
 
-function StarIcon({ filled = true }: { filled?: boolean }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 14 14" fill={filled ? "#F59E0B" : "#E0E0E0"} aria-hidden="true">
-      <path d="M7 1L8.854 5.146L13.5 5.854L10.25 9.02L11.09 13.646L7 11.5L2.91 13.646L3.75 9.02L0.5 5.854L5.146 5.146L7 1Z" />
-    </svg>
-  );
-}
 
 function ThumbsUpIcon() {
   return (
@@ -178,7 +171,7 @@ export function PostDetailPage({ post }: PostDetailPageProps) {
           <div className="flex gap-1.5 items-center">
             <div className="flex items-center gap-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
-                <StarIcon key={i} filled={i < filledStars} />
+                <StarIcon key={i} size={16} filled={i < filledStars} />
               ))}
             </div>
             <span className="font-bold text-subtitle text-[#F59E0B]">{rating}</span>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Post } from "../model/types";
 import { cn } from "@/shared/lib/utils";
 import { ROUTES } from "@/shared/config/routes";
+import { StarIcon } from "@/shared/ui";
 
 type DealCardProps = {
   post: Post;
@@ -57,13 +58,6 @@ function VerifiedBadge() {
   );
 }
 
-function StarIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 14 14" fill="#F59E0B" aria-hidden="true">
-      <path d="M7 1L8.854 5.146L13.5 5.854L10.25 9.02L11.09 13.646L7 11.5L2.91 13.646L3.75 9.02L0.5 5.854L5.146 5.146L7 1Z" />
-    </svg>
-  );
-}
 
 function ThumbsUpIcon() {
   return (
@@ -165,7 +159,7 @@ export function DealCard({ post, href, wishlistButton, className }: DealCardProp
         <span className="font-medium text-body2 text-[#92400E]">영수증 인증 후기 {reviewCount}건</span>
         <div className="flex-1" />
         <div className="flex items-center gap-[2px]">
-          <StarIcon />
+          <StarIcon size={13} />
           <span className="font-bold text-body2 text-[#F59E0B]">{rating}</span>
         </div>
         <ChevronRightIcon size={16} />
