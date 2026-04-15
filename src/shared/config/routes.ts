@@ -8,4 +8,5 @@ export const ROUTES = {
   reviewWrite: "/review/write",
   postDetail: (postId: string) => `/home/${postId}`,
   relatedReports: (postId: string) => `/related-reports/${postId}`,
+  mypage: "/mypage",
 } as const;
