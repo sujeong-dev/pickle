@@ -2,33 +2,13 @@
 
 import { useRef } from "react";
 import { RemoveButton } from "@/shared/ui";
+import { ScanIcon } from '@/shared/ui/icons';
 
 function TagIcon() {
   return (
     <svg width="31" height="31" viewBox="0 0 24 24" fill="none" stroke="#2D8A5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
       <line x1="7" y1="7" x2="7.01" y2="7" />
-    </svg>
-  );
-}
-
-function RefreshIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#616161" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <polyline points="1 4 1 10 7 10" />
-      <polyline points="23 20 23 14 17 14" />
-      <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" />
-    </svg>
-  );
-}
-
-function ScanIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <polyline points="4 7 4 4 7 4" />
-      <polyline points="17 4 20 4 20 7" />
-      <polyline points="20 17 20 20 17 20" />
-      <polyline points="7 20 4 20 4 17" />
     </svg>
   );
 }
@@ -88,7 +68,7 @@ export function ReportStep1({ photo, onPhotoChange, onPhotoRemove }: ReportStep1
           </button>
 
           <div className="bg-gray-100 rounded-[6px] flex gap-2 items-center px-3 py-2">
-            <RefreshIcon />
+            <ScanIcon size={16} />
             <p className="text-[12px] text-gray-700 leading-normal">
               이 사진에서 AI가 상품명, 가격을 자동 인식합니다.
             </p>

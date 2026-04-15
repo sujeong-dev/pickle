@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, PageHeader, StepIndicator } from "@/shared/ui";
+import { ROUTES } from "@/shared/config/routes";
+import { Button, PageHeader, StepIndicator, SuccessScreen } from "@/shared/ui";
 import { ReviewStep1, useReviewStep1 } from "@/features/review-step1-receipt";
 import { ReviewStep2, useReviewStep2 } from "@/features/review-step2-items";
 import { ReviewStep3, useReviewStep3 } from "@/features/review-step3-write";
@@ -15,6 +16,7 @@ export function ReviewWritePage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
   const [itemIdx, setItemIdx] = useState(0);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const { receipt, setReceipt } = useReviewStep1();
   const { items } = useReviewStep2();
@@ -34,9 +36,20 @@ export function ReviewWritePage() {
     else if (step === 2) setStep(3);
     else if (step === 3) {
       if (!isLastItem) setItemIdx((i) => i + 1);
-      else console.log("후기 등록 완료");
+      else setShowSuccess(true);
     }
   };
+
+  if (showSuccess) {
+    return (
+      <SuccessScreen
+        title="후기 등록이 완료되었습니다"
+        description={<>영수증 후기가 등록되었어요.<br />이웃들에게 도움이 될 거예요!</>}
+        buttonLabel="다른 후기들 보러가기"
+        onButtonClick={() => router.push(ROUTES.review)}
+      />
+    );
+  }
 
   const canNext = step === 1 ? receipt !== null : true;
 

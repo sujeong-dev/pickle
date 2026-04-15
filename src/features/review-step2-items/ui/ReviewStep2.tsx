@@ -1,14 +1,7 @@
 "use client";
 
+import { ScanIcon } from '@/shared/ui/icons';
 import type { ReviewItem } from "../model/useReviewStep2";
-
-function SparkleIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D8A5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
-  );
-}
 
 function CheckIcon() {
   return (
@@ -32,7 +25,7 @@ export function ReviewStep2({ items }: ReviewStep2Props) {
     <div className="flex flex-col flex-1 min-h-0">
       {/* OCR notice */}
       <div className="bg-primary-50 flex items-center gap-2 px-5 py-2 shrink-0">
-        <SparkleIcon />
+        <ScanIcon size={16} />
         <span className="text-[12px] font-medium text-primary-500">{items.length}개 항목을 인식했어요!</span>
       </div>
 

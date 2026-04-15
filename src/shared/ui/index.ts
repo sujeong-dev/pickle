@@ -8,3 +8,4 @@ export { Textarea } from "./Textarea";
 export { PageHeader } from "./PageHeader";
 export { StepIndicator } from "./StepIndicator";
 export { StarIcon } from "./icons/StarIcon";
+export { SuccessScreen } from "./SuccessScreen";

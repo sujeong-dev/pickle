@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { RemoveButton } from "@/shared/ui";
+import { ScanIcon } from '@/shared/ui/icons';
 
 function DocumentIcon() {
   return (
@@ -11,17 +12,6 @@ function DocumentIcon() {
       <polyline points="14 2 14 8 20 8" />
       <line x1="16" y1="13" x2="8" y2="13" />
       <line x1="16" y1="17" x2="8" y2="17" />
-    </svg>
-  );
-}
-
-function SyncIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#616161" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <polyline points="17 1 21 5 17 9" />
-      <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-      <polyline points="7 23 3 19 7 15" />
-      <path d="M21 13v2a4 4 0 0 1-4 4H3" />
     </svg>
   );
 }
@@ -75,7 +65,7 @@ export function ReviewStep1({ receipt, onReceiptChange, onReceiptRemove }: Revie
       )}
 
       <div className="bg-gray-100 rounded-[6px] flex gap-2 items-center px-3 py-2">
-        <SyncIcon />
+        <ScanIcon size={16} />
         <p className="text-[12px] text-gray-700 leading-normal">
           이 사진에서 AI가 상품명, 가격을 자동 인식합니다.
         </p>
