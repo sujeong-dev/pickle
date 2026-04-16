@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Input, Toast } from "@/shared/ui";
+import { Input, Toast, Button } from "@/shared/ui";
+import { ROUTES } from "@/shared/config/routes";
 
 function ChevronLeftIcon() {
   return (
@@ -47,6 +48,7 @@ export function ProfileEditPage() {
   const [savedNickname, setSavedNickname] = useState(INITIAL_NICKNAME);
   const [avatarChanged, setAvatarChanged] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
   const isDirty = nickname !== savedNickname || avatarChanged;
 
@@ -114,9 +116,50 @@ export function ProfileEditPage() {
 
         {/* 하단 푸터 */}
         <div className="flex items-center justify-center flex-1 min-h-[128px]">
-          <span className="text-caption text-gray-500">로그아웃 | 탈퇴하기</span>
+          <div className="flex items-center gap-2 text-caption text-gray-500">
+            <button type="button" onClick={() => setLogoutModalOpen(true)}>
+              로그아웃
+            </button>
+            <span>|</span>
+            <button type="button">탈퇴하기</button>
+          </div>
         </div>
       </div>
+
+      {/* 로그아웃 확인 모달 */}
+      {logoutModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-5"
+          onClick={() => setLogoutModalOpen(false)}
+        >
+          <div
+            className="w-full bg-white rounded-[10px] shadow-md flex flex-col gap-3 px-5 py-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-body1 font-bold text-gray-900">로그아웃</p>
+            <p className="text-body2 text-gray-600">정말 로그아웃 하시겠어요?</p>
+            <div className="flex gap-3 pt-1">
+              <Button
+                size="md"
+                variant="outline"
+                onClick={() => setLogoutModalOpen(false)}
+              >
+                취소
+              </Button>
+              <Button
+                size="md"
+                variant="danger"
+                onClick={() => {
+                  setLogoutModalOpen(false);
+                  router.push(ROUTES.login);
+                }}
+              >
+                로그아웃
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Toast
         message="프로필이 저장되었어요"
