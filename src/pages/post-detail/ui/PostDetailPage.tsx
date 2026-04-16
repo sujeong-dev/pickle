@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BackHeader, StarIcon, RemoveButton } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
@@ -104,7 +104,7 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
   const { data: commentsData } = usePostComments(postId);
   const [comment, setComment] = useState("");
   const [liked, setLiked] = useState(false);
-  const [localLikeCount, setLocalLikeCount] = useState(0);
+  const [localLikeCount, setLocalLikeCount] = useState<number | null>(null);
   const { isOpen: isSoldoutOpen, isReported, open: openSoldout, close: closeSoldout, report: localReport } = useReportSoldout();
   const { mutate: reportSoldout, isPending: isReportingPending } = useReportSoldoutMutation(postId);
   const queryClient = useQueryClient();
@@ -160,10 +160,8 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
     );
   }
 
-  const { author, createdAt, product, reviewCount, rating, likeCount } = post;
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { setLocalLikeCount(likeCount); }, [post.id]);
+  const { author, createdAt, product, reviewCount, rating, likeCount: serverLikeCount } = post;
+  const displayLikeCount = localLikeCount ?? serverLikeCount;
   const comments = commentsData?.data ?? [];
   const filledStars = Math.round(rating);
 
@@ -209,13 +207,13 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
               type="button"
               onClick={() => {
                 setLiked((prev) => !prev);
-                setLocalLikeCount((prev) => liked ? prev - 1 : prev + 1);
+                setLocalLikeCount(liked ? displayLikeCount - 1 : displayLikeCount + 1);
                 toggleLike();
               }}
               className="flex gap-2 items-center p-2 rounded"
             >
               <ThumbsUpIcon />
-              <span className={cn("text-subtitle", liked ? "text-primary-500 font-semibold" : "text-gray-500")}>{localLikeCount}</span>
+              <span className={cn("text-subtitle", liked ? "text-primary-500 font-semibold" : "text-gray-500")}>{displayLikeCount}</span>
             </button>
             <button
               type="button"

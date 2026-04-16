@@ -79,13 +79,13 @@ export function ProfileEditPage() {
   const { mutate: updateNickname } = useUpdateNickname();
   const { mutate: withdraw } = useWithdraw();
 
+  const [nickname, setNickname] = useState('');
+  const [savedNickname, setSavedNickname] = useState('');
+
   const savedNicknameFromServer = profile?.nickname ?? '';
   const isNicknameChanged = nickname.length > 0 && nickname !== savedNicknameFromServer;
   const { data: nicknameCheckData } = useNicknameCheck(isNicknameChanged ? nickname : '');
   const nicknameAvailable = isNicknameChanged ? (nicknameCheckData?.isAvailable ?? null) : null;
-
-  const [nickname, setNickname] = useState('');
-  const [savedNickname, setSavedNickname] = useState('');
   const [avatarChanged, setAvatarChanged] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
