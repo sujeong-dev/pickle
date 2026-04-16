@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ReportStep1, useReportStep1 } from "@/features/report-step1-photo";
-import { ReportStep2, useReportStep2 } from "@/features/report-step2-info";
+import { ReportStep2, useReportStep2, useCreateReport } from "@/features/report-step2-info";
 import { Button, PageHeader, StepIndicator, SuccessScreen } from "@/shared/ui";
 import { ROUTES } from "@/shared/config/routes";
 import { useState } from "react";
@@ -16,7 +16,19 @@ export function ReportPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
   const [showSuccess, setShowSuccess] = useState(false);
-  const { photo, setPhoto } = useReportStep1();
+
+  const {
+    photo,
+    setPhoto,
+    fileUrl,
+    setFileUrl,
+    jobId,
+    setJobId,
+    ocrResult,
+    setOcrResult,
+    removePhoto,
+  } = useReportStep1();
+
   const {
     photos,
     representativeIdx,
@@ -26,7 +38,7 @@ export function ReportPage() {
     originalPrice,
     review,
     addPhoto,
-    removePhoto,
+    removePhoto: removeProductPhoto,
     setRepresentativeIdx,
     setProductCode,
     setProductName,
@@ -35,17 +47,44 @@ export function ReportPage() {
     setReview,
   } = useReportStep2();
 
+  const { mutateAsync: createReport, isPending: isSubmitting } = useCreateReport();
+
   const handleBack = () => {
     if (step === 1) router.back();
     else setStep(1);
   };
 
-  const handleNext = () => {
-    if (step === 1) setStep(2);
-    else setShowSuccess(true);
+  const handleNext = async () => {
+    if (step === 1) {
+      setStep(2);
+      return;
+    }
+
+    // Step 2: submit
+    const discountedPriceNum = Number(discountPrice);
+    const originalPriceNum = Number(originalPrice);
+    const discountRateNum =
+      originalPriceNum > 0
+        ? Math.round(((originalPriceNum - discountedPriceNum) / originalPriceNum) * 100)
+        : (ocrResult?.discountRate ?? 0);
+
+    await createReport({
+      productName,
+      originalPrice: originalPriceNum,
+      discountedPrice: discountedPriceNum,
+      discountRate: discountRateNum,
+      storeLocation: productCode,
+      imageUrl: fileUrl ?? undefined,
+      content: review || undefined,
+    });
+
+    setShowSuccess(true);
   };
 
-  const canNext = step === 1 ? photo !== null : photos.length > 0;
+  const canNext =
+    step === 1
+      ? photo !== null
+      : photos.length > 0 && !!productName && !!discountPrice && !!originalPrice;
 
   if (showSuccess) {
     return (
@@ -68,7 +107,17 @@ export function ReportPage() {
       {/* Content */}
       <main className="flex-1 overflow-y-auto min-h-0 px-5 py-6">
         {step === 1 && (
-          <ReportStep1 photo={photo} onPhotoChange={setPhoto} onPhotoRemove={() => setPhoto(null)} />
+          <ReportStep1
+            photo={photo}
+            fileUrl={fileUrl}
+            jobId={jobId}
+            ocrResult={ocrResult}
+            onPhotoChange={setPhoto}
+            onPhotoRemove={removePhoto}
+            onFileUrlChange={setFileUrl}
+            onJobIdChange={setJobId}
+            onOcrResultChange={setOcrResult}
+          />
         )}
         {step === 2 && (
           <ReportStep2
@@ -79,8 +128,9 @@ export function ReportPage() {
             discountPrice={discountPrice}
             originalPrice={originalPrice}
             review={review}
+            ocrResult={ocrResult}
             onAddPhoto={addPhoto}
-            onRemovePhoto={removePhoto}
+            onRemovePhoto={removeProductPhoto}
             onSetRepresentative={setRepresentativeIdx}
             onProductCodeChange={setProductCode}
             onProductNameChange={setProductName}
@@ -93,8 +143,8 @@ export function ReportPage() {
 
       {/* Bottom button */}
       <div className="shrink-0 px-6 pb-8 pt-3">
-        <Button onClick={handleNext} disabled={!canNext}>
-          {step === 1 ? "다음" : "제보하기"}
+        <Button onClick={handleNext} disabled={!canNext || isSubmitting}>
+          {step === 1 ? "다음" : isSubmitting ? "제보 중..." : "제보하기"}
         </Button>
       </div>
     </div>

@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import Image from "next/image";
 import { Input, Textarea, StarIcon } from "@/shared/ui";
+import type { OcrResult } from "@/shared/api/report";
 
 function CameraIcon() {
   return (
@@ -12,7 +13,6 @@ function CameraIcon() {
     </svg>
   );
 }
-
 
 function CloseIcon() {
   return (
@@ -30,6 +30,7 @@ type ReportStep2Props = {
   discountPrice: string;
   originalPrice: string;
   review: string;
+  ocrResult?: OcrResult | null;
   onAddPhoto: (file: File) => void;
   onRemovePhoto: (idx: number) => void;
   onSetRepresentative: (idx: number) => void;
@@ -48,6 +49,7 @@ export function ReportStep2({
   discountPrice,
   originalPrice,
   review,
+  ocrResult,
   onAddPhoto,
   onRemovePhoto,
   onSetRepresentative,
@@ -58,6 +60,19 @@ export function ReportStep2({
   onReviewChange,
 }: ReportStep2Props) {
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-fill form fields from OCR result when it becomes available
+  useEffect(() => {
+    if (!ocrResult || ocrResult.status !== "done") return;
+    if (ocrResult.productName && !productName) {
+      onProductNameChange(ocrResult.productName);
+    }
+    if (ocrResult.price !== undefined && !discountPrice) {
+      onDiscountPriceChange(String(ocrResult.price));
+    }
+  // Only run when ocrResult changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ocrResult]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

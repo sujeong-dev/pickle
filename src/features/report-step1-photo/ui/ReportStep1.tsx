@@ -1,8 +1,10 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { RemoveButton } from "@/shared/ui";
-import { ScanIcon } from '@/shared/ui/icons';
+import { ScanIcon } from "@/shared/ui/icons";
+import { useUploadPresigned, useOcrProduct, useOcrStatus } from "../api/useOcr";
+import type { OcrResult } from "@/shared/api/report";
 
 function TagIcon() {
   return (
@@ -15,16 +17,71 @@ function TagIcon() {
 
 type ReportStep1Props = {
   photo: File | null;
+  fileUrl: string | null;
+  jobId: string | null;
+  ocrResult: OcrResult | null;
   onPhotoChange: (file: File) => void;
   onPhotoRemove: () => void;
+  onFileUrlChange: (url: string) => void;
+  onJobIdChange: (jobId: string) => void;
+  onOcrResultChange: (result: OcrResult) => void;
 };
 
-export function ReportStep1({ photo, onPhotoChange, onPhotoRemove }: ReportStep1Props) {
+export function ReportStep1({
+  photo,
+  fileUrl,
+  jobId,
+  ocrResult,
+  onPhotoChange,
+  onPhotoRemove,
+  onFileUrlChange,
+  onJobIdChange,
+  onOcrResultChange,
+}: ReportStep1Props) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const { mutateAsync: getPresigned, isPending: isPresignedPending } = useUploadPresigned();
+  const { mutateAsync: requestOcr, isPending: isOcrPending } = useOcrProduct();
+  const { data: ocrStatus } = useOcrStatus(jobId);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const isOcrLoading =
+    isPresignedPending ||
+    isOcrPending ||
+    (!!jobId && ocrStatus?.status === "pending");
+
+  // When OCR status becomes done or failed, propagate result
+  useEffect(() => {
+    if (ocrStatus && (ocrStatus.status === "done" || ocrStatus.status === "failed")) {
+      onOcrResultChange(ocrStatus);
+    }
+  }, [ocrStatus, onOcrResultChange]);
+
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) onPhotoChange(file);
+    if (!file) return;
+    onPhotoChange(file);
+
+    try {
+      // 1. Get presigned URL
+      const { presignedUrl, fileUrl: uploadedFileUrl } = await getPresigned({
+        filename: file.name,
+        contentType: file.type,
+      });
+
+      // 2. Upload to R2
+      await fetch(presignedUrl, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type },
+      });
+
+      onFileUrlChange(uploadedFileUrl);
+
+      // 3. Request OCR
+      const { jobId: newJobId } = await requestOcr(file);
+      onJobIdChange(newJobId);
+    } catch {
+      // Error is handled centrally by kyInstance (toast shown)
+    }
   };
 
   return (
@@ -46,11 +103,25 @@ export function ReportStep1({ photo, onPhotoChange, onPhotoRemove }: ReportStep1
           <div className="absolute top-3 right-3">
             <RemoveButton onClick={onPhotoRemove} aria-label="사진 삭제" />
           </div>
-          {/* OCR badge */}
+          {/* OCR badge / loading state */}
           <div className="absolute bottom-3 left-3 bg-primary-500 rounded-[4px] flex gap-1 items-center px-2 py-1">
             <ScanIcon />
-            <span className="font-bold text-[12px] text-white">OCR 인식 대상</span>
+            {isOcrLoading ? (
+              <span className="font-bold text-[12px] text-white">OCR 인식 중...</span>
+            ) : ocrResult?.status === "done" ? (
+              <span className="font-bold text-[12px] text-white">OCR 인식 완료</span>
+            ) : ocrResult?.status === "failed" ? (
+              <span className="font-bold text-[12px] text-white">OCR 인식 실패</span>
+            ) : (
+              <span className="font-bold text-[12px] text-white">OCR 인식 대상</span>
+            )}
           </div>
+          {/* Loading overlay */}
+          {isOcrLoading && (
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+              <span className="text-white text-[14px] font-semibold">AI가 이미지를 분석 중이에요...</span>
+            </div>
+          )}
         </div>
       ) : (
         /* ── Empty state ── */
@@ -84,6 +155,9 @@ export function ReportStep1({ photo, onPhotoChange, onPhotoRemove }: ReportStep1
         className="hidden"
         onChange={handleChange}
       />
+
+      {/* Hidden field to track fileUrl for parent usage */}
+      {fileUrl && <input type="hidden" value={fileUrl} readOnly />}
     </div>
   );
 }
