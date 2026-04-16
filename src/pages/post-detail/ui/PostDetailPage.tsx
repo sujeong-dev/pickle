@@ -24,9 +24,15 @@ function VerifiedBadge() {
   );
 }
 
-function ThumbsUpIcon() {
+function ThumbsUpIcon({ filled }: { filled: boolean }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9E9E9E" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      width="20" height="20" viewBox="0 0 24 24"
+      fill={filled ? "#2D8A5A" : "none"}
+      stroke={filled ? "#2D8A5A" : "#9E9E9E"}
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+      aria-hidden="true"
+    >
       <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
     </svg>
   );
@@ -103,7 +109,7 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
   const { data: post, isLoading, isError } = usePostDetail(postId);
   const { data: commentsData } = usePostComments(postId);
   const [comment, setComment] = useState("");
-  const [liked, setLiked] = useState(false);
+  const [likedOverride, setLikedOverride] = useState<boolean | null>(null);
   const [localLikeCount, setLocalLikeCount] = useState<number | null>(null);
   const { isOpen: isSoldoutOpen, isReported, open: openSoldout, close: closeSoldout, report: localReport } = useReportSoldout();
   const { mutate: reportSoldout, isPending: isReportingPending } = useReportSoldoutMutation(postId);
@@ -112,7 +118,7 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
   const { mutate: toggleLike } = useMutation({
     mutationFn: () => togglePostLike(postId),
     onSuccess: (data) => {
-      setLiked(data.liked);
+      setLikedOverride(data.liked);
       setLocalLikeCount(data.likeCount);
     },
   });
@@ -161,6 +167,7 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
   }
 
   const { author, createdAt, product, reviewCount, rating, likeCount: serverLikeCount } = post;
+  const liked = likedOverride ?? (post.liked ?? false);
   const displayLikeCount = localLikeCount ?? serverLikeCount;
   const comments = commentsData?.data ?? [];
   const filledStars = Math.round(rating);
@@ -206,13 +213,14 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
             <button
               type="button"
               onClick={() => {
-                setLiked((prev) => !prev);
-                setLocalLikeCount(liked ? displayLikeCount - 1 : displayLikeCount + 1);
+                const nowLiked = !liked;
+                setLikedOverride(nowLiked);
+                setLocalLikeCount(nowLiked ? displayLikeCount + 1 : displayLikeCount - 1);
                 toggleLike();
               }}
               className="flex gap-2 items-center p-2 rounded"
             >
-              <ThumbsUpIcon />
+              <ThumbsUpIcon filled={liked} />
               <span className={cn("text-subtitle", liked ? "text-primary-500 font-semibold" : "text-gray-500")}>{displayLikeCount}</span>
             </button>
             <button
@@ -235,7 +243,7 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
             </button>
           </div>
           <div className="flex gap-3 items-center">
-            <WishlistButton postId={post.id} />
+            <WishlistButton postId={post.id} initialBookmarked={post.bookmarked ?? false} />
             <button type="button" aria-label="공유하기"><ShareIcon /></button>
           </div>
         </div>

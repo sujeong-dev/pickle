@@ -98,6 +98,10 @@ const mockComments: Comment[] = [
   },
 ];
 
+// 토글 상태 추적
+const likedState = new Map<string, boolean>();
+const bookmarkedState = new Map<string, boolean>();
+
 export const productHandlers = [
   http.get('*/posts', ({ request }) => {
     const url = new URL(request.url);
@@ -119,7 +123,11 @@ export const productHandlers = [
     if (!post) {
       return HttpResponse.json({ message: '제보를 찾을 수 없어요.' }, { status: 404 });
     }
-    return HttpResponse.json(post);
+    return HttpResponse.json({
+      ...post,
+      liked: likedState.get(id) ?? false,
+      bookmarked: bookmarkedState.get(id) ?? false,
+    });
   }),
 
   http.post('*/posts/:postId/like', ({ params }) => {
@@ -128,7 +136,12 @@ export const productHandlers = [
     if (!post) {
       return HttpResponse.json({ message: '제보를 찾을 수 없어요.' }, { status: 404 });
     }
-    const response: LikeResponse = { liked: true, likeCount: post.likeCount + 1 };
+    const nowLiked = !(likedState.get(postId) ?? false);
+    likedState.set(postId, nowLiked);
+    const response: LikeResponse = {
+      liked: nowLiked,
+      likeCount: nowLiked ? post.likeCount + 1 : post.likeCount,
+    };
     return HttpResponse.json(response);
   }),
 
@@ -138,7 +151,9 @@ export const productHandlers = [
     if (!post) {
       return HttpResponse.json({ message: '제보를 찾을 수 없어요.' }, { status: 404 });
     }
-    const response: BookmarkResponse = { bookmarked: true };
+    const nowBookmarked = !(bookmarkedState.get(postId) ?? false);
+    bookmarkedState.set(postId, nowBookmarked);
+    const response: BookmarkResponse = { bookmarked: nowBookmarked };
     return HttpResponse.json(response);
   }),
 

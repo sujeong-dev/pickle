@@ -23,6 +23,8 @@ export type Post = {
   likeCount: number;
   commentCount: number;
   relatedPostCount: number;
+  liked?: boolean;
+  bookmarked?: boolean;
 };
 
 export type ReceiptReviewItem = {
