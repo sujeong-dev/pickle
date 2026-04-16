@@ -81,6 +81,14 @@ export function ProfileEditPage() {
 
   const [nickname, setNickname] = useState('');
   const [savedNickname, setSavedNickname] = useState('');
+  const [profileSynced, setProfileSynced] = useState(false);
+
+  // profile이 처음 도착할 때 render 중에 바로 초기화 (useEffect 없이)
+  if (!profileSynced && profile?.nickname) {
+    setProfileSynced(true);
+    setNickname(profile.nickname);
+    setSavedNickname(profile.nickname);
+  }
 
   const savedNicknameFromServer = profile?.nickname ?? '';
   const isNicknameChanged = nickname.length > 0 && nickname !== savedNicknameFromServer;
@@ -92,14 +100,6 @@ export function ProfileEditPage() {
   const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const [withdrawReason, setWithdrawReason] = useState(WITHDRAW_REASONS[0]);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
-
-  // Sync nickname from server when profile is loaded
-  useEffect(() => {
-    if (savedNicknameFromServer) {
-      setNickname(savedNicknameFromServer);
-      setSavedNickname(savedNicknameFromServer);
-    }
-  }, [savedNicknameFromServer]);
 
   useEffect(() => {
     if (!toastVisible) return;

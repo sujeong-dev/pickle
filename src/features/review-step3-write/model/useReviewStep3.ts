@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 type ItemReview = {
   photos: File[];
@@ -12,14 +12,16 @@ function makeDefault(): ItemReview {
 }
 
 export function useReviewStep3(itemCount: number) {
+  const [lastItemCount, setLastItemCount] = useState(itemCount);
   const [reviews, setReviews] = useState<ItemReview[]>(() =>
     Array.from({ length: itemCount }, makeDefault),
   );
 
-  // Reinitialize when item count changes (e.g. after receipt API returns)
-  useEffect(() => {
+  // itemCount가 바뀌면 render 중에 바로 재초기화 (useEffect 없이)
+  if (lastItemCount !== itemCount) {
+    setLastItemCount(itemCount);
     setReviews(Array.from({ length: itemCount }, makeDefault));
-  }, [itemCount]);
+  }
 
   const setRating = (itemIdx: number, rating: number) => {
     setReviews((prev) =>
