@@ -4,6 +4,10 @@ import { useRef } from "react";
 import Image from "next/image";
 import { RemoveButton } from "@/shared/ui";
 import { ScanIcon } from '@/shared/ui/icons';
+import { useMutation } from "@tanstack/react-query";
+import { getPresignedUrl } from "@/shared/api/report";
+import { useRegisterReceipt } from "../api/useReceipt";
+import type { ReceiptData } from "../model/useReviewStep1";
 
 function DocumentIcon() {
   return (
@@ -18,16 +22,56 @@ function DocumentIcon() {
 
 type ReviewStep1Props = {
   receipt: File | null;
+  receiptData: ReceiptData | null;
   onReceiptChange: (file: File) => void;
   onReceiptRemove: () => void;
+  onReceiptDataChange: (data: ReceiptData) => void;
 };
 
-export function ReviewStep1({ receipt, onReceiptChange, onReceiptRemove }: ReviewStep1Props) {
+export function ReviewStep1({
+  receipt,
+  receiptData,
+  onReceiptChange,
+  onReceiptRemove,
+  onReceiptDataChange,
+}: ReviewStep1Props) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const { mutateAsync: getPresigned, isPending: isPresignedPending } = useMutation({
+    mutationFn: (body: { filename: string; contentType: string }) => getPresignedUrl(body),
+  });
+  const { mutateAsync: registerReceiptMutation, isPending: isReceiptPending } = useRegisterReceipt();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const isLoading = isPresignedPending || isReceiptPending;
+
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) onReceiptChange(file);
+    if (!file) return;
+    onReceiptChange(file);
+
+    try {
+      // 1. Get presigned URL and upload image
+      const { presignedUrl, fileUrl } = await getPresigned({
+        filename: file.name,
+        contentType: file.type,
+      });
+
+      await fetch(presignedUrl, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type },
+      });
+
+      // 2. Register receipt with uploaded image URL
+      const result = await registerReceiptMutation({ imageUrl: fileUrl });
+      onReceiptDataChange({
+        receiptId: result.id,
+        imageUrl: fileUrl,
+        items: result.items,
+        totalAmount: result.totalAmount,
+      });
+    } catch {
+      // Error is handled centrally by kyInstance (toast shown)
+    }
   };
 
   return (
@@ -49,6 +93,17 @@ export function ReviewStep1({ receipt, onReceiptChange, onReceiptRemove }: Revie
           <div className="absolute top-3 right-3">
             <RemoveButton onClick={onReceiptRemove} aria-label="사진 삭제" />
           </div>
+          {isLoading && (
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+              <span className="text-white text-[14px] font-semibold">AI가 영수증을 분석 중이에요...</span>
+            </div>
+          )}
+          {receiptData && !isLoading && (
+            <div className="absolute bottom-3 left-3 bg-primary-500 rounded-[4px] flex gap-1 items-center px-2 py-1">
+              <ScanIcon />
+              <span className="font-bold text-[12px] text-white">분석 완료</span>
+            </div>
+          )}
         </div>
       ) : (
         <button

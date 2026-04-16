@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type ItemReview = {
   photos: File[];
@@ -15,6 +15,11 @@ export function useReviewStep3(itemCount: number) {
   const [reviews, setReviews] = useState<ItemReview[]>(() =>
     Array.from({ length: itemCount }, makeDefault),
   );
+
+  // Reinitialize when item count changes (e.g. after receipt API returns)
+  useEffect(() => {
+    setReviews(Array.from({ length: itemCount }, makeDefault));
+  }, [itemCount]);
 
   const setRating = (itemIdx: number, rating: number) => {
     setReviews((prev) =>
