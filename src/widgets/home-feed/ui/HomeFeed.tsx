@@ -1,45 +1,11 @@
+"use client";
+
 import { DealCard } from "@/entities/post";
 import type { Post } from "@/entities/post";
 import { FeedEmpty } from "./FeedEmpty";
 import { ROUTES } from "@/shared/config/routes";
 import { WishlistButton } from "@/features/wishlist";
-
-const mockPosts: Post[] = [
-  {
-    id: "1",
-    author: { name: "할인사냥꾼", isVerified: true },
-    createdAt: "2시간 전",
-    content: "양재점 물티슈 세일 중이에요! 재고 많으니 서두르세요 🔥",
-    product: {
-      name: "커클랜드 시그니처 물티슈",
-      discountRate: 24,
-      originalPrice: 16900,
-      currentPrice: 12900,
-    },
-    reviewCount: 3,
-    rating: 4.7,
-    likeCount: 47,
-    commentCount: 24,
-    relatedPostCount: 3,
-  },
-  {
-    id: "2",
-    author: { name: "알뜰주부", isVerified: true },
-    createdAt: "4시간 전",
-    content: "오늘 코스트코 잠실점 갔다가 발견했어요. 1+1 행사 중이라 진짜 이득이에요!",
-    product: {
-      name: "코코넛오일 1.6L",
-      discountRate: 15,
-      originalPrice: 22900,
-      currentPrice: 19500,
-    },
-    reviewCount: 5,
-    rating: 4.5,
-    likeCount: 32,
-    commentCount: 11,
-    relatedPostCount: 2,
-  },
-];
+import { usePosts } from "../api/usePosts";
 
 function FireIcon() {
   return (
@@ -83,12 +49,28 @@ function SectionHeader({
   );
 }
 
-type HomeFeedProps = {
-  isEmpty?: boolean;
-};
+function FeedSkeleton() {
+  return (
+    <div className="flex flex-col gap-3 px-5 py-3 animate-pulse">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div key={i} className="h-28 rounded-xl bg-gray-100" />
+      ))}
+    </div>
+  );
+}
 
-export function HomeFeed({ isEmpty = false }: HomeFeedProps) {
-  if (isEmpty) {
+export function HomeFeed() {
+  const { data, isLoading, isError } = usePosts();
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col flex-1 min-h-0">
+        <FeedSkeleton />
+      </div>
+    );
+  }
+
+  if (isError || !data || data.data.length === 0) {
     return (
       <div className="flex flex-col flex-1 min-h-0">
         <FeedEmpty />
@@ -96,15 +78,30 @@ export function HomeFeed({ isEmpty = false }: HomeFeedProps) {
     );
   }
 
+  const posts: Post[] = data.data;
+  const hotPost = posts[0];
+  const recentPosts = posts.slice(1);
+
   return (
     <div className="flex flex-col">
       <section>
         <SectionHeader icon={<FireIcon />} title="지금 핫한" showMore />
-        <DealCard post={mockPosts[0]} href={ROUTES.postDetail(mockPosts[0].id)} wishlistButton={<WishlistButton postId={mockPosts[0].id} />} />
+        <DealCard
+          post={hotPost}
+          href={ROUTES.postDetail(hotPost.id)}
+          wishlistButton={<WishlistButton postId={hotPost.id} />}
+        />
       </section>
       <section>
         <SectionHeader icon={<ClockIcon />} title="최신 제보" />
-        <DealCard post={mockPosts[1]} href={ROUTES.postDetail(mockPosts[1].id)} wishlistButton={<WishlistButton postId={mockPosts[1].id} />} />
+        {recentPosts.map((post) => (
+          <DealCard
+            key={post.id}
+            post={post}
+            href={ROUTES.postDetail(post.id)}
+            wishlistButton={<WishlistButton postId={post.id} />}
+          />
+        ))}
       </section>
     </div>
   );

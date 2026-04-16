@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Toast } from "@/shared/ui";
+import { useToggleBookmark } from "../api/useBookmark";
 
 function HeartIcon({ filled }: { filled: boolean }) {
   return (
@@ -30,25 +31,23 @@ function ToastHeartIcon() {
 }
 
 type WishlistButtonProps = {
-  // TODO: use postId for API call when backend is ready
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   postId: string;
+  initialBookmarked?: boolean;
 };
 
-export function WishlistButton({ postId: _postId }: WishlistButtonProps) {
-  const [isWished, setIsWished] = useState(false);
+export function WishlistButton({ postId, initialBookmarked = false }: WishlistButtonProps) {
+  const [isWished, setIsWished] = useState(initialBookmarked);
   const [toastVisible, setToastVisible] = useState(false);
-
-  useEffect(() => {
-    if (!toastVisible) return;
-    const timer = setTimeout(() => setToastVisible(false), 2000);
-    return () => clearTimeout(timer);
-  }, [toastVisible]);
+  const { mutate: toggleBookmark } = useToggleBookmark(postId);
 
   function handleToggle() {
-    const next = !isWished;
-    setIsWished(next);
-    if (next) setToastVisible(true);
+    toggleBookmark(undefined, {
+      onSuccess: (data) => {
+        setIsWished(data.bookmarked);
+        if (data.bookmarked) setToastVisible(true);
+        setTimeout(() => setToastVisible(false), 2000);
+      },
+    });
   }
 
   return (

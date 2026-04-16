@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { BackHeader, StarIcon } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
-import type { Post } from "@/entities/post";
 import { WishlistButton } from "@/features/wishlist";
-import { ReportSoldoutModal, useReportSoldout } from "@/features/report-soldout";
+import { ReportSoldoutModal, useReportSoldout, useReportSoldoutMutation } from "@/features/report-soldout";
+import { usePostDetail, usePostComments } from "../api/usePostDetail";
 
 type PostDetailPageProps = {
-  post: Post;
+  postId: string;
 };
 
 // ── sub-components ──────────────────────────────────────────
@@ -21,7 +21,6 @@ function VerifiedBadge() {
     </svg>
   );
 }
-
 
 function ThumbsUpIcon() {
   return (
@@ -86,13 +85,55 @@ function Avatar() {
   );
 }
 
+function PostDetailSkeleton() {
+  return (
+    <div className="flex flex-col gap-4 p-5 animate-pulse">
+      <div className="w-full aspect-375/225 bg-gray-100 rounded" />
+      <div className="h-4 bg-gray-100 rounded w-2/3" />
+      <div className="h-4 bg-gray-100 rounded w-1/2" />
+    </div>
+  );
+}
+
 // ── page ────────────────────────────────────────────────────
 
-export function PostDetailPage({ post }: PostDetailPageProps) {
-  const { author, createdAt, product, reviewCount, rating, likeCount, commentCount } = post;
+export function PostDetailPage({ postId }: PostDetailPageProps) {
+  const { data: post, isLoading, isError } = usePostDetail(postId);
+  const { data: commentsData } = usePostComments(postId);
   const [comment, setComment] = useState("");
-  const { isOpen: isSoldoutOpen, isReported, open: openSoldout, close: closeSoldout, report } = useReportSoldout();
+  const { isOpen: isSoldoutOpen, isReported, open: openSoldout, close: closeSoldout, report: localReport } = useReportSoldout();
+  const { mutate: reportSoldout, isPending: isReportingPending } = useReportSoldoutMutation(postId);
 
+  function handleReport() {
+    reportSoldout(undefined, {
+      onSuccess: () => {
+        localReport();
+      },
+    });
+  }
+
+  if (isLoading) {
+    return (
+      <div className="bg-white flex flex-col h-dvh">
+        <BackHeader />
+        <PostDetailSkeleton />
+      </div>
+    );
+  }
+
+  if (isError || !post) {
+    return (
+      <div className="bg-white flex flex-col h-dvh">
+        <BackHeader />
+        <div className="flex flex-col flex-1 items-center justify-center gap-2">
+          <span className="text-body2 text-gray-500">제보를 불러올 수 없어요.</span>
+        </div>
+      </div>
+    );
+  }
+
+  const { author, createdAt, product, reviewCount, rating, likeCount } = post;
+  const comments = commentsData?.data ?? [];
   const filledStars = Math.round(rating);
 
   return (
@@ -140,7 +181,7 @@ export function PostDetailPage({ post }: PostDetailPageProps) {
             <button
               type="button"
               onClick={isReported ? undefined : openSoldout}
-              disabled={isReported}
+              disabled={isReported || isReportingPending}
               className={cn(
                 "flex gap-1 items-center px-2 py-2 rounded",
                 isReported ? "bg-gray-100 cursor-default" : "bg-secondary-50",
@@ -182,19 +223,20 @@ export function PostDetailPage({ post }: PostDetailPageProps) {
 
         {/* Comments section */}
         <div className="flex flex-col gap-2 px-5 py-3 border-t border-gray-100">
-          <span className="font-bold text-body2 text-black">댓글 {commentCount}</span>
-          {/* Mock comment */}
-          <div className="flex gap-3 items-start">
-            <div className="size-8 rounded-full bg-gray-100 shrink-0" />
-            <div className="flex flex-col gap-1.5">
-              <span className="font-semibold text-[13.5px] text-gray-800">코코맘</span>
-              <span className="text-[13.5px] text-gray-700">상봉점은 품절 ㅠㅠ</span>
+          <span className="font-bold text-body2 text-black">댓글 {comments.length}</span>
+          {comments.map((c) => (
+            <div key={c.id} className="flex gap-3 items-start">
+              <div className="size-8 rounded-full bg-gray-100 shrink-0" />
+              <div className="flex flex-col gap-1.5">
+                <span className="font-semibold text-[13.5px] text-gray-800">{c.author.name}</span>
+                <span className="text-[13.5px] text-gray-700">{c.content}</span>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
 
-      <ReportSoldoutModal open={isSoldoutOpen} onClose={closeSoldout} onReport={report} />
+      <ReportSoldoutModal open={isSoldoutOpen} onClose={closeSoldout} onReport={handleReport} />
 
       {/* Comment input bar */}
       <div className="flex items-center gap-3 px-5 py-3 border-t border-gray-200 shrink-0">
