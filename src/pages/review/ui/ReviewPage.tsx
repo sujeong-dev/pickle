@@ -1,32 +1,13 @@
+"use client";
+
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { HomeHeader } from "@/widgets/home-header";
 import { BottomNav } from "@/widgets/bottom-nav";
 import { ROUTES } from "@/shared/config/routes";
 import { ReviewCard, ReviewEmptyState } from "@/entities/review";
-import type { Review } from "@/entities/review";
-
-const MOCK_REVIEWS: Review[] = [
-  {
-    id: "1",
-    username: "할인사냥꾼",
-    timeAgo: "2시간 전",
-    content: "오늘 양재점에서 장봤어요! 물티슈 대박 세일이라\n바로 담음",
-    productName: "커클랜드 물티슈",
-    rating: 5.0,
-    likeCount: 47,
-    commentCount: 24,
-  },
-  {
-    id: "2",
-    username: "할인사냥꾼",
-    timeAgo: "2시간 전",
-    content: "오늘 양재점에서 장봤어요! 물티슈 대박 세일이라\n바로 담음",
-    productName: "커클랜드 물티슈",
-    rating: 5.0,
-    likeCount: 47,
-    commentCount: 24,
-  },
-];
+import { getReviews } from "@/shared/api";
 
 function PencilIcon() {
   return (
@@ -37,14 +18,31 @@ function PencilIcon() {
   );
 }
 
+const reviewKeys = {
+  all: ['review'] as const,
+  list: (postId: string) => [...reviewKeys.all, 'list', postId] as const,
+  detail: (id: string) => [...reviewKeys.all, 'detail', id] as const,
+};
+
 export function ReviewPage() {
+  const searchParams = useSearchParams();
+  const postId = searchParams?.get("postId") ?? "";
+
+  const { data, isLoading } = useQuery({
+    queryKey: reviewKeys.list(postId),
+    queryFn: () => getReviews({ postId }),
+    enabled: !!postId,
+  });
+
+  const reviews = data?.data ?? [];
+
   return (
     <div className="bg-gray-50 flex flex-col h-dvh">
       <HomeHeader />
       <main className="flex flex-col flex-1 overflow-y-auto min-h-0 gap-1">
-        {MOCK_REVIEWS.length === 0
+        {isLoading ? null : reviews.length === 0
           ? <ReviewEmptyState />
-          : MOCK_REVIEWS.map((review) => (
+          : reviews.map((review) => (
               <Link key={review.id} href={ROUTES.reviewDetail(review.id)}>
                 <ReviewCard {...review} />
               </Link>

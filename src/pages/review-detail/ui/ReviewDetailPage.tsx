@@ -1,7 +1,14 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
 import { HomeHeader } from "@/widgets/home-header";
 import { BottomNav } from "@/widgets/bottom-nav";
 import { ReviewItemRow } from "@/entities/review";
-import type { ReviewItem } from "@/entities/review";
+import { getReviewDetail } from "@/shared/api";
+
+const reviewDetailKeys = {
+  detail: (id: string) => ['review', 'detail', id] as const,
+};
 
 function UserAvatarIcon() {
   return (
@@ -38,19 +45,28 @@ function CommentIcon() {
   );
 }
 
-const MOCK_ITEMS: ReviewItem[] = [
-  { name: "커클랜드 물티슈", price: "12,900원", rating: 5, comment: "가성비 최고!" },
-  { name: "커클랜드 물티슈", price: "12,900원", rating: 5, comment: "가성비 최고!" },
-  { name: "커클랜드 물티슈", price: "12,900원", rating: 5, comment: "가성비 최고!" },
-];
+function formatPrice(price: number): string {
+  return price.toLocaleString('ko-KR') + '원';
+}
 
-const MOCK_TOTAL = "33,580원";
+function calcTotal(items: { price: number; quantity: number }[]): string {
+  const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  return formatPrice(total);
+}
 
 type ReviewDetailPageProps = {
   reviewId: string;
 };
 
-export function ReviewDetailPage({ reviewId: _ }: ReviewDetailPageProps) {
+export function ReviewDetailPage({ reviewId }: ReviewDetailPageProps) {
+  const { data } = useQuery({
+    queryKey: reviewDetailKeys.detail(reviewId),
+    queryFn: () => getReviewDetail(reviewId),
+  });
+
+  const receiptItems = data?.receiptItems ?? [];
+  const total = receiptItems.length > 0 ? calcTotal(receiptItems) : '-';
+
   return (
     <div className="bg-white flex flex-col h-dvh">
       <HomeHeader />
@@ -63,24 +79,30 @@ export function ReviewDetailPage({ reviewId: _ }: ReviewDetailPageProps) {
           </div>
           <div className="flex flex-col gap-0.5 flex-1 min-w-0">
             <div className="flex gap-1 items-center">
-              <span className="font-semibold text-[16px] text-gray-900">할인사냥꾼</span>
+              <span className="font-semibold text-[16px] text-gray-900">{data?.username ?? ''}</span>
               <VerifiedBadgeIcon />
             </div>
-            <span className="text-gray-500 text-[11.5px] leading-[17px]">2시간 전</span>
+            <span className="text-gray-500 text-[11.5px] leading-[17px]">{data?.timeAgo ?? ''}</span>
           </div>
         </div>
 
         <div className="flex flex-col gap-1">
           {/* 요약 바 */}
           <div className="bg-gray-50 flex items-center justify-between px-5 py-3">
-            <span className="text-gray-600 text-[16px]">총 {MOCK_ITEMS.length}개 항목</span>
-            <span className="font-bold text-[16px] text-gray-900">{MOCK_TOTAL}</span>
+            <span className="text-gray-600 text-[16px]">총 {receiptItems.length}개 항목</span>
+            <span className="font-bold text-[16px] text-gray-900">{total}</span>
           </div>
 
           {/* 상품 목록 */}
           <div className="flex flex-col">
-            {MOCK_ITEMS.map((item, idx) => (
-              <ReviewItemRow key={idx} {...item} />
+            {receiptItems.map((item, idx) => (
+              <ReviewItemRow
+                key={idx}
+                name={item.name}
+                price={formatPrice(item.price)}
+                rating={data?.rating ?? 0}
+                comment=""
+              />
             ))}
           </div>
 
@@ -89,11 +111,11 @@ export function ReviewDetailPage({ reviewId: _ }: ReviewDetailPageProps) {
             <div className="flex gap-5 items-center">
               <div className="flex gap-1.5 items-center">
                 <LikeIcon />
-                <span className="text-gray-500 text-[16px] leading-none">47</span>
+                <span className="text-gray-500 text-[16px] leading-none">{data?.likeCount ?? 0}</span>
               </div>
-              <div className="flex items-center gap-[5.77px]">
+              <div className="flex items-center" style={{ gap: "5.77px" }}>
                 <CommentIcon />
-                <span className="text-gray-500 text-[16px] leading-none">24</span>
+                <span className="text-gray-500 text-[16px] leading-none">{data?.commentCount ?? 0}</span>
               </div>
             </div>
           </div>
