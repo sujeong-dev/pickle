@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Input, Toast, Button, SuccessScreen } from "@/shared/ui";
 import { ROUTES } from "@/shared/config/routes";
+import { useMyProfile, useWithdraw } from "@/features/profile-edit";
+import { useUpdateNickname } from "@/features/set-nickname";
 
 function ChevronLeftIcon() {
   return (
@@ -62,8 +64,6 @@ function CheckCircleIcon() {
   );
 }
 
-const INITIAL_NICKNAME = "커클랜드 시그니처";
-
 const WITHDRAW_REASONS = [
   "더 이상 사용하지 않아요",
   "원하는 정보를 찾기 어려워요",
@@ -73,8 +73,14 @@ const WITHDRAW_REASONS = [
 
 export function ProfileEditPage() {
   const router = useRouter();
-  const [nickname, setNickname] = useState(INITIAL_NICKNAME);
-  const [savedNickname, setSavedNickname] = useState(INITIAL_NICKNAME);
+  const { data: profile } = useMyProfile();
+  const { mutate: updateNickname } = useUpdateNickname();
+  const { mutate: withdraw } = useWithdraw();
+
+  const savedNicknameFromServer = profile?.nickname ?? '';
+
+  const [nickname, setNickname] = useState('');
+  const [savedNickname, setSavedNickname] = useState('');
   const [avatarChanged, setAvatarChanged] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
@@ -82,7 +88,13 @@ export function ProfileEditPage() {
   const [withdrawReason, setWithdrawReason] = useState(WITHDRAW_REASONS[0]);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
 
-  const isDirty = nickname !== savedNickname || avatarChanged;
+  // Sync nickname from server when profile is loaded
+  useEffect(() => {
+    if (savedNicknameFromServer) {
+      setNickname(savedNicknameFromServer);
+      setSavedNickname(savedNicknameFromServer);
+    }
+  }, [savedNicknameFromServer]);
 
   useEffect(() => {
     if (!toastVisible) return;
@@ -90,10 +102,31 @@ export function ProfileEditPage() {
     return () => clearTimeout(timer);
   }, [toastVisible]);
 
+  const isDirty = nickname !== savedNickname || avatarChanged;
+
   function handleSave() {
-    setSavedNickname(nickname);
-    setAvatarChanged(false);
-    setToastVisible(true);
+    if (nickname !== savedNickname) {
+      updateNickname(nickname, {
+        onSuccess: () => {
+          setSavedNickname(nickname);
+          setAvatarChanged(false);
+          setToastVisible(true);
+        },
+      });
+    } else {
+      setSavedNickname(nickname);
+      setAvatarChanged(false);
+      setToastVisible(true);
+    }
+  }
+
+  function handleWithdraw() {
+    withdraw(undefined, {
+      onSuccess: () => {
+        setWithdrawModalOpen(false);
+        setDeleteSuccess(true);
+      },
+    });
   }
 
   if (deleteSuccess) {
@@ -219,10 +252,7 @@ export function ProfileEditPage() {
               <Button
                 size="md"
                 variant="danger"
-                onClick={() => {
-                  setWithdrawModalOpen(false);
-                  setDeleteSuccess(true);
-                }}
+                onClick={handleWithdraw}
               >
                 탈퇴하기
               </Button>

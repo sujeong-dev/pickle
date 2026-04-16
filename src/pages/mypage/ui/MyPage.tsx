@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BottomNav } from "@/widgets/bottom-nav";
 import { ROUTES } from "@/shared/config/routes";
+import { useMyProfile } from "@/features/profile-edit";
 
 // ── Icons ──────────────────────────────────────────
 
@@ -62,8 +63,6 @@ function ChevronRightIcon({ size = 20 }: { size?: number }) {
   );
 }
 
-// ── Bottom nav icons ─────────────────────────────────
-
 // ── Sub-components ───────────────────────────────────
 
 function ActivityRow({ icon, label, count, href }: { icon: React.ReactNode; label: string; count: number; href?: string }) {
@@ -102,6 +101,12 @@ function MenuRow({ label }: { label: string }) {
 
 export function MyPage() {
   const router = useRouter();
+  const { data: profile } = useMyProfile();
+
+  const nickname = profile?.nickname ?? '로딩 중...';
+  const postCount = profile?.postCount ?? 0;
+  const reviewCount = profile?.reviewCount ?? 0;
+  const bookmarkCount = profile?.bookmarkCount ?? 0;
 
   return (
     <div className='bg-gray-50 flex flex-col h-dvh'>
@@ -118,7 +123,7 @@ export function MyPage() {
               <PersonIcon />
             </div>
             <span className='font-bold text-[20px] text-gray-900'>
-              할인사냥꾼
+              {nickname}
             </span>
             <ChevronRightIcon size={20} />
           </button>
@@ -132,16 +137,16 @@ export function MyPage() {
           <ActivityRow
             icon={<TagIcon />}
             label='내 제보'
-            count={12}
+            count={postCount}
             href={ROUTES.mypageMyReports}
           />
           <ActivityRow
             icon={<ReceiptIcon />}
             label='내 영수증 후기'
-            count={8}
+            count={reviewCount}
             href={ROUTES.mypageMyReceiptReviews}
           />
-          <ActivityRow icon={<HeartIcon />} label='찜한 제보' count={24} href={ROUTES.mypageWishlist} />
+          <ActivityRow icon={<HeartIcon />} label='찜한 제보' count={bookmarkCount} href={ROUTES.mypageWishlist} />
         </section>
 
         {/* Settings section */}

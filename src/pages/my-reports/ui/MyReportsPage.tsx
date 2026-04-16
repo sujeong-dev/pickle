@@ -1,69 +1,45 @@
+"use client";
+
 import { PageHeader } from "@/shared/ui";
 import { MyReportCard } from "@/entities/post";
 import type { Post } from "@/entities/post";
+import { useMyPosts } from "@/features/my-reports";
+import type { MyPost } from "@/shared/api";
 
-const MOCK_POSTS: Post[] = [
-  {
-    id: "1",
-    author: { name: "할인사냥꾼", isVerified: true },
-    createdAt: "2시간 전",
-    content: "코스트코 커클랜드 물티슈 할인 중입니다!",
+function toPost(myPost: MyPost): Post {
+  return {
+    id: myPost.id,
+    author: { name: '', isVerified: false },
+    createdAt: myPost.createdAt,
+    content: '',
     product: {
-      name: "커클랜드 물티슈",
-      discountRate: 24,
-      originalPrice: 16900,
-      currentPrice: 12900,
-    },
-    reviewCount: 3,
-    rating: 4.5,
-    likeCount: 47,
-    commentCount: 24,
-    relatedPostCount: 2,
-  },
-  {
-    id: "2",
-    author: { name: "할인사냥꾼", isVerified: true },
-    createdAt: "1일 전",
-    content: "올리브영 세일 기간 마스크팩 득템했어요",
-    product: {
-      name: "메디힐 마스크팩 10매",
-      discountRate: 40,
-      originalPrice: 15000,
-      currentPrice: 9000,
-    },
-    reviewCount: 1,
-    rating: 4.0,
-    likeCount: 23,
-    commentCount: 8,
-    relatedPostCount: 0,
-  },
-  {
-    id: "3",
-    author: { name: "할인사냥꾼", isVerified: true },
-    createdAt: "3일 전",
-    content: "GS25 1+1 행사 중",
-    product: {
-      name: "초코파이 정 12입",
-      discountRate: 15,
-      originalPrice: 6500,
-      currentPrice: 5500,
+      name: myPost.productName,
+      discountRate: myPost.discountRate,
+      originalPrice: myPost.price,
+      currentPrice: myPost.price,
+      imageUrl: myPost.imageUrl,
     },
     reviewCount: 0,
     rating: 0,
-    likeCount: 12,
-    commentCount: 3,
-    relatedPostCount: 1,
-  },
-];
+    likeCount: myPost.likeCount,
+    commentCount: 0,
+    relatedPostCount: 0,
+  };
+}
 
 export function MyReportsPage() {
-  const posts = MOCK_POSTS;
+  const { data, isLoading } = useMyPosts();
+  const posts = data?.data.map(toPost) ?? [];
 
   return (
     <div className="bg-gray-50 flex flex-col h-dvh">
       <PageHeader title="내 제보" />
       <div className="flex-1 overflow-y-auto min-h-0 bg-white">
-        {posts.length === 0 ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-body1 text-gray-400">불러오는 중...</p>
+          </div>
+        ) : posts.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-body1 text-gray-500">아직 제보한 내역이 없어요</p>
           </div>
