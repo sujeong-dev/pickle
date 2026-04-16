@@ -12,4 +12,5 @@ export const ROUTES = {
   mypageMyReports: "/mypage/my-reports",
   mypageMyReceiptReviews: "/mypage/my-receipt-reviews",
   mypageWishlist: "/mypage/wishlist",
+  mypageProfileEdit: "/mypage/profile-edit",
 } as const;

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { BottomNav } from "@/widgets/bottom-nav";
 import { ROUTES } from "@/shared/config/routes";
 
@@ -100,6 +101,8 @@ function MenuRow({ label }: { label: string }) {
 // ── Page ─────────────────────────────────────────────
 
 export function MyPage() {
+  const router = useRouter();
+
   return (
     <div className='bg-gray-50 flex flex-col h-dvh'>
       {/* Scrollable content */}
@@ -109,7 +112,7 @@ export function MyPage() {
           <button
             type='button'
             className='flex items-center gap-2'
-            onClick={() => {}}
+            onClick={() => router.push(ROUTES.mypageProfileEdit)}
           >
             <div className='bg-primary-50 rounded-full size-[42px] flex items-center justify-center shrink-0'>
               <PersonIcon />
