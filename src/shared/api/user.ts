@@ -63,18 +63,18 @@ export function deleteMyAccount(): Promise<void> {
 
 export function getMyPosts(params?: PaginationParams): Promise<PaginatedResponse<MyPost>> {
   return api
-    .get('api/users/me/posts', params ? { searchParams: params as Record<string, string | number> } : undefined)
+    .get('users/me/posts', params ? { searchParams: params as Record<string, string | number> } : undefined)
     .json<PaginatedResponse<MyPost>>()
 }
 
 export function getMyReviews(params?: PaginationParams): Promise<PaginatedResponse<MyReview>> {
   return api
-    .get('api/users/me/reviews', params ? { searchParams: params as Record<string, string | number> } : undefined)
+    .get('users/me/reviews', params ? { searchParams: params as Record<string, string | number> } : undefined)
     .json<PaginatedResponse<MyReview>>()
 }
 
 export function getMyBookmarks(params?: PaginationParams): Promise<PaginatedResponse<MyBookmark>> {
   return api
-    .get('api/users/me/bookmarks', params ? { searchParams: params as Record<string, string | number> } : undefined)
+    .get('users/me/bookmarks', params ? { searchParams: params as Record<string, string | number> } : undefined)
     .json<PaginatedResponse<MyBookmark>>()
 }

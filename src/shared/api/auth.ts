@@ -39,35 +39,35 @@ export interface UpdateNicknameBody {
 }
 
 export function getKakaoAuthorizeUrl(): Promise<AuthorizeResponse> {
-  return api.get('api/auth/kakao/authorize').json<AuthorizeResponse>()
+  return api.get('auth/kakao/authorize').json<AuthorizeResponse>()
 }
 
 export function getNaverAuthorizeUrl(): Promise<AuthorizeResponse> {
-  return api.get('api/auth/naver/authorize').json<AuthorizeResponse>()
+  return api.get('auth/naver/authorize').json<AuthorizeResponse>()
 }
 
 export function kakaoLogin(body: KakaoLoginBody): Promise<LoginResponse> {
-  return api.post('api/auth/kakao/login', { json: body }).json<LoginResponse>()
+  return api.post('auth/kakao/login', { json: body }).json<LoginResponse>()
 }
 
 export function naverLogin(body: NaverLoginBody): Promise<LoginResponse> {
-  return api.post('api/auth/naver/login', { json: body }).json<LoginResponse>()
+  return api.post('auth/naver/login', { json: body }).json<LoginResponse>()
 }
 
 export function signup(body: SignupBody): Promise<SignupResponse> {
-  return api.post('api/auth/signup', { json: body }).json<SignupResponse>()
+  return api.post('auth/signup', { json: body }).json<SignupResponse>()
 }
 
 export function logout(): Promise<void> {
-  return api.post('api/auth/logout').json<void>()
+  return api.post('auth/logout').json<void>()
 }
 
 export function checkNickname(nickname: string): Promise<NicknameCheckResponse> {
   return api
-    .get('api/users/nickname/check', { searchParams: { nickname } })
+    .get('users/nickname/check', { searchParams: { nickname } })
     .json<NicknameCheckResponse>()
 }
 
 export function updateNickname(body: UpdateNicknameBody): Promise<void> {
-  return api.patch('api/users/me/nickname', { json: body }).json<void>()
+  return api.patch('users/me/nickname', { json: body }).json<void>()
 }
