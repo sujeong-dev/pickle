@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { BackHeader, StarIcon } from "@/shared/ui";
+import { useState, useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { BackHeader, StarIcon, RemoveButton } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
 import { WishlistButton } from "@/features/wishlist";
 import { ReportSoldoutModal, useReportSoldout, useReportSoldoutMutation } from "@/features/report-soldout";
+import { togglePostLike, createPostComment, deletePostComment, postKeys } from "@/shared/api";
 import { usePostDetail, usePostComments } from "../api/usePostDetail";
 
 type PostDetailPageProps = {
@@ -101,8 +103,34 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
   const { data: post, isLoading, isError } = usePostDetail(postId);
   const { data: commentsData } = usePostComments(postId);
   const [comment, setComment] = useState("");
+  const [liked, setLiked] = useState(false);
+  const [localLikeCount, setLocalLikeCount] = useState(0);
   const { isOpen: isSoldoutOpen, isReported, open: openSoldout, close: closeSoldout, report: localReport } = useReportSoldout();
   const { mutate: reportSoldout, isPending: isReportingPending } = useReportSoldoutMutation(postId);
+  const queryClient = useQueryClient();
+
+  const { mutate: toggleLike } = useMutation({
+    mutationFn: () => togglePostLike(postId),
+    onSuccess: (data) => {
+      setLiked(data.liked);
+      setLocalLikeCount(data.likeCount);
+    },
+  });
+
+  const { mutate: submitComment, isPending: isSubmittingComment } = useMutation({
+    mutationFn: (content: string) => createPostComment(postId, content),
+    onSuccess: () => {
+      setComment("");
+      queryClient.invalidateQueries({ queryKey: postKeys.comments(postId) });
+    },
+  });
+
+  const { mutate: removeComment } = useMutation({
+    mutationFn: (commentId: string) => deletePostComment(postId, commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: postKeys.comments(postId) });
+    },
+  });
 
   function handleReport() {
     reportSoldout(undefined, {
@@ -133,6 +161,9 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
   }
 
   const { author, createdAt, product, reviewCount, rating, likeCount } = post;
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { setLocalLikeCount(likeCount); }, [post.id]);
   const comments = commentsData?.data ?? [];
   const filledStars = Math.round(rating);
 
@@ -174,9 +205,17 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
         {/* Action bar */}
         <div className="flex items-center justify-between px-5 py-3 border-y border-gray-100">
           <div className="flex gap-1 items-center">
-            <button type="button" className="flex gap-2 items-center p-2 rounded">
+            <button
+              type="button"
+              onClick={() => {
+                setLiked((prev) => !prev);
+                setLocalLikeCount((prev) => liked ? prev - 1 : prev + 1);
+                toggleLike();
+              }}
+              className="flex gap-2 items-center p-2 rounded"
+            >
               <ThumbsUpIcon />
-              <span className="text-subtitle text-gray-500">{likeCount}</span>
+              <span className={cn("text-subtitle", liked ? "text-primary-500 font-semibold" : "text-gray-500")}>{localLikeCount}</span>
             </button>
             <button
               type="button"
@@ -227,10 +266,11 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
           {comments.map((c) => (
             <div key={c.id} className="flex gap-3 items-start">
               <div className="size-8 rounded-full bg-gray-100 shrink-0" />
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 flex-1">
                 <span className="font-semibold text-[13.5px] text-gray-800">{c.author.name}</span>
                 <span className="text-[13.5px] text-gray-700">{c.content}</span>
               </div>
+              <RemoveButton size="sm" aria-label="댓글 삭제" onClick={() => removeComment(c.id)} />
             </div>
           ))}
         </div>
@@ -249,9 +289,14 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
         />
         <button
           type="button"
-          className="size-12.5 rounded-full bg-gray-200 flex items-center justify-center shrink-0"
+          disabled={!comment.trim() || isSubmittingComment}
+          onClick={() => { if (comment.trim()) submitComment(comment); }}
+          className={cn(
+            "size-12.5 rounded-full flex items-center justify-center shrink-0 transition-colors",
+            comment.trim() ? "bg-primary-500" : "bg-gray-200",
+          )}
         >
-          <span className="text-[15.4px] text-gray-400">등록</span>
+          <span className={cn("text-[15.4px]", comment.trim() ? "text-white font-semibold" : "text-gray-400")}>등록</span>
         </button>
       </div>
     </div>
