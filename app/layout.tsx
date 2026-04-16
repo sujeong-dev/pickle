@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { QueryProvider } from "@/shared/providers";
+import { MSWProvider } from "./MSWProvider";
 
 export const metadata: Metadata = {
   title: "Pickle",
@@ -13,7 +15,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className="h-full antialiased">
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        <MSWProvider>
+          <QueryProvider>{children}</QueryProvider>
+        </MSWProvider>
+      </body>
     </html>
   );
 }
