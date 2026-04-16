@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { Input, Toast, Button, SuccessScreen } from "@/shared/ui";
 import { ROUTES } from "@/shared/config/routes";
 import { useMyProfile, useWithdraw } from "@/features/profile-edit";
-import { useUpdateNickname } from "@/features/set-nickname";
+import { useUpdateNickname, useNicknameCheck } from "@/features/set-nickname";
+import { logout } from "@/shared/api";
+import { clearTokens } from "@/shared/model";
 
 function ChevronLeftIcon() {
   return (
@@ -78,6 +80,9 @@ export function ProfileEditPage() {
   const { mutate: withdraw } = useWithdraw();
 
   const savedNicknameFromServer = profile?.nickname ?? '';
+  const isNicknameChanged = nickname.length > 0 && nickname !== savedNicknameFromServer;
+  const { data: nicknameCheckData } = useNicknameCheck(isNicknameChanged ? nickname : '');
+  const nicknameAvailable = isNicknameChanged ? (nicknameCheckData?.isAvailable ?? null) : null;
 
   const [nickname, setNickname] = useState('');
   const [savedNickname, setSavedNickname] = useState('');
@@ -102,7 +107,8 @@ export function ProfileEditPage() {
     return () => clearTimeout(timer);
   }, [toastVisible]);
 
-  const isDirty = nickname !== savedNickname || avatarChanged;
+  const isDirty = (nickname !== savedNickname || avatarChanged) &&
+    (isNicknameChanged ? nicknameAvailable === true : true);
 
   function handleSave() {
     if (nickname !== savedNickname) {
@@ -189,6 +195,11 @@ export function ProfileEditPage() {
               onClear={() => setNickname("")}
               className="w-full"
             />
+            {isNicknameChanged && nicknameAvailable !== null && (
+              <span className={`text-caption ${nicknameAvailable ? "text-primary-500" : "text-secondary-500"}`}>
+                {nicknameAvailable ? "사용 가능한 닉네임이에요" : "이미 사용 중인 닉네임이에요"}
+              </span>
+            )}
           </div>
         </div>
 
@@ -284,8 +295,10 @@ export function ProfileEditPage() {
               <Button
                 size="md"
                 variant="danger"
-                onClick={() => {
+                onClick={async () => {
                   setLogoutModalOpen(false);
+                  try { await logout(); } catch {}
+                  clearTokens();
                   router.push(ROUTES.login);
                 }}
               >
