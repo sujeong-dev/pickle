@@ -16,17 +16,6 @@ pnpm lint         # Run ESLint
 - **lucideIcons** (`@lucide-react`) — this is the configured `iconLibrary`
 - **MCP server**: `shadcn` MCP available via `.mcp.json`
 
-## Path Aliases
-
-| Alias | Path |
-|---|---|
-| `@/components` | UI components |
-| `@/components/ui` | shadcn UI primitives |
-| `@/lib` | Utilities |
-| `@/hooks` | Custom hooks |
-
-`cn()` utility is at `@/lib/utils` — use it for all conditional className merging.
-
 ## 아키텍처: FSD (Feature-Sliced Design)
 
 레이어 의존 방향: `app → pages → widgets → features → entities → shared`

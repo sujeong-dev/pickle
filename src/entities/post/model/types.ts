@@ -24,3 +24,17 @@ export type Post = {
   commentCount: number;
   relatedPostCount: number;
 };
+
+export type ReceiptReviewItem = {
+  imageUrl?: string;
+  rating: number;
+};
+
+export type ReceiptReview = {
+  id: string;
+  rating: number;
+  createdAt: string;
+  itemCount: number;
+  totalAmount: number;
+  items: ReceiptReviewItem[];
+};

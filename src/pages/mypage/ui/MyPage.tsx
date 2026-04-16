@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { BottomNav } from "@/widgets/bottom-nav";
+import { ROUTES } from "@/shared/config/routes";
 
 // ── Icons ──────────────────────────────────────────
 
@@ -63,13 +65,25 @@ function ChevronRightIcon({ size = 20 }: { size?: number }) {
 
 // ── Sub-components ───────────────────────────────────
 
-function ActivityRow({ icon, label, count }: { icon: React.ReactNode; label: string; count: number }) {
-  return (
-    <div className="flex items-center gap-4 border-b border-gray-100 px-5 py-[13px]">
+function ActivityRow({ icon, label, count, href }: { icon: React.ReactNode; label: string; count: number; href?: string }) {
+  const inner = (
+    <>
       <div className="shrink-0 size-6 flex items-center justify-center">{icon}</div>
       <span className="flex-1 text-[16px] text-gray-900">{label}</span>
       <span className="font-bold text-[16px] text-gray-500 shrink-0">{count}</span>
       <ChevronRightIcon />
+    </>
+  );
+  if (href) {
+    return (
+      <Link href={href} className="flex items-center gap-4 border-b border-gray-100 px-5 py-[13px]">
+        {inner}
+      </Link>
+    );
+  }
+  return (
+    <div className="flex items-center gap-4 border-b border-gray-100 px-5 py-[13px]">
+      {inner}
     </div>
   );
 }
@@ -87,42 +101,54 @@ function MenuRow({ label }: { label: string }) {
 
 export function MyPage() {
   return (
-    <div className="bg-gray-50 flex flex-col h-dvh">
+    <div className='bg-gray-50 flex flex-col h-dvh'>
       {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto min-h-0 flex flex-col gap-[1.9px]">
+      <div className='flex-1 overflow-y-auto min-h-0 flex flex-col gap-[1.9px]'>
         {/* Profile header */}
-        <header className="bg-white flex items-center justify-between px-5 py-3 shrink-0">
+        <header className='bg-white flex items-center justify-between px-5 py-3 shrink-0'>
           <button
-            type="button"
-            className="flex items-center gap-2"
+            type='button'
+            className='flex items-center gap-2'
             onClick={() => {}}
           >
-            <div className="bg-primary-50 rounded-full size-[42px] flex items-center justify-center shrink-0">
+            <div className='bg-primary-50 rounded-full size-[42px] flex items-center justify-center shrink-0'>
               <PersonIcon />
             </div>
-            <span className="font-bold text-[20px] text-gray-900">할인사냥꾼</span>
+            <span className='font-bold text-[20px] text-gray-900'>
+              할인사냥꾼
+            </span>
             <ChevronRightIcon size={20} />
           </button>
-          <button type="button" aria-label="설정">
+          <button type='button' aria-label='설정'>
             <SettingsIcon />
           </button>
         </header>
 
         {/* Activity section */}
-        <section className="bg-white shrink-0">
-          <ActivityRow icon={<TagIcon />} label="내 제보" count={12} />
-          <ActivityRow icon={<ReceiptIcon />} label="내 영수증 후기" count={8} />
-          <ActivityRow icon={<HeartIcon />} label="찜한 제보" count={24} />
+        <section className='bg-white shrink-0'>
+          <ActivityRow
+            icon={<TagIcon />}
+            label='내 제보'
+            count={12}
+            href={ROUTES.mypageMyReports}
+          />
+          <ActivityRow
+            icon={<ReceiptIcon />}
+            label='내 영수증 후기'
+            count={8}
+            href={ROUTES.mypageMyReceiptReviews}
+          />
+          <ActivityRow icon={<HeartIcon />} label='찜한 제보' count={24} href={ROUTES.mypageWishlist} />
         </section>
 
         {/* Settings section */}
-        <section className="bg-white shrink-0">
-          <MenuRow label="이용약관" />
-          <MenuRow label="개인정보처리방침" />
+        <section className='bg-white shrink-0'>
+          <MenuRow label='이용약관' />
+          <MenuRow label='개인정보처리방침' />
         </section>
       </div>
 
-      <BottomNav activeTab="my" />
+      <BottomNav activeTab='my' />
     </div>
   );
 }

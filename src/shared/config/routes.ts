@@ -9,4 +9,7 @@ export const ROUTES = {
   postDetail: (postId: string) => `/home/${postId}`,
   relatedReports: (postId: string) => `/related-reports/${postId}`,
   mypage: "/mypage",
+  mypageMyReports: "/mypage/my-reports",
+  mypageMyReceiptReviews: "/mypage/my-receipt-reviews",
+  mypageWishlist: "/mypage/wishlist",
 } as const;

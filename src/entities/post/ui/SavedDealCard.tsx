@@ -1,0 +1,76 @@
+import Image from "next/image";
+import type { Post } from "../model/types";
+
+type SavedDealCardProps = {
+  post: Post;
+};
+
+function FilledHeartIcon() {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="#E0421A"
+      stroke="#E0421A"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </svg>
+  );
+}
+
+export function SavedDealCard({ post }: SavedDealCardProps) {
+  const { author, createdAt, product } = post;
+
+  return (
+    <article className="flex items-start gap-[18px] px-lg py-sm bg-white border-b border-gray-200">
+      {/* 썸네일 */}
+      <div className="shrink-0 size-20 rounded-[6px] bg-gray-200 overflow-hidden">
+        {product?.imageUrl && (
+          <Image
+            src={product.imageUrl}
+            alt={product.name}
+            width={80}
+            height={80}
+            className="size-full object-cover"
+          />
+        )}
+      </div>
+
+      {/* 정보 */}
+      <div className="flex flex-col h-20 justify-between flex-1 min-w-0">
+        <span className="text-h2 font-bold text-gray-900 truncate">
+          {product?.name ?? "-"}
+        </span>
+
+        <div className="flex items-baseline gap-xs">
+          {product?.discountRate != null && (
+            <span className="text-body2 font-bold text-secondary-500">
+              {product.discountRate}%
+            </span>
+          )}
+          <span className="text-h3 font-bold text-gray-900">
+            {product?.currentPrice != null
+              ? `${product.currentPrice.toLocaleString()}원`
+              : "-"}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-xs">
+          <span className="text-caption text-gray-500">{createdAt}</span>
+          <span className="text-caption text-gray-400">·</span>
+          <span className="text-caption text-gray-500">{author.name}</span>
+        </div>
+      </div>
+
+      {/* 찜 해제 버튼 */}
+      <button type="button" aria-label="찜 해제" className="shrink-0 mt-0.5">
+        <FilledHeartIcon />
+      </button>
+    </article>
+  );
+}
