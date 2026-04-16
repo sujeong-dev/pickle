@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/shared/lib/utils";
-import { Button } from "@/shared/ui/button";
+import { Button } from "@/shared/ui/";
 import { useSetBoundary } from "../model/useSetBoundary";
 import { NaverMap } from "./NaverMap";
 import type { SelectedLocation } from "../model/useSetBoundary";

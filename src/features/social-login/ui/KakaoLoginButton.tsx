@@ -1,13 +1,18 @@
 "use client";
 
+import { getKakaoAuthorizeUrl } from '@/shared/api';
+
+async function handleKakaoLogin() {
+  const { url } = await getKakaoAuthorizeUrl();
+  window.location.href = url;
+}
+
 export function KakaoLoginButton() {
   return (
     <button
       type="button"
       className="relative flex w-full items-center justify-center h-12 bg-kakao rounded-sm"
-      onClick={() => {
-        // TODO: Kakao OAuth 연동
-      }}
+      onClick={handleKakaoLogin}
     >
       <span className="absolute left-5 flex items-center">
         <img src="/images/kakao-icon.svg" alt="" className="size-5" />

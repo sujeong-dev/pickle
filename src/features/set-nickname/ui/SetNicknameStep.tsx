@@ -2,6 +2,7 @@
 
 import { Button, Input } from '@/shared/ui';
 import { useSetNickname } from "../model/useSetNickname";
+import { useNicknameCheck, useSignup } from "../api/useNickname";
 
 function NicknameRulesPanel() {
   return (
@@ -43,6 +44,16 @@ interface SetNicknameStepProps {
 
 export function SetNicknameStep({ onNext }: SetNicknameStepProps) {
   const { nickname, setNickname, isValid, handleClear } = useSetNickname();
+  const { data: nicknameCheckData } = useNicknameCheck(isValid ? nickname : '');
+  const signup = useSignup();
+
+  const isAvailable = nicknameCheckData?.isAvailable ?? null;
+  const canSubmit = isValid && isAvailable === true;
+
+  async function handleSubmit() {
+    await signup.mutateAsync(nickname);
+    onNext?.();
+  }
 
   return (
     <main className="flex flex-col min-h-svh bg-white w-full">
@@ -69,7 +80,7 @@ export function SetNicknameStep({ onNext }: SetNicknameStepProps) {
       </section>
 
       <div className="sticky bottom-0 px-5 pb-5 bg-white">
-        <Button size="lg" disabled={!isValid} onClick={onNext}>
+        <Button size="lg" disabled={!canSubmit || signup.isPending} onClick={handleSubmit}>
           다음
         </Button>
       </div>
