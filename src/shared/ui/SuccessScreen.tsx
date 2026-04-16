@@ -18,25 +18,29 @@ function CheckmarkIcon() {
   );
 }
 
+type ButtonVariant = "primary" | "secondary" | "outline" | "danger" | "ghost" | "black";
+
 interface SuccessScreenProps {
   title: string;
   description: React.ReactNode;
   buttonLabel: string;
   onButtonClick: () => void;
+  iconClassName?: string;
+  buttonVariant?: ButtonVariant;
 }
 
-export function SuccessScreen({ title, description, buttonLabel, onButtonClick }: SuccessScreenProps) {
+export function SuccessScreen({ title, description, buttonLabel, onButtonClick, iconClassName, buttonVariant }: SuccessScreenProps) {
   return (
     <div className="bg-white flex flex-col h-dvh items-center justify-center px-[31px]">
       <div className="flex flex-col items-center gap-6 w-full">
-        <div className="bg-primary-50 rounded-full size-[60px] flex items-center justify-center">
+        <div className={iconClassName ?? "bg-primary-50 rounded-full size-[60px] flex items-center justify-center"}>
           <CheckmarkIcon />
         </div>
         <div className="flex flex-col items-center gap-2 text-center w-full">
           <p className="font-bold text-[24px] text-gray-900">{title}</p>
           <p className="text-[14px] text-gray-600 leading-[1.3]">{description}</p>
         </div>
-        <Button onClick={onButtonClick}>{buttonLabel}</Button>
+        <Button variant={buttonVariant} onClick={onButtonClick}>{buttonLabel}</Button>
       </div>
     </div>
   );
