@@ -25,3 +25,9 @@ export function useUpdateNickname() {
     mutationFn: (nickname: string) => updateNickname({ nickname }),
   })
 }
+
+export function useCheckNickname() {
+  return useMutation({
+    mutationFn: (nickname: string) => checkNickname(nickname),
+  })
+}

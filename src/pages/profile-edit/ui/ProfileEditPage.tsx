@@ -93,7 +93,7 @@ export function ProfileEditPage() {
   const savedNicknameFromServer = profile?.nickname ?? '';
   const isNicknameChanged = nickname.length > 0 && nickname !== savedNicknameFromServer;
   const { data: nicknameCheckData } = useNicknameCheck(isNicknameChanged ? nickname : '');
-  const nicknameAvailable = isNicknameChanged ? (nicknameCheckData?.isAvailable ?? null) : null;
+  const nicknameAvailable = isNicknameChanged ? (nicknameCheckData?.available ?? null) : null;
   const [avatarChanged, setAvatarChanged] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);

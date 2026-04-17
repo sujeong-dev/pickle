@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { Button, Input } from '@/shared/ui';
 import { useSetNickname } from "../model/useSetNickname";
-import { useNicknameCheck, useSignup } from "../api/useNickname";
+import { useCheckNickname, useSignup } from "../api/useNickname";
 
 function NicknameRulesPanel() {
   return (
@@ -45,13 +46,18 @@ interface SetNicknameStepProps {
 
 export function SetNicknameStep({ onNext, onSubmit }: SetNicknameStepProps) {
   const { nickname, setNickname, isValid, handleClear } = useSetNickname();
-  const { data: nicknameCheckData } = useNicknameCheck(isValid ? nickname : '');
+  const checkMutation = useCheckNickname();
   const signup = useSignup();
 
-  const isAvailable = nicknameCheckData?.isAvailable ?? null;
-  const canSubmit = isValid && isAvailable === true;
+  const [checkError, setCheckError] = useState(false);
 
   async function handleSubmit() {
+    const result = await checkMutation.mutateAsync(nickname);
+    if (!result.available) {
+      setCheckError(true);
+      return;
+    }
+    setCheckError(false);
     if (onSubmit) {
       await onSubmit(nickname);
     } else {
@@ -73,19 +79,35 @@ export function SetNicknameStep({ onNext, onSubmit }: SetNicknameStepProps) {
         </div>
 
         <div className="flex flex-col gap-15">
-          <Input
-            placeholder="사용하실 닉네임을 입력해주세요."
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            onClear={handleClear}
-            maxLength={12}
-          />
+          <div className="flex flex-col gap-1">
+            <Input
+              variant={checkError ? "error" : "default"}
+              placeholder="사용하실 닉네임을 입력해주세요."
+              value={nickname}
+              onChange={(e) => {
+                setNickname(e.target.value);
+                if (checkError) setCheckError(false);
+              }}
+              onClear={() => {
+                handleClear();
+                if (checkError) setCheckError(false);
+              }}
+              maxLength={12}
+            />
+            {checkError && (
+              <p className="text-caption text-secondary-500">사용하실 수 없는 닉네임입니다.</p>
+            )}
+          </div>
           <NicknameRulesPanel />
         </div>
       </section>
 
       <div className="sticky bottom-0 px-5 pb-5 bg-white">
-        <Button size="lg" disabled={!canSubmit || (onSubmit ? false : signup.isPending)} onClick={handleSubmit}>
+        <Button
+          size="lg"
+          disabled={!isValid || checkMutation.isPending || (onSubmit ? false : signup.isPending)}
+          onClick={handleSubmit}
+        >
           다음
         </Button>
       </div>
