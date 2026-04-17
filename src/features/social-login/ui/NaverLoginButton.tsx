@@ -5,6 +5,7 @@ import { getNaverAuthorizeUrl } from '@/shared/api';
 
 async function handleNaverLogin() {
   const { url } = await getNaverAuthorizeUrl();
+  console.log('naver url: ', url);
   window.location.href = url;
 }
 

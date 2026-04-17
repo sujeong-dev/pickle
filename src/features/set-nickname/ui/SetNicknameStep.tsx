@@ -40,9 +40,10 @@ function NicknameRulesPanel() {
 
 interface SetNicknameStepProps {
   onNext?: () => void;
+  onSubmit?: (nickname: string) => void | Promise<void>;
 }
 
-export function SetNicknameStep({ onNext }: SetNicknameStepProps) {
+export function SetNicknameStep({ onNext, onSubmit }: SetNicknameStepProps) {
   const { nickname, setNickname, isValid, handleClear } = useSetNickname();
   const { data: nicknameCheckData } = useNicknameCheck(isValid ? nickname : '');
   const signup = useSignup();
@@ -51,8 +52,12 @@ export function SetNicknameStep({ onNext }: SetNicknameStepProps) {
   const canSubmit = isValid && isAvailable === true;
 
   async function handleSubmit() {
-    await signup.mutateAsync(nickname);
-    onNext?.();
+    if (onSubmit) {
+      await onSubmit(nickname);
+    } else {
+      await signup.mutateAsync(nickname);
+      onNext?.();
+    }
   }
 
   return (
@@ -80,7 +85,7 @@ export function SetNicknameStep({ onNext }: SetNicknameStepProps) {
       </section>
 
       <div className="sticky bottom-0 px-5 pb-5 bg-white">
-        <Button size="lg" disabled={!canSubmit || signup.isPending} onClick={handleSubmit}>
+        <Button size="lg" disabled={!canSubmit || (onSubmit ? false : signup.isPending)} onClick={handleSubmit}>
           다음
         </Button>
       </div>
