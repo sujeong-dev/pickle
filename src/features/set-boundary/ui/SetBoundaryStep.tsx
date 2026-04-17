@@ -12,17 +12,13 @@ interface SetBoundaryStepProps {
 }
 
 export function SetBoundaryStep({ onPrev, onComplete }: SetBoundaryStepProps) {
-  const { selectedLocation, setSelectedLocation, clearLocation, isSelected } =
+  const { selectedLocation, setSelectedLocation, isSelected } =
     useSetBoundary();
   
   console.log(isSelected, selectedLocation);
 
   function handleLocationChange(location: SelectedLocation) {
     setSelectedLocation(location);
-  }
-
-  function handleClearSearch() {
-    clearLocation();
   }
 
   function handleComplete() {

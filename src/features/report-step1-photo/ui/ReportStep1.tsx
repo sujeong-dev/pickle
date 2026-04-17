@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import Image from "next/image";
 import { RemoveButton } from "@/shared/ui";
 import { ScanIcon } from "@/shared/ui/icons";
 import { useUploadPresigned, useOcrProduct, useOcrStatus } from "../api/useOcr";
@@ -94,10 +95,12 @@ export function ReportStep1({
       {photo ? (
         /* ── Uploaded state ── */
         <div className="relative w-full aspect-[335/255] bg-gray-200 rounded-[10px] overflow-hidden">
-          <img
+          <Image
             src={URL.createObjectURL(photo)}
             alt="할인표 사진"
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            unoptimized
           />
           {/* Remove button */}
           <div className="absolute top-3 right-3">

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // MSW 자동 생성 파일
+    "public/mockServiceWorker.js",
   ]),
 ]);
 

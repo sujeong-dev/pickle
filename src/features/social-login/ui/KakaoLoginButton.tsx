@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { getKakaoAuthorizeUrl } from '@/shared/api';
 
 async function handleKakaoLogin() {
@@ -15,7 +16,7 @@ export function KakaoLoginButton() {
       onClick={handleKakaoLogin}
     >
       <span className="absolute left-5 flex items-center">
-        <img src="/images/kakao-icon.svg" alt="" className="size-5" />
+        <Image src="/images/kakao-icon.svg" alt="" width={20} height={20} />
       </span>
       <span className="font-semibold text-gray-800 text-[17px] leading-[22px] tracking-[-0.3px]">
         카카오로 시작하기
