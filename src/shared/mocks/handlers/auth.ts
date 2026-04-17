@@ -54,10 +54,10 @@ export const authHandlers = [
     const nickname = url.searchParams.get('nickname')
 
     if (nickname === 'taken') {
-      return HttpResponse.json({ isAvailable: false })
+      return HttpResponse.json({ nickname, available: false })
     }
 
-    return HttpResponse.json({ isAvailable: true })
+    return HttpResponse.json({ nickname, available: true })
   }),
 
   // PATCH /api/users/me/nickname

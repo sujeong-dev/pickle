@@ -19,7 +19,8 @@ export interface SignupResponse {
 }
 
 export interface NicknameCheckResponse {
-  isAvailable: boolean
+  nickname: string
+  available: boolean
 }
 
 export interface KakaoLoginBody {
