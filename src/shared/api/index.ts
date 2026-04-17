@@ -5,6 +5,7 @@ export {
   kakaoLogin,
   naverLogin,
   signup,
+  signupNewUser,
   logout,
   checkNickname,
   updateNickname,

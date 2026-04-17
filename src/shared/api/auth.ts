@@ -1,3 +1,4 @@
+import ky from 'ky'
 import { api } from './kyInstance'
 
 export interface AuthorizeResponse {
@@ -5,10 +6,10 @@ export interface AuthorizeResponse {
 }
 
 export interface LoginResponse {
-  accessToken: string
-  refreshToken: string
-  isNewUser: boolean
-  userId: number
+  signupRequired: boolean
+  signupToken?: string    // signupRequired: true 일 때
+  accessToken?: string    // signupRequired: false 일 때
+  refreshToken?: string
 }
 
 export interface SignupResponse {
@@ -56,6 +57,16 @@ export function naverLogin(body: NaverLoginBody): Promise<LoginResponse> {
 
 export function signup(body: SignupBody): Promise<SignupResponse> {
   return api.post('auth/signup', { json: body }).json<SignupResponse>()
+}
+
+// 신규 사용자 전용 — signupToken을 Authorization 헤더에 직접 삽입
+// kyInstance의 beforeRequest가 accessToken을 덮어쓰므로 raw ky 사용
+export function signupNewUser(body: SignupBody, signupToken: string): Promise<SignupResponse> {
+  return ky.post('auth/signup', {
+    prefix: process.env.NEXT_PUBLIC_API_URL,
+    json: body,
+    headers: { Authorization: `Bearer ${signupToken}` },
+  }).json<SignupResponse>()
 }
 
 export function logout(): Promise<void> {
