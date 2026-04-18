@@ -20,7 +20,7 @@ const FALLBACK_CENTER = { lat: 37.5665, lng: 126.978 }; // 서울시청
 function reverseGeocodeWithRetry(
   lat: number,
   lng: number,
-  onResult: (loc: { lat: number; lng: number; address: string; dongName: string }) => void,
+  onResult: (loc: SelectedLocation) => void,
   retries = 15,
   isCancelled?: () => boolean,
 ) {
@@ -38,11 +38,12 @@ function reverseGeocodeWithRetry(
       const items: any[] = response.v2?.results ?? [];
       if (items.length === 0) return;
       const region = items[0].region;
-      const city = (region?.area1?.name ?? "").replace(/(특별시|광역시|특별자치시|도)$/, "");
-      const gu = region?.area2?.name ?? "";
+      const sido = region?.area1?.name ?? "";
+      const sigungu = region?.area2?.name ?? "";
+      const city = sido.replace(/(특별시|광역시|특별자치시|도)$/, "");
       const dong = region?.area3?.name ?? "";
-      const address = [city, gu, dong].filter(Boolean).join(" ");
-      onResult({ lat, lng, address, dongName: dong || gu });
+      const address = [city, sigungu, dong].filter(Boolean).join(" ");
+      onResult({ lat, lng, address, dongName: dong || sigungu, sido, sigungu });
     },
   );
 }
