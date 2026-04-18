@@ -6,7 +6,7 @@ import { SetNicknameStep } from "@/features/set-nickname";
 import { SetBoundaryStep } from "@/features/set-boundary";
 import type { SelectedLocation } from "@/features/set-boundary";
 import { signupNewUser, type SignupNewUserBody, type SignupResponse } from "@/shared/api";
-import { useTokenStore } from "@/shared/model";
+import { useTokenStore, useToastStore } from "@/shared/model";
 import { ROUTES } from "@/shared/config/routes";
 import { useSignupFlowStore } from "../model/signupFlowStore";
 
@@ -17,6 +17,7 @@ export function SignUpPage() {
 
   const { signupToken, nickname: storedNickname, setNickname, reset } = useSignupFlowStore();
   const { setAccessToken, setRefreshToken } = useTokenStore();
+  const showToast = useToastStore((s) => s.show);
 
   const { mutateAsync: doSignup } = useMutation<SignupResponse, Error, SignupNewUserBody>({
     mutationFn: signupNewUser,
@@ -45,7 +46,7 @@ export function SignUpPage() {
       reset();
       router.replace(ROUTES.home);
     } catch {
-      router.replace(ROUTES.login);
+      showToast('회원가입에 실패했어요. 다시 시도해주세요.');
     }
   }
 
