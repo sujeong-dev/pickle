@@ -36,6 +36,14 @@ export interface SignupBody {
   nickname: string
 }
 
+export interface SignupNewUserBody {
+  signupToken: string
+  nickname: string
+  sido: string
+  sigungu: string
+  termsAgreed: boolean
+}
+
 export interface UpdateNicknameBody {
   nickname: string
 }
@@ -60,13 +68,11 @@ export function signup(body: SignupBody): Promise<SignupResponse> {
   return api.post('auth/signup', { json: body }).json<SignupResponse>()
 }
 
-// 신규 사용자 전용 — signupToken을 Authorization 헤더에 직접 삽입
-// kyInstance의 beforeRequest가 accessToken을 덮어쓰므로 raw ky 사용
-export function signupNewUser(body: SignupBody, signupToken: string): Promise<SignupResponse> {
+// 신규 사용자 전용 — signupToken을 body에 포함, accessToken 없는 상태에서 호출되므로 raw ky 사용
+export function signupNewUser(body: SignupNewUserBody): Promise<SignupResponse> {
   return ky.post('auth/signup', {
     prefix: process.env.NEXT_PUBLIC_API_URL,
     json: body,
-    headers: { Authorization: `Bearer ${signupToken}` },
   }).json<SignupResponse>()
 }
 

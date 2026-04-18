@@ -18,6 +18,7 @@ export type {
   KakaoLoginBody,
   NaverLoginBody,
   SignupBody,
+  SignupNewUserBody,
   UpdateNicknameBody,
 } from './auth'
 export {

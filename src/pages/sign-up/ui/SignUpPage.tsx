@@ -4,7 +4,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { SetNicknameStep } from "@/features/set-nickname";
 import { SetBoundaryStep } from "@/features/set-boundary";
-import { signupNewUser, type SignupResponse } from "@/shared/api";
+import type { SelectedLocation } from "@/features/set-boundary";
+import { signupNewUser, type SignupNewUserBody, type SignupResponse } from "@/shared/api";
 import { useTokenStore } from "@/shared/model";
 import { ROUTES } from "@/shared/config/routes";
 import { useSignupFlowStore } from "../model/signupFlowStore";
@@ -17,9 +18,8 @@ export function SignUpPage() {
   const { signupToken, nickname: storedNickname, setNickname, reset } = useSignupFlowStore();
   const { setAccessToken, setRefreshToken } = useTokenStore();
 
-  const { mutateAsync: doSignup } = useMutation<SignupResponse, Error, { nickname: string; signupToken: string }>({
-    mutationFn: ({ nickname, signupToken }) =>
-      signupNewUser({ nickname }, signupToken),
+  const { mutateAsync: doSignup } = useMutation<SignupResponse, Error, SignupNewUserBody>({
+    mutationFn: signupNewUser,
   });
 
   function handleNicknameSubmit(nickname: string) {
@@ -27,13 +27,19 @@ export function SignUpPage() {
     router.replace(`${ROUTES.signUp}?step=boundary`);
   }
 
-  async function handleBoundaryComplete() {
+  async function handleBoundaryComplete(location: SelectedLocation) {
     if (!signupToken) {
       router.replace(ROUTES.login);
       return;
     }
     try {
-      const data = await doSignup({ nickname: storedNickname, signupToken });
+      const data = await doSignup({
+        signupToken,
+        nickname: storedNickname,
+        sido: location.sido,
+        sigungu: location.sigungu,
+        termsAgreed: true,
+      });
       setAccessToken(data.accessToken);
       setRefreshToken(data.refreshToken);
       reset();
