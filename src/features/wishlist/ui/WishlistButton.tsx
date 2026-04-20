@@ -43,8 +43,8 @@ export function WishlistButton({ postId, initialBookmarked = false }: WishlistBu
   function handleToggle() {
     toggleBookmark(undefined, {
       onSuccess: (data) => {
-        setIsWished(data.bookmarked);
-        if (data.bookmarked) setToastVisible(true);
+        setIsWished(data.isBookmarked);
+        if (data.isBookmarked) setToastVisible(true);
         setTimeout(() => setToastVisible(false), 2000);
       },
     });

@@ -2,7 +2,8 @@
 
 import { useRef, useEffect } from "react";
 import Image from "next/image";
-import { Input, Textarea, StarIcon } from "@/shared/ui";
+import { Input, StarIcon } from "@/shared/ui";
+import { useUploadPresigned } from "@/features/report-step1-photo/api/useOcr";
 import type { OcrResult } from "@/shared/api/report";
 
 function CameraIcon() {
@@ -25,59 +26,63 @@ function CloseIcon() {
 type ReportStep2Props = {
   photos: File[];
   representativeIdx: number;
-  productCode: string;
   productName: string;
-  discountPrice: string;
-  originalPrice: string;
-  review: string;
+  price: string;
+  store: string;
+  branch: string;
   ocrResult?: OcrResult | null;
-  onAddPhoto: (file: File) => void;
+  onAddPhoto: (file: File, r2Key: string) => void;
   onRemovePhoto: (idx: number) => void;
   onSetRepresentative: (idx: number) => void;
-  onProductCodeChange: (v: string) => void;
   onProductNameChange: (v: string) => void;
-  onDiscountPriceChange: (v: string) => void;
-  onOriginalPriceChange: (v: string) => void;
-  onReviewChange: (v: string) => void;
+  onPriceChange: (v: string) => void;
+  onStoreChange: (v: string) => void;
+  onBranchChange: (v: string) => void;
 };
 
 export function ReportStep2({
   photos,
   representativeIdx,
-  productCode,
   productName,
-  discountPrice,
-  originalPrice,
-  review,
+  price,
+  store,
+  branch,
   ocrResult,
   onAddPhoto,
   onRemovePhoto,
   onSetRepresentative,
-  onProductCodeChange,
   onProductNameChange,
-  onDiscountPriceChange,
-  onOriginalPriceChange,
-  onReviewChange,
+  onPriceChange,
+  onStoreChange,
+  onBranchChange,
 }: ReportStep2Props) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const { mutateAsync: getPresigned } = useUploadPresigned();
 
   // Auto-fill form fields from OCR result when it becomes available
   useEffect(() => {
-    if (!ocrResult || ocrResult.status !== "done") return;
-    if (ocrResult.productName && !productName) {
-      onProductNameChange(ocrResult.productName);
+    if (!ocrResult || ocrResult.status !== "completed") return;
+    if (ocrResult.result?.productName && !productName) {
+      onProductNameChange(ocrResult.result.productName);
     }
-    if (ocrResult.price !== undefined && !discountPrice) {
-      onDiscountPriceChange(String(ocrResult.price));
+    if (ocrResult.result?.price !== undefined && !price) {
+      onPriceChange(String(ocrResult.result.price));
     }
   // Only run when ocrResult changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ocrResult]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) onAddPhoto(file);
+    if (!file) return;
     e.target.value = "";
+    try {
+      const { uploadUrl, r2Key } = await getPresigned({ fileType: file.type, purpose: 'post' });
+      await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
+      onAddPhoto(file, r2Key);
+    } catch {
+      // Error is handled centrally by kyInstance (toast shown)
+    }
   };
 
   return (
@@ -145,17 +150,6 @@ export function ReportStep2({
       <div className='flex flex-col gap-3'>
         <div className='flex flex-col gap-1'>
           <label className='text-[14px] font-semibold text-gray-900'>
-            상품코드
-          </label>
-          <Input
-            value={productCode}
-            onChange={(e) => onProductCodeChange(e.target.value)}
-            onClear={() => onProductCodeChange('')}
-            placeholder='상품코드를 입력해주세요'
-          />
-        </div>
-        <div className='flex flex-col gap-1'>
-          <label className='text-[14px] font-semibold text-gray-900'>
             상품명
           </label>
           <Input
@@ -167,38 +161,36 @@ export function ReportStep2({
         </div>
         <div className='flex flex-col gap-1'>
           <label className='text-[14px] font-semibold text-gray-900'>
-            할인가
+            가격
           </label>
           <Input
-            value={discountPrice}
-            onChange={(e) => onDiscountPriceChange(e.target.value)}
-            onClear={() => onDiscountPriceChange('')}
-            placeholder='할인가를 입력해주세요'
+            value={price}
+            onChange={(e) => onPriceChange(e.target.value)}
+            onClear={() => onPriceChange('')}
+            placeholder='가격을 입력해주세요'
             inputMode='numeric'
           />
         </div>
         <div className='flex flex-col gap-1'>
           <label className='text-[14px] font-semibold text-gray-900'>
-            원가
+            매장
           </label>
           <Input
-            value={originalPrice}
-            onChange={(e) => onOriginalPriceChange(e.target.value)}
-            onClear={() => onOriginalPriceChange('')}
-            placeholder='원가를 입력해주세요'
-            inputMode='numeric'
+            value={store}
+            onChange={(e) => onStoreChange(e.target.value)}
+            onClear={() => onStoreChange('')}
+            placeholder='매장명을 입력해주세요 (예: 코스트코)'
           />
         </div>
         <div className='flex flex-col gap-1'>
           <label className='text-[14px] font-semibold text-gray-900'>
-            제보 글
+            지점
           </label>
-          <Textarea
-            value={review}
-            onChange={(e) => onReviewChange(e.target.value)}
-            placeholder='어떤 할인을 발견했나요? 매장 상황, 재고, 꿀팁을 자유롭게 적어주세요'
-            maxLength={300}
-            rows={4}
+          <Input
+            value={branch}
+            onChange={(e) => onBranchChange(e.target.value)}
+            onClear={() => onBranchChange('')}
+            placeholder='지점명을 입력해주세요 (예: 양재점)'
           />
         </div>
       </div>

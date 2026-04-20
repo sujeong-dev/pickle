@@ -18,24 +18,24 @@ function TagIcon() {
 
 type ReportStep1Props = {
   photo: File | null;
-  fileUrl: string | null;
+  r2Key: string | null;
   jobId: string | null;
   ocrResult: OcrResult | null;
   onPhotoChange: (file: File) => void;
   onPhotoRemove: () => void;
-  onFileUrlChange: (url: string) => void;
+  onR2KeyChange: (r2Key: string) => void;
   onJobIdChange: (jobId: string) => void;
   onOcrResultChange: (result: OcrResult) => void;
 };
 
 export function ReportStep1({
   photo,
-  fileUrl,
+  r2Key,
   jobId,
   ocrResult,
   onPhotoChange,
   onPhotoRemove,
-  onFileUrlChange,
+  onR2KeyChange,
   onJobIdChange,
   onOcrResultChange,
 }: ReportStep1Props) {
@@ -47,11 +47,11 @@ export function ReportStep1({
   const isOcrLoading =
     isPresignedPending ||
     isOcrPending ||
-    (!!jobId && ocrStatus?.status === "pending");
+    (!!jobId && (ocrStatus?.status === "waiting" || ocrStatus?.status === "active"));
 
-  // When OCR status becomes done or failed, propagate result
+  // When OCR status becomes completed or failed, propagate result
   useEffect(() => {
-    if (ocrStatus && (ocrStatus.status === "done" || ocrStatus.status === "failed")) {
+    if (ocrStatus && (ocrStatus.status === "completed" || ocrStatus.status === "failed")) {
       onOcrResultChange(ocrStatus);
     }
   }, [ocrStatus, onOcrResultChange]);
@@ -63,22 +63,22 @@ export function ReportStep1({
 
     try {
       // 1. Get presigned URL
-      const { presignedUrl, fileUrl: uploadedFileUrl } = await getPresigned({
-        filename: file.name,
-        contentType: file.type,
+      const { uploadUrl, r2Key: newR2Key } = await getPresigned({
+        fileType: file.type,
+        purpose: 'post',
       });
 
       // 2. Upload to R2
-      await fetch(presignedUrl, {
+      await fetch(uploadUrl, {
         method: "PUT",
         body: file,
         headers: { "Content-Type": file.type },
       });
 
-      onFileUrlChange(uploadedFileUrl);
+      onR2KeyChange(newR2Key);
 
-      // 3. Request OCR
-      const { jobId: newJobId } = await requestOcr(file);
+      // 3. Request OCR with r2Key
+      const { jobId: newJobId } = await requestOcr({ r2Key: newR2Key });
       onJobIdChange(newJobId);
     } catch {
       // Error is handled centrally by kyInstance (toast shown)
@@ -111,7 +111,7 @@ export function ReportStep1({
             <ScanIcon />
             {isOcrLoading ? (
               <span className="font-bold text-[12px] text-white">OCR 인식 중...</span>
-            ) : ocrResult?.status === "done" ? (
+            ) : ocrResult?.status === "completed" ? (
               <span className="font-bold text-[12px] text-white">OCR 인식 완료</span>
             ) : ocrResult?.status === "failed" ? (
               <span className="font-bold text-[12px] text-white">OCR 인식 실패</span>
@@ -159,8 +159,8 @@ export function ReportStep1({
         onChange={handleChange}
       />
 
-      {/* Hidden field to track fileUrl for parent usage */}
-      {fileUrl && <input type="hidden" value={fileUrl} readOnly />}
+      {/* Hidden field to track r2Key for parent usage */}
+      {r2Key && <input type="hidden" value={r2Key} readOnly />}
     </div>
   );
 }
