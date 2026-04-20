@@ -2,15 +2,22 @@ import { useState } from "react";
 
 export function useReportStep2() {
   const [photos, setPhotos] = useState<File[]>([]);
+  const [photoR2Keys, setPhotoR2Keys] = useState<string[]>([]);
   const [representativeIdx, setRepresentativeIdx] = useState(0);
-  const [productCode, setProductCode] = useState("");
   const [productName, setProductName] = useState("");
-  const [discountPrice, setDiscountPrice] = useState("");
-  const [originalPrice, setOriginalPrice] = useState("");
-  const [review, setReview] = useState("");
+  const [price, setPrice] = useState("");
+  const [store, setStore] = useState("");
+  const [branch, setBranch] = useState("");
 
-  const addPhoto = (file: File) => {
-    setPhotos((prev) => (prev.length < 5 ? [...prev, file] : prev));
+  const addPhoto = (file: File, r2Key: string) => {
+    setPhotos((prev) => {
+      if (prev.length >= 5) return prev;
+      return [...prev, file];
+    });
+    setPhotoR2Keys((prev) => {
+      if (prev.length >= 5) return prev;
+      return [...prev, r2Key];
+    });
   };
 
   const removePhoto = (idx: number) => {
@@ -21,23 +28,23 @@ export function useReportStep2() {
       }
       return next;
     });
+    setPhotoR2Keys((prev) => prev.filter((_, i) => i !== idx));
   };
 
   return {
     photos,
+    photoR2Keys,
     representativeIdx,
-    productCode,
     productName,
-    discountPrice,
-    originalPrice,
-    review,
+    price,
+    store,
+    branch,
     addPhoto,
     removePhoto,
     setRepresentativeIdx,
-    setProductCode,
     setProductName,
-    setDiscountPrice,
-    setOriginalPrice,
-    setReview,
+    setPrice,
+    setStore,
+    setBranch,
   };
 }

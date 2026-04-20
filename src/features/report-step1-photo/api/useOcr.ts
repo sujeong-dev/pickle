@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { getPresignedUrl, requestOcr, getOcrStatus } from '@/shared/api/report'
-import type { PresignedUrlBody } from '@/shared/api/report'
 
 export const ocrKeys = {
   all: ['ocr'] as const,
@@ -9,13 +8,13 @@ export const ocrKeys = {
 
 export function useUploadPresigned() {
   return useMutation({
-    mutationFn: (body: PresignedUrlBody) => getPresignedUrl(body),
+    mutationFn: (body: { fileType: string; purpose: string }) => getPresignedUrl(body),
   })
 }
 
 export function useOcrProduct() {
   return useMutation({
-    mutationFn: (imageFile: File) => requestOcr(imageFile),
+    mutationFn: (body: { r2Key: string }) => requestOcr(body),
   })
 }
 
@@ -26,7 +25,7 @@ export function useOcrStatus(jobId: string | null) {
     enabled: !!jobId,
     refetchInterval: (query) => {
       const status = query.state.data?.status
-      if (status === 'done' || status === 'failed') return false
+      if (status === 'completed' || status === 'failed') return false
       return 2000
     },
   })
