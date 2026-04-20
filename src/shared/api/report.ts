@@ -2,13 +2,13 @@ import { api } from './kyInstance'
 
 // Types
 export type PresignedUrlBody = {
-  filename: string
-  contentType: string
+  fileType: string
+  purpose: string
 }
 
 export type PresignedUrlResponse = {
-  presignedUrl: string
-  fileUrl: string
+  uploadUrl: string
+  r2Key: string
 }
 
 export type OcrJobResponse = {
@@ -17,30 +17,32 @@ export type OcrJobResponse = {
 
 export type OcrResult = {
   jobId: string
-  status: 'pending' | 'done' | 'failed'
-  productName?: string
-  price?: number
-  discountRate?: number
+  status: 'waiting' | 'active' | 'completed' | 'failed'
+  result?: {
+    productName?: string
+    price?: number
+    discountRate?: number
+  }
 }
 
 export type CreatePostBody = {
+  store: string
+  branch: string
   productName: string
-  originalPrice: number
-  discountedPrice: number
-  discountRate: number
-  storeLocation: string
-  imageUrl?: string
+  price: number
+  imageKeys: string[]
   content?: string
 }
 
 export type Post = {
   id: string
   productName: string
+  price: number
   originalPrice: number
-  discountedPrice: number
   discountRate: number
-  storeLocation: string
-  imageUrl?: string
+  store: string
+  branch?: string
+  imageKeys?: string[]
   content?: string
   createdAt: string
 }
@@ -51,10 +53,8 @@ export async function getPresignedUrl(body: PresignedUrlBody): Promise<Presigned
   return api.post('upload/presigned', { json: body }).json<PresignedUrlResponse>()
 }
 
-export async function requestOcr(imageFile: File): Promise<OcrJobResponse> {
-  const formData = new FormData()
-  formData.append('imageFile', imageFile)
-  return api.post('ocr/product', { body: formData }).json<OcrJobResponse>()
+export async function requestOcr(body: { r2Key: string }): Promise<OcrJobResponse> {
+  return api.post('ocr/product', { json: body }).json<OcrJobResponse>()
 }
 
 export async function getOcrStatus(jobId: string): Promise<OcrResult> {

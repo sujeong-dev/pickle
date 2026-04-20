@@ -7,22 +7,22 @@ export type ReviewDetail = Review & {
 };
 
 export type ReviewListResponse = {
-  data: Review[];
-  total: number;
-  page: number;
-  size: number;
+  items: Review[];
+  limit: number;
+  hasNext: boolean;
+  nextCursor: string | null;
 };
 
 export type ReviewListParams = {
-  postId: string;
-  page?: number;
-  size?: number;
+  productId: string;
+  limit?: number;
+  cursor?: string;
 };
 
-export function getReviews({ postId, page, size }: ReviewListParams): Promise<ReviewListResponse> {
-  const searchParams: Record<string, string | number> = { postId };
-  if (page !== undefined) searchParams.page = page;
-  if (size !== undefined) searchParams.size = size;
+export function getReviews({ productId, limit, cursor }: ReviewListParams): Promise<ReviewListResponse> {
+  const searchParams: Record<string, string | number> = { productId };
+  if (limit !== undefined) searchParams.limit = limit;
+  if (cursor !== undefined) searchParams.cursor = cursor;
   return api.get('reviews', { searchParams }).json<ReviewListResponse>();
 }
 

@@ -33,6 +33,7 @@ export {
   deletePostComment,
 } from './product'
 export type {
+  PostImage,
   Comment,
   PostListParams,
   PostListResponse,

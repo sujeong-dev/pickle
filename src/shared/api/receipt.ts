@@ -11,7 +11,11 @@ export type ReceiptItem = {
 };
 
 export type RegisterReceiptBody = {
-  imageUrl: string;
+  store: string;
+  branch: string;
+  totalAmount: number;
+  itemCount: number;
+  purchasedAt: string;
 };
 
 export type RegisterReceiptResponse = {
@@ -21,11 +25,10 @@ export type RegisterReceiptResponse = {
 };
 
 export type CreateReviewBody = {
-  postId: string;
+  receiptId: string;
+  productName: string;
   rating: number;
-  content: string;
-  receiptId?: string;
-  imageUrls?: string[];
+  imageKeys?: string[];
 };
 
 export type UpdateReviewBody = {
@@ -36,17 +39,17 @@ export type UpdateReviewBody = {
 // ── API Functions ─────────────────────────────────────────────
 
 export function registerReceipt(body: RegisterReceiptBody): Promise<RegisterReceiptResponse> {
-  return api.post('api/receipts', { json: body }).json<RegisterReceiptResponse>();
+  return api.post('receipts', { json: body }).json<RegisterReceiptResponse>();
 }
 
 export function createReview(body: CreateReviewBody): Promise<Review> {
-  return api.post('api/reviews', { json: body }).json<Review>();
+  return api.post('reviews', { json: body }).json<Review>();
 }
 
 export function updateReview(id: string, body: UpdateReviewBody): Promise<Review> {
-  return api.patch(`api/reviews/${id}`, { json: body }).json<Review>();
+  return api.patch(`reviews/${id}`, { json: body }).json<Review>();
 }
 
 export function deleteReview(id: string): Promise<void> {
-  return api.delete(`api/reviews/${id}`).json<void>();
+  return api.delete(`reviews/${id}`).json<void>();
 }

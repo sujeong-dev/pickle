@@ -1,40 +1,53 @@
 import { api } from './kyInstance';
-import type { Post, Author } from '@/entities/post';
+import type { Post } from '@/entities/post';
 
 // ── Types ────────────────────────────────────────────────────
+
+// Post, Review 이미지 배열의 공통 타입
+export type PostImage = {
+  id: string;
+  url: string;
+  orderNum: number;
+};
 
 export type Comment = {
   id: string;
   content: string;
-  author: Author;
   createdAt: string;
+  authorNickname: string;
+  isMine: boolean;
 };
 
 export type PostListParams = {
-  page?: number;
-  size?: number;
-  sort?: string;
+  limit?: number;
+  cursor?: string;
   productId?: string;
 };
 
 export type PostListResponse = {
-  data: Post[];
-  total: number;
-  page: number;
-  size: number;
+  items: Post[];
+  limit: number;
+  hasNext: boolean;
+  nextCursor: string | null;
 };
 
 export type LikeResponse = {
-  liked: boolean;
-  likeCount: number;
+  postId: string;
+  isLiked: boolean;
+  // TODO: Swagger 미존재 — 백엔드 확인 필요 (현재 UI에서 likeCount 표시에 사용)
+  likeCount?: number;
 };
 
 export type BookmarkResponse = {
-  bookmarked: boolean;
+  postId: string;
+  isBookmarked: boolean;
 };
 
 export type CommentListResponse = {
-  data: Comment[];
+  items: Comment[];
+  limit: number;
+  hasNext: boolean;
+  nextCursor: string | null;
 };
 
 // ── API functions ────────────────────────────────────────────
