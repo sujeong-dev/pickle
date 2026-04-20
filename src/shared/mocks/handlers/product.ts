@@ -5,74 +5,86 @@ import type { Comment, PostListResponse, LikeResponse, BookmarkResponse, Comment
 const mockPosts: Post[] = [
   {
     id: '1',
-    author: { name: '할인사냥꾼', isVerified: true, avatarUrl: undefined },
+    authorNickname: '할인사냥꾼',
+    // TODO: Swagger 미존재 — 백엔드 확인 필요
+    isVerified: true,
     createdAt: '2시간 전',
     content: '양재점 물티슈 세일 중이에요! 재고 많으니 서두르세요',
-    product: {
-      name: '커클랜드 시그니처 물티슈',
-      discountRate: 24,
-      originalPrice: 16900,
-      currentPrice: 12900,
-      imageUrl: undefined,
-    },
+    productName: '커클랜드 시그니처 물티슈',
+    discountRate: 24,
+    originalPrice: 16900,
+    price: 12900,
+    store: '코스트코',
+    branch: '양재점',
+    images: [],
     reviewCount: 3,
     rating: 4.7,
     likeCount: 47,
     commentCount: 3,
+    // TODO: Swagger 미존재 — 백엔드 확인 필요
     relatedPostCount: 3,
   },
   {
     id: '2',
-    author: { name: '알뜰주부', isVerified: true, avatarUrl: undefined },
+    authorNickname: '알뜰주부',
+    // TODO: Swagger 미존재 — 백엔드 확인 필요
+    isVerified: true,
     createdAt: '4시간 전',
     content: '오늘 코스트코 잠실점 갔다가 발견했어요. 1+1 행사 중이라 진짜 이득이에요!',
-    product: {
-      name: '코코넛오일 1.6L',
-      discountRate: 15,
-      originalPrice: 22900,
-      currentPrice: 19500,
-      imageUrl: undefined,
-    },
+    productName: '코코넛오일 1.6L',
+    discountRate: 15,
+    originalPrice: 22900,
+    price: 19500,
+    store: '코스트코',
+    branch: '잠실점',
+    images: [],
     reviewCount: 5,
     rating: 4.5,
     likeCount: 32,
     commentCount: 11,
+    // TODO: Swagger 미존재 — 백엔드 확인 필요
     relatedPostCount: 2,
   },
   {
     id: '3',
-    author: { name: '절약왕', isVerified: false, avatarUrl: undefined },
+    authorNickname: '절약왕',
+    // TODO: Swagger 미존재 — 백엔드 확인 필요
+    isVerified: false,
     createdAt: '1일 전',
     content: '목동점 세제 특가 나왔어요. 1개 구매 시 1개 증정!',
-    product: {
-      name: '다우니 섬유유연제 3L',
-      discountRate: 30,
-      originalPrice: 18900,
-      currentPrice: 13200,
-      imageUrl: undefined,
-    },
+    productName: '다우니 섬유유연제 3L',
+    discountRate: 30,
+    originalPrice: 18900,
+    price: 13200,
+    store: '코스트코',
+    branch: '목동점',
+    images: [],
     reviewCount: 8,
     rating: 4.2,
     likeCount: 61,
     commentCount: 19,
+    // TODO: Swagger 미존재 — 백엔드 확인 필요
     relatedPostCount: 1,
   },
   {
     id: '4',
-    author: { name: '코스트코마니아', isVerified: true, avatarUrl: undefined },
+    authorNickname: '코스트코마니아',
+    // TODO: Swagger 미존재 — 백엔드 확인 필요
+    isVerified: true,
     createdAt: '3시간 전',
     content: '하남점 올리브오일 세일 중! 유통기한 넉넉합니다.',
-    product: {
-      name: '커클랜드 엑스트라버진 올리브오일',
-      discountRate: 20,
-      originalPrice: 34900,
-      currentPrice: 27900,
-      imageUrl: undefined,
-    },
+    productName: '커클랜드 엑스트라버진 올리브오일',
+    discountRate: 20,
+    originalPrice: 34900,
+    price: 27900,
+    store: '코스트코',
+    branch: '하남점',
+    images: [],
     reviewCount: 12,
     rating: 4.8,
     likeCount: 89,
     commentCount: 34,
+    // TODO: Swagger 미존재 — 백엔드 확인 필요
     relatedPostCount: 4,
   },
 ];
@@ -81,19 +93,22 @@ const mockComments: Comment[] = [
   {
     id: 'c1',
     content: '상봉점은 품절 ㅠㅠ',
-    author: { name: '코코맘', isVerified: false },
+    authorNickname: '코코맘',
+    isMine: false,
     createdAt: '1시간 전',
   },
   {
     id: 'c2',
     content: '저도 양재점 들렀는데 재고 많았어요 빨리 가세요!',
-    author: { name: '절약마스터', isVerified: true },
+    authorNickname: '절약마스터',
+    isMine: false,
     createdAt: '30분 전',
   },
   {
     id: 'c3',
     content: '가격 대비 정말 좋네요 감사합니다',
-    author: { name: '새벽할인', isVerified: false },
+    authorNickname: '새벽할인',
+    isMine: true,
     createdAt: '15분 전',
   },
 ];
@@ -105,14 +120,13 @@ const bookmarkedState = new Map<string, boolean>();
 export const productHandlers = [
   http.get('*/posts', ({ request }) => {
     const url = new URL(request.url);
-    const page = Number(url.searchParams.get('page') ?? 1);
-    const size = Number(url.searchParams.get('size') ?? 10);
+    const limit = Number(url.searchParams.get('limit') ?? 10);
 
     const response: PostListResponse = {
-      data: mockPosts,
-      total: mockPosts.length,
-      page,
-      size,
+      items: mockPosts,
+      limit,
+      hasNext: false,
+      nextCursor: null,
     };
     return HttpResponse.json(response);
   }),
@@ -125,8 +139,8 @@ export const productHandlers = [
     }
     return HttpResponse.json({
       ...post,
-      liked: likedState.get(id) ?? false,
-      bookmarked: bookmarkedState.get(id) ?? false,
+      isLiked: likedState.get(id) ?? false,
+      isBookmarked: bookmarkedState.get(id) ?? false,
     });
   }),
 
@@ -139,7 +153,9 @@ export const productHandlers = [
     const nowLiked = !(likedState.get(postId) ?? false);
     likedState.set(postId, nowLiked);
     const response: LikeResponse = {
-      liked: nowLiked,
+      postId,
+      isLiked: nowLiked,
+      // TODO: Swagger 미존재 — 백엔드 확인 필요
       likeCount: nowLiked ? post.likeCount + 1 : post.likeCount,
     };
     return HttpResponse.json(response);
@@ -153,7 +169,7 @@ export const productHandlers = [
     }
     const nowBookmarked = !(bookmarkedState.get(postId) ?? false);
     bookmarkedState.set(postId, nowBookmarked);
-    const response: BookmarkResponse = { bookmarked: nowBookmarked };
+    const response: BookmarkResponse = { postId, isBookmarked: nowBookmarked };
     return HttpResponse.json(response);
   }),
 
@@ -172,7 +188,12 @@ export const productHandlers = [
     if (!post) {
       return HttpResponse.json({ message: '제보를 찾을 수 없어요.' }, { status: 404 });
     }
-    const response: CommentListResponse = { data: mockComments };
+    const response: CommentListResponse = {
+      items: mockComments,
+      limit: 20,
+      hasNext: false,
+      nextCursor: null,
+    };
     return HttpResponse.json(response);
   }),
 
@@ -186,7 +207,8 @@ export const productHandlers = [
     const newComment: Comment = {
       id: `c${Date.now()}`,
       content: body.content,
-      author: { name: '나', isVerified: false },
+      authorNickname: '나',
+      isMine: true,
       createdAt: '방금',
     };
     return HttpResponse.json(newComment, { status: 201 });
