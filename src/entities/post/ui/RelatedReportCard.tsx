@@ -70,17 +70,27 @@ function CommentIcon() {
 }
 
 export function RelatedReportCard({ post, className }: RelatedReportCardProps) {
-  const { author, createdAt, content, likeCount, commentCount } = post;
+  const {
+    authorNickname,
+    // TODO: Swagger 미존재 — 백엔드 확인 필요
+    isVerified,
+    avatarUrl,
+    createdAt,
+    content,
+    likeCount,
+    commentCount,
+  } = post;
 
   return (
     <article className={cn("bg-white flex flex-col gap-0.5 w-full", className)}>
       {/* Author row */}
       <div className="flex gap-2.5 items-center px-5 py-3">
-        <Avatar name={author.name} avatarUrl={author.avatarUrl} />
+        <Avatar name={authorNickname} avatarUrl={avatarUrl} />
         <div className="flex flex-col gap-0.5 flex-1 min-w-0">
           <div className="flex gap-1 items-center">
-            <span className="font-semibold text-subtitle text-gray-900 whitespace-nowrap">{author.name}</span>
-            {author.isVerified && <VerifiedBadge />}
+            <span className="font-semibold text-subtitle text-gray-900 whitespace-nowrap">{authorNickname}</span>
+            {/* TODO: Swagger 미존재 — 백엔드 확인 필요 */}
+            {isVerified && <VerifiedBadge />}
           </div>
           <span className="text-[11.5px] text-gray-500">{createdAt}</span>
         </div>

@@ -1,7 +1,13 @@
-import type { ReviewItem } from "../model/types";
 import { StarIcon } from "@/shared/ui";
 
-export function ReviewItemRow({ name, price, rating, comment }: ReviewItem) {
+type ReviewItemProps = {
+  name: string;
+  price: string;
+  rating: number;
+  comment: string;
+};
+
+export function ReviewItemRow({ name, price, rating, comment }: ReviewItemProps) {
   return (
     <div className="flex gap-3 items-center border-b border-gray-100 px-5 py-3">
       <div className="bg-[#e8e8e8] rounded-[6px] shrink-0 size-[60px]" />

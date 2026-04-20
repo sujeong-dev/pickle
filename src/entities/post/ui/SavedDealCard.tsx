@@ -24,16 +24,24 @@ function FilledHeartIcon() {
 }
 
 export function SavedDealCard({ post }: SavedDealCardProps) {
-  const { author, createdAt, product } = post;
+  const {
+    authorNickname,
+    createdAt,
+    productName,
+    discountRate,
+    price,
+    images,
+  } = post;
+  const thumbnailUrl = images[0]?.url;
 
   return (
     <article className="flex items-start gap-[18px] px-lg py-sm bg-white border-b border-gray-200">
       {/* 썸네일 */}
       <div className="shrink-0 size-20 rounded-[6px] bg-gray-200 overflow-hidden">
-        {product?.imageUrl && (
+        {thumbnailUrl && (
           <Image
-            src={product.imageUrl}
-            alt={product.name}
+            src={thumbnailUrl}
+            alt={productName}
             width={80}
             height={80}
             className="size-full object-cover"
@@ -44,26 +52,22 @@ export function SavedDealCard({ post }: SavedDealCardProps) {
       {/* 정보 */}
       <div className="flex flex-col h-20 justify-between flex-1 min-w-0">
         <span className="text-h2 font-bold text-gray-900 truncate">
-          {product?.name ?? "-"}
+          {productName}
         </span>
 
         <div className="flex items-baseline gap-xs">
-          {product?.discountRate != null && (
-            <span className="text-body2 font-bold text-secondary-500">
-              {product.discountRate}%
-            </span>
-          )}
+          <span className="text-body2 font-bold text-secondary-500">
+            {discountRate}%
+          </span>
           <span className="text-h3 font-bold text-gray-900">
-            {product?.currentPrice != null
-              ? `${product.currentPrice.toLocaleString()}원`
-              : "-"}
+            {price.toLocaleString()}원
           </span>
         </div>
 
         <div className="flex items-center gap-xs">
           <span className="text-caption text-gray-500">{createdAt}</span>
           <span className="text-caption text-gray-400">·</span>
-          <span className="text-caption text-gray-500">{author.name}</span>
+          <span className="text-caption text-gray-500">{authorNickname}</span>
         </div>
       </div>
 

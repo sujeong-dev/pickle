@@ -7,16 +7,17 @@ type MyReportCardProps = {
 };
 
 export function MyReportCard({ post }: MyReportCardProps) {
-  const { product, createdAt, likeCount, commentCount } = post;
+  const { productName, discountRate, price, images, createdAt, likeCount, commentCount } = post;
+  const thumbnailUrl = images[0]?.url;
 
   return (
     <article className="bg-white flex gap-[15px] items-start px-lg py-sm border-b border-gray-100">
       {/* 썸네일 */}
       <div className="shrink-0 size-20 rounded-xs bg-gray-200 overflow-hidden">
-        {product?.imageUrl && (
+        {thumbnailUrl && (
           <Image
-            src={product.imageUrl}
-            alt={product.name}
+            src={thumbnailUrl}
+            alt={productName}
             width={80}
             height={80}
             className="size-full object-cover"
@@ -28,20 +29,16 @@ export function MyReportCard({ post }: MyReportCardProps) {
       <div className="flex flex-col h-20 justify-between flex-1 min-w-0">
         {/* 상품명 */}
         <span className="text-h2 font-bold text-gray-900 truncate">
-          {product?.name ?? "-"}
+          {productName}
         </span>
 
         {/* 할인율 + 가격 */}
         <div className="flex items-baseline gap-2xs">
-          {product?.discountRate != null && (
-            <span className="text-body2 font-bold text-secondary-500">
-              {product.discountRate}%
-            </span>
-          )}
+          <span className="text-body2 font-bold text-secondary-500">
+            {discountRate}%
+          </span>
           <span className="text-h3 font-bold text-gray-900">
-            {product?.currentPrice != null
-              ? `${product.currentPrice.toLocaleString()}원`
-              : "-"}
+            {price.toLocaleString()}원
           </span>
         </div>
 

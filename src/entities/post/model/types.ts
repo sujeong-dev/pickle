@@ -1,30 +1,31 @@
-export type Author = {
-  name: string;
-  avatarUrl?: string;
-  isVerified: boolean;
-};
+import type { PostImage } from '@/shared/api';
 
-export type Product = {
-  name: string;
-  discountRate: number;
-  originalPrice: number;
-  currentPrice: number;
-  imageUrl?: string;
-};
+export type { PostImage };
 
 export type Post = {
   id: string;
-  author: Author;
+  authorNickname: string;
   createdAt: string;
   content: string;
-  product?: Product;
+  productName: string;
+  price: number;
+  originalPrice: number;
+  discountRate: number;
+  store: string;
+  branch?: string;
+  images: PostImage[];
   reviewCount: number;
   rating: number;
   likeCount: number;
   commentCount: number;
-  relatedPostCount: number;
-  liked?: boolean;
-  bookmarked?: boolean;
+  // TODO: Swagger 미존재 — 백엔드 확인 필요
+  isVerified?: boolean;
+  avatarUrl?: string;
+  relatedPostCount?: number;
+  // Swagger 존재
+  isLiked?: boolean;
+  isBookmarked?: boolean;
+  isMine?: boolean;
 };
 
 export type ReceiptReviewItem = {

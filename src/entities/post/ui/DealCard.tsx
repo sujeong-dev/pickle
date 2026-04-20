@@ -104,7 +104,26 @@ function ReceiptIcon() {
 }
 
 export function DealCard({ post, href, wishlistButton, className }: DealCardProps) {
-  const { id, author, createdAt, content, product, reviewCount, rating, likeCount, commentCount, relatedPostCount } = post;
+  const {
+    id,
+    authorNickname,
+    // TODO: Swagger 미존재 — 백엔드 확인 필요
+    isVerified,
+    avatarUrl,
+    relatedPostCount,
+    createdAt,
+    content,
+    productName,
+    discountRate,
+    price,
+    originalPrice,
+    images,
+    reviewCount,
+    rating,
+    likeCount,
+    commentCount,
+  } = post;
+  const thumbnailUrl = images[0]?.url;
 
   return (
     <article className={cn("bg-white flex flex-col gap-[2px] w-full relative", className)}>
@@ -113,11 +132,12 @@ export function DealCard({ post, href, wishlistButton, className }: DealCardProp
       )}
       {/* Author row */}
       <div className="flex gap-2.5 items-center px-5 py-3">
-        <Avatar name={author.name} avatarUrl={author.avatarUrl} />
+        <Avatar name={authorNickname} avatarUrl={avatarUrl} />
         <div className="flex flex-col gap-0.5 flex-1 min-w-0">
           <div className="flex gap-1 items-center">
-            <span className="font-semibold text-subtitle text-gray-900 whitespace-nowrap">{author.name}</span>
-            {author.isVerified && <VerifiedBadge />}
+            <span className="font-semibold text-subtitle text-gray-900 whitespace-nowrap">{authorNickname}</span>
+            {/* TODO: Swagger 미존재 — 백엔드 확인 필요 */}
+            {isVerified && <VerifiedBadge />}
           </div>
           <span className="text-[11.5px] text-gray-500">{createdAt}</span>
         </div>
@@ -129,29 +149,27 @@ export function DealCard({ post, href, wishlistButton, className }: DealCardProp
       </div>
 
       {/* Product image */}
-      {product?.imageUrl ? (
+      {thumbnailUrl ? (
         <div className="relative w-full aspect-375/134 mt-0.5">
-          <Image src={product.imageUrl} alt={product.name} fill className="object-cover" />
+          <Image src={thumbnailUrl} alt={productName} fill className="object-cover" />
         </div>
       ) : (
         <div className="w-full aspect-375/134 bg-gray-200 mt-0.5" />
       )}
 
       {/* Product info */}
-      {product && (
-        <div className="flex gap-3 items-center px-5 py-3">
-          <div className="size-[46px] rounded-[6px] bg-secondary-500 flex items-center justify-center shrink-0 px-1">
-            <span className="font-bold text-subtitle text-white leading-none">{product.discountRate}%</span>
-          </div>
-          <div className="flex flex-col justify-between h-[46px] flex-1 min-w-0">
-            <span className="font-bold text-subtitle text-gray-900">{product.name}</span>
-            <div className="flex gap-[6px] items-baseline whitespace-nowrap">
-              <span className="font-bold text-h2 text-gray-900">{product.currentPrice.toLocaleString()}원</span>
-              <span className="text-caption text-gray-400 line-through">{product.originalPrice.toLocaleString()}원</span>
-            </div>
+      <div className="flex gap-3 items-center px-5 py-3">
+        <div className="size-[46px] rounded-[6px] bg-secondary-500 flex items-center justify-center shrink-0 px-1">
+          <span className="font-bold text-subtitle text-white leading-none">{discountRate}%</span>
+        </div>
+        <div className="flex flex-col justify-between h-[46px] flex-1 min-w-0">
+          <span className="font-bold text-subtitle text-gray-900">{productName}</span>
+          <div className="flex gap-[6px] items-baseline whitespace-nowrap">
+            <span className="font-bold text-h2 text-gray-900">{price.toLocaleString()}원</span>
+            <span className="text-caption text-gray-400 line-through">{originalPrice.toLocaleString()}원</span>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Review row */}
       <div className="flex items-center gap-2 px-3 py-2 bg-[#FFFBEB] rounded-[6px] mx-0">
@@ -185,7 +203,8 @@ export function DealCard({ post, href, wishlistButton, className }: DealCardProp
       </div>
 
       {/* Related reports row */}
-      {relatedPostCount > 0 && (
+      {/* TODO: Swagger 미존재 — 백엔드 확인 필요 */}
+      {relatedPostCount != null && relatedPostCount > 0 && (
         <Link href={ROUTES.relatedReports(id)} className="relative z-10 flex items-center justify-between px-5 py-3 bg-primary-50">
           <div className="flex gap-2 items-center">
             <div className="flex -space-x-[18px]">
