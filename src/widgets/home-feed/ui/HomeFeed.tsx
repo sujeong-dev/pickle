@@ -70,7 +70,7 @@ export function HomeFeed() {
     );
   }
 
-  if (isError || !data || data.data.length === 0) {
+  if (isError || !data || data.pages[0].items.length === 0) {
     return (
       <div className="flex flex-col flex-1 min-h-0">
         <FeedEmpty />
@@ -78,7 +78,7 @@ export function HomeFeed() {
     );
   }
 
-  const posts: Post[] = data.data;
+  const posts: Post[] = data.pages.flatMap((p) => p.items);
   const hotPost = posts[0];
   const recentPosts = posts.slice(1);
 

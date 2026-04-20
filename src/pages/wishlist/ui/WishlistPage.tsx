@@ -9,21 +9,20 @@ import type { MyBookmark } from "@/shared/api";
 function toPost(bookmark: MyBookmark): Post {
   return {
     id: bookmark.id,
-    author: { name: bookmark.author.nickname, isVerified: false },
+    authorNickname: bookmark.author.nickname,
     createdAt: bookmark.createdAt,
-    content: '',
-    product: {
-      name: bookmark.productName,
-      discountRate: bookmark.discountRate,
-      originalPrice: bookmark.originalPrice,
-      currentPrice: bookmark.price,
-      imageUrl: bookmark.imageUrl,
-    },
+    content: "",
+    productName: bookmark.productName,
+    price: bookmark.price,
+    originalPrice: bookmark.originalPrice,
+    discountRate: bookmark.discountRate,
+    store: bookmark.storeLocation,
+    images: bookmark.imageUrl ? [{ id: "", url: bookmark.imageUrl, orderNum: 0 }] : [],
     reviewCount: 0,
     rating: 0,
     likeCount: 0,
     commentCount: 0,
-    relatedPostCount: 0,
+    isBookmarked: true,
   };
 }
 

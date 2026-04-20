@@ -20,8 +20,8 @@ export function ReportPage() {
   const {
     photo,
     setPhoto,
-    fileUrl,
-    setFileUrl,
+    r2Key,
+    setR2Key,
     jobId,
     setJobId,
     ocrResult,
@@ -31,20 +31,19 @@ export function ReportPage() {
 
   const {
     photos,
+    photoR2Keys,
     representativeIdx,
-    productCode,
     productName,
-    discountPrice,
-    originalPrice,
-    review,
+    price,
+    store,
+    branch,
     addPhoto,
     removePhoto: removeProductPhoto,
     setRepresentativeIdx,
-    setProductCode,
     setProductName,
-    setDiscountPrice,
-    setOriginalPrice,
-    setReview,
+    setPrice,
+    setStore,
+    setBranch,
   } = useReportStep2();
 
   const { mutateAsync: createReport, isPending: isSubmitting } = useCreateReport();
@@ -61,21 +60,12 @@ export function ReportPage() {
     }
 
     // Step 2: submit
-    const discountedPriceNum = Number(discountPrice);
-    const originalPriceNum = Number(originalPrice);
-    const discountRateNum =
-      originalPriceNum > 0
-        ? Math.round(((originalPriceNum - discountedPriceNum) / originalPriceNum) * 100)
-        : (ocrResult?.discountRate ?? 0);
-
     await createReport({
       productName,
-      originalPrice: originalPriceNum,
-      discountedPrice: discountedPriceNum,
-      discountRate: discountRateNum,
-      storeLocation: productCode,
-      imageUrl: fileUrl ?? undefined,
-      content: review || undefined,
+      price: Number(price),
+      store,
+      branch,
+      imageKeys: photoR2Keys,
     });
 
     setShowSuccess(true);
@@ -84,7 +74,7 @@ export function ReportPage() {
   const canNext =
     step === 1
       ? photo !== null
-      : photos.length > 0 && !!productName && !!discountPrice && !!originalPrice;
+      : photos.length > 0 && !!productName && !!price && !!store && !!branch;
 
   if (showSuccess) {
     return (
@@ -109,12 +99,12 @@ export function ReportPage() {
         {step === 1 && (
           <ReportStep1
             photo={photo}
-            fileUrl={fileUrl}
+            r2Key={r2Key}
             jobId={jobId}
             ocrResult={ocrResult}
             onPhotoChange={setPhoto}
             onPhotoRemove={removePhoto}
-            onFileUrlChange={setFileUrl}
+            onR2KeyChange={setR2Key}
             onJobIdChange={setJobId}
             onOcrResultChange={setOcrResult}
           />
@@ -123,20 +113,18 @@ export function ReportPage() {
           <ReportStep2
             photos={photos}
             representativeIdx={representativeIdx}
-            productCode={productCode}
             productName={productName}
-            discountPrice={discountPrice}
-            originalPrice={originalPrice}
-            review={review}
+            price={price}
+            store={store}
+            branch={branch}
             ocrResult={ocrResult}
             onAddPhoto={addPhoto}
             onRemovePhoto={removeProductPhoto}
             onSetRepresentative={setRepresentativeIdx}
-            onProductCodeChange={setProductCode}
             onProductNameChange={setProductName}
-            onDiscountPriceChange={setDiscountPrice}
-            onOriginalPriceChange={setOriginalPrice}
-            onReviewChange={setReview}
+            onPriceChange={setPrice}
+            onStoreChange={setStore}
+            onBranchChange={setBranch}
           />
         )}
       </main>

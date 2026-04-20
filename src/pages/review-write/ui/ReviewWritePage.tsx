@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ROUTES } from "@/shared/config/routes";
 import { Button, PageHeader, StepIndicator, SuccessScreen } from "@/shared/ui";
 import { ReviewStep1, useReviewStep1 } from "@/features/review-step1-receipt";
@@ -15,14 +15,12 @@ const STEP_LABELS = ["영수증 등록", "항목 확인", "후기 등록"];
 
 export function ReviewWritePage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const postId = searchParams?.get("postId") ?? "";
 
   const [step, setStep] = useState<Step>(1);
   const [itemIdx, setItemIdx] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const { receipt, receiptData, setReceipt, setReceiptData, removeReceipt } = useReviewStep1();
+  const { receiptData, setReceiptData } = useReviewStep1();
   const { items: receiptItems } = useReviewStep2(receiptData?.items);
   const { reviews, setRating, setComment, addPhoto, removePhoto, setRepresentative } =
     useReviewStep3(receiptItems.length);
@@ -51,36 +49,32 @@ export function ReviewWritePage() {
           for (let i = 0; i < receiptItems.length; i++) {
             const review = reviews[i];
 
-            // Upload photos for this item and collect URLs
-            let imageUrls: string[] | undefined;
-            if (review.photos.length > 0) {
-              const uploadedUrls: string[] = [];
-              for (const photo of review.photos) {
-                const { presignedUrl, fileUrl } = await getPresignedUrl({
-                  filename: photo.name,
-                  contentType: photo.type,
-                });
-                await fetch(presignedUrl, {
-                  method: "PUT",
-                  body: photo,
-                  headers: { "Content-Type": photo.type },
-                });
-                uploadedUrls.push(fileUrl);
-              }
-              // Reorder so representative photo is first
-              if (review.representativeIdx > 0 && review.representativeIdx < uploadedUrls.length) {
-                const rep = uploadedUrls.splice(review.representativeIdx, 1)[0];
-                uploadedUrls.unshift(rep);
-              }
-              imageUrls = uploadedUrls;
+            // Upload photos and collect r2Keys
+            const r2Keys: string[] = [];
+            for (const photo of review.photos) {
+              const { uploadUrl, r2Key } = await getPresignedUrl({
+                fileType: photo.type,
+                purpose: "review",
+              });
+              await fetch(uploadUrl, {
+                method: "PUT",
+                body: photo,
+                headers: { "Content-Type": photo.type },
+              });
+              r2Keys.push(r2Key);
+            }
+
+            // Reorder so representative photo is first
+            if (review.representativeIdx > 0 && review.representativeIdx < r2Keys.length) {
+              const rep = r2Keys.splice(review.representativeIdx, 1)[0];
+              r2Keys.unshift(rep);
             }
 
             await createReview({
-              postId,
+              receiptId: receiptData!.receiptId,
+              productName: receiptItems[i].name,
               rating: review.rating,
-              content: review.comment,
-              receiptId: receiptData?.receiptId,
-              imageUrls,
+              imageKeys: r2Keys.length > 0 ? r2Keys : undefined,
             });
           }
           setShowSuccess(true);
@@ -103,7 +97,7 @@ export function ReviewWritePage() {
   }
 
   const canNext =
-    step === 1 ? receipt !== null && receiptData !== null : true;
+    step === 1 ? receiptData !== null : true;
 
   const nextLabel =
     step === 1
@@ -125,10 +119,7 @@ export function ReviewWritePage() {
         <>
           <main className="flex-1 overflow-y-auto min-h-0 px-5 py-6">
             <ReviewStep1
-              receipt={receipt}
               receiptData={receiptData}
-              onReceiptChange={setReceipt}
-              onReceiptRemove={removeReceipt}
               onReceiptDataChange={setReceiptData}
             />
           </main>
@@ -151,7 +142,7 @@ export function ReviewWritePage() {
         <>
           <ReviewStep3
             itemName={receiptItems[itemIdx].name}
-            itemPrice={receiptItems[itemIdx].price}
+            itemPrice={`${receiptItems[itemIdx].price.toLocaleString()}원`}
             currentIdx={itemIdx}
             total={receiptItems.length}
             photos={reviews[itemIdx].photos}

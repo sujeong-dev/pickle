@@ -30,11 +30,11 @@ export function ReviewPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: reviewKeys.list(postId),
-    queryFn: () => getReviews({ postId }),
+    queryFn: () => getReviews({ productId: postId }),
     enabled: !!postId,
   });
 
-  const reviews = data?.data ?? [];
+  const reviews = data?.items ?? [];
 
   return (
     <div className="bg-gray-50 flex flex-col h-dvh">

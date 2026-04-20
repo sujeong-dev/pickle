@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { RelatedReportCard } from "@/entities/post";
-import type { Product } from "@/entities/post";
+import type { Post } from "@/entities/post";
 import { BackHeader } from "@/shared/ui";
 import { useRelatedReports } from "../api/useRelatedReports";
 
@@ -10,22 +10,23 @@ type RelatedReportsPageProps = {
   productId: string;
 };
 
-function ProductSummary({ product }: { product: Product & { imageUrl?: string } }) {
+function ProductSummary({ post }: { post: Post }) {
+  const imageUrl = post.images[0]?.url;
   return (
     <div className="bg-white flex gap-4 items-center px-5 py-3 shrink-0">
-      {product.imageUrl ? (
+      {imageUrl ? (
         <div className="relative size-16 rounded-[6px] overflow-hidden shrink-0">
-          <Image src={product.imageUrl} alt={product.name} fill className="object-cover" />
+          <Image src={imageUrl} alt={post.productName} fill className="object-cover" />
         </div>
       ) : (
         <div className="size-16 rounded-[6px] bg-gray-200 shrink-0" />
       )}
       <div className="flex flex-col justify-between h-14 flex-1 min-w-0">
-        <span className="font-bold text-h2 text-gray-900 truncate">{product.name}</span>
+        <span className="font-bold text-h2 text-gray-900 truncate">{post.productName}</span>
         <div className="flex gap-2 items-baseline whitespace-nowrap">
-          <span className="font-bold text-subtitle text-secondary-500">{product.discountRate}%</span>
-          <span className="font-bold text-h2 text-gray-900">{product.currentPrice.toLocaleString()}원</span>
-          <span className="text-subtitle text-gray-400 line-through">{product.originalPrice.toLocaleString()}원</span>
+          <span className="font-bold text-subtitle text-secondary-500">{post.discountRate}%</span>
+          <span className="font-bold text-h2 text-gray-900">{post.price.toLocaleString()}원</span>
+          <span className="text-subtitle text-gray-400 line-through">{post.originalPrice.toLocaleString()}원</span>
         </div>
       </div>
     </div>
@@ -45,14 +46,13 @@ function RelatedReportsSkeleton() {
 export function RelatedReportsPage({ productId }: RelatedReportsPageProps) {
   const { data, isLoading, isError } = useRelatedReports(productId);
 
-  const posts = data?.data ?? [];
-  // Use the first post's product info for the header summary
-  const product = posts[0]?.product;
+  const posts = data?.items ?? [];
+  const firstPost = posts[0];
 
   return (
     <div className="bg-white flex flex-col h-dvh">
       <BackHeader />
-      {product && <ProductSummary product={product} />}
+      {firstPost && <ProductSummary post={firstPost} />}
       {isLoading && <RelatedReportsSkeleton />}
       {isError && (
         <div className="flex flex-col flex-1 items-center justify-center gap-2">

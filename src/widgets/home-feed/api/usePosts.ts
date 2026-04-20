@@ -1,12 +1,13 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { getPosts, postKeys } from "@/shared/api";
-import type { PostListParams } from "@/shared/api";
 
-export function usePosts(params?: PostListParams) {
-  return useQuery({
+export function usePosts() {
+  return useInfiniteQuery({
     queryKey: postKeys.list(),
-    queryFn: () => getPosts(params),
+    queryFn: ({ pageParam }) => getPosts({ cursor: pageParam as string | undefined }),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.hasNext ? lastPage.nextCursor ?? undefined : undefined,
   });
 }

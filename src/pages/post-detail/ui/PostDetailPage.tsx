@@ -118,8 +118,9 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
   const { mutate: toggleLike } = useMutation({
     mutationFn: () => togglePostLike(postId),
     onSuccess: (data) => {
-      setLikedOverride(data.liked);
-      setLocalLikeCount(data.likeCount);
+      setLikedOverride(data.isLiked);
+      // TODO: likeCount는 Swagger LikeResponse에 없음 — 백엔드 확인 필요
+      if (data.likeCount != null) setLocalLikeCount(data.likeCount);
     },
   });
 
@@ -166,10 +167,22 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
     );
   }
 
-  const { author, createdAt, product, reviewCount, rating, likeCount: serverLikeCount } = post;
-  const liked = likedOverride ?? (post.liked ?? false);
+  const {
+    authorNickname,
+    // TODO: Swagger 미존재 — 백엔드 확인 필요
+    isVerified,
+    createdAt,
+    productName,
+    price,
+    originalPrice,
+    discountRate,
+    reviewCount,
+    rating,
+    likeCount: serverLikeCount,
+  } = post;
+  const liked = likedOverride ?? (post.isLiked ?? false);
   const displayLikeCount = localLikeCount ?? serverLikeCount;
-  const comments = commentsData?.data ?? [];
+  const comments = commentsData?.items ?? [];
   const filledStars = Math.round(rating);
 
   return (
@@ -187,24 +200,21 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
             <Avatar />
             <div className="flex flex-col gap-0.5">
               <div className="flex gap-1 items-center">
-                <span className="font-semibold text-subtitle text-gray-900">{author.name}</span>
-                {author.isVerified && <VerifiedBadge />}
+                <span className="font-semibold text-subtitle text-gray-900">{authorNickname}</span>
+                {/* TODO: Swagger 미존재 — 백엔드 확인 필요 */}
+                {isVerified && <VerifiedBadge />}
               </div>
               <span className="text-[11.5px] text-gray-500">{createdAt}</span>
             </div>
           </div>
 
           {/* Product name & price */}
-          {product && (
-            <>
-              <h1 className="font-bold text-h2 text-gray-900 leading-normal">{product.name}</h1>
-              <div className="flex gap-2 items-baseline whitespace-nowrap">
-                <span className="font-bold text-subtitle text-secondary-500">{product.discountRate}%</span>
-                <span className="font-bold text-h2 text-gray-900">{product.currentPrice.toLocaleString()}원</span>
-                <span className="text-subtitle text-gray-400 line-through">{product.originalPrice.toLocaleString()}원</span>
-              </div>
-            </>
-          )}
+          <h1 className="font-bold text-h2 text-gray-900 leading-normal">{productName}</h1>
+          <div className="flex gap-2 items-baseline whitespace-nowrap">
+            <span className="font-bold text-subtitle text-secondary-500">{discountRate}%</span>
+            <span className="font-bold text-h2 text-gray-900">{price.toLocaleString()}원</span>
+            <span className="text-subtitle text-gray-400 line-through">{originalPrice.toLocaleString()}원</span>
+          </div>
         </div>
 
         {/* Action bar */}
@@ -243,7 +253,7 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
             </button>
           </div>
           <div className="flex gap-3 items-center">
-            <WishlistButton postId={post.id} initialBookmarked={post.bookmarked ?? false} />
+            <WishlistButton postId={post.id} initialBookmarked={post.isBookmarked ?? false} />
             <button type="button" aria-label="공유하기"><ShareIcon /></button>
           </div>
         </div>
@@ -273,7 +283,7 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
             <div key={c.id} className="flex gap-3 items-start">
               <div className="size-8 rounded-full bg-gray-100 shrink-0" />
               <div className="flex flex-col gap-1.5 flex-1">
-                <span className="font-semibold text-[13.5px] text-gray-800">{c.author.name}</span>
+                <span className="font-semibold text-[13.5px] text-gray-800">{c.authorNickname}</span>
                 <span className="text-[13.5px] text-gray-700">{c.content}</span>
               </div>
               <RemoveButton size="sm" aria-label="댓글 삭제" onClick={() => removeComment(c.id)} />
