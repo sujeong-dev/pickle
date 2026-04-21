@@ -35,7 +35,7 @@ export function Button({
     <button
       disabled={disabled}
       className={cn(
-        "flex items-center justify-center w-full font-medium overflow-hidden",
+        "flex items-center justify-center font-medium overflow-hidden",
         sizeStyles[size],
         disabled ? "bg-gray-200 text-gray-400" : variantStyles[variant],
         className,

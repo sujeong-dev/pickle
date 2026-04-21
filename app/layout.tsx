@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { QueryProvider } from "@/shared/providers";
-import { MSWProvider } from "./MSWProvider";
+import { MSWProvider } from '@/shared/providers';
 
 export const metadata: Metadata = {
   title: "Pickle",
