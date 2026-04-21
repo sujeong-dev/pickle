@@ -176,6 +176,7 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
     price,
     originalPrice,
     discountRate,
+    avgRating,
     reviewCount,
     rating,
     likeCount: serverLikeCount,
@@ -183,7 +184,8 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
   const liked = likedOverride ?? (post.isLiked ?? false);
   const displayLikeCount = localLikeCount ?? serverLikeCount;
   const comments = commentsData?.items ?? [];
-  const filledStars = Math.round(rating);
+  const displayRating = avgRating ?? rating ?? 0;
+  const filledStars = Math.round(displayRating);
 
   return (
     <div className="bg-white flex flex-col h-dvh">
@@ -211,9 +213,9 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
           {/* Product name & price */}
           <h1 className="font-bold text-h2 text-gray-900 leading-normal">{productName}</h1>
           <div className="flex gap-2 items-baseline whitespace-nowrap">
-            <span className="font-bold text-subtitle text-secondary-500">{discountRate}%</span>
+            <span className="font-bold text-subtitle text-secondary-500">{discountRate ?? 0}%</span>
             <span className="font-bold text-h2 text-gray-900">{price.toLocaleString()}원</span>
-            <span className="text-subtitle text-gray-400 line-through">{originalPrice.toLocaleString()}원</span>
+            <span className="text-subtitle text-gray-400 line-through">{(originalPrice ?? 0).toLocaleString()}원</span>
           </div>
         </div>
 
@@ -270,7 +272,7 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
                 <StarIcon key={i} size={16} filled={i < filledStars} />
               ))}
             </div>
-            <span className="font-bold text-subtitle text-[#F59E0B]">{rating}</span>
+            <span className="font-bold text-subtitle text-[#F59E0B]">{displayRating}</span>
             <span className="text-body2 text-gray-500">{reviewCount}건</span>
             <ChevronRightIcon />
           </div>

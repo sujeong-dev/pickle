@@ -11,17 +11,16 @@ function toPost(myPost: MyPost): Post {
     id: myPost.id,
     authorNickname: "",
     createdAt: myPost.createdAt,
-    content: "",
     productName: myPost.productName,
     price: myPost.price,
-    originalPrice: myPost.price,
-    discountRate: myPost.discountRate,
     store: myPost.storeLocation,
-    images: myPost.imageUrl ? [{ id: "", url: myPost.imageUrl, orderNum: 0 }] : [],
     reviewCount: 0,
-    rating: 0,
     likeCount: myPost.likeCount,
     commentCount: 0,
+    isMine: true,
+    originalPrice: myPost.price,
+    discountRate: myPost.discountRate,
+    thumbnail: myPost.imageUrl ?? undefined,
   };
 }
 

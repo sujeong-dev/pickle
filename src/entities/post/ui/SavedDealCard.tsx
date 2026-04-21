@@ -28,11 +28,13 @@ export function SavedDealCard({ post }: SavedDealCardProps) {
     authorNickname,
     createdAt,
     productName,
-    discountRate,
     price,
+    thumbnail,
+    discountRate,
     images,
   } = post;
-  const thumbnailUrl = images[0]?.url;
+  const thumbnailUrl = thumbnail ?? images?.[0]?.url;
+  const displayDiscountRate = discountRate ?? 0;
 
   return (
     <article className="flex items-start gap-[18px] px-lg py-sm bg-white border-b border-gray-200">
@@ -57,7 +59,7 @@ export function SavedDealCard({ post }: SavedDealCardProps) {
 
         <div className="flex items-baseline gap-xs">
           <span className="text-body2 font-bold text-secondary-500">
-            {discountRate}%
+            {displayDiscountRate}%
           </span>
           <span className="text-h3 font-bold text-gray-900">
             {price.toLocaleString()}원

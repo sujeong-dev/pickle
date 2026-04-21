@@ -7,8 +7,9 @@ type MyReportCardProps = {
 };
 
 export function MyReportCard({ post }: MyReportCardProps) {
-  const { productName, discountRate, price, images, createdAt, likeCount, commentCount } = post;
-  const thumbnailUrl = images[0]?.url;
+  const { productName, discountRate, price, thumbnail, images, createdAt, likeCount, commentCount } = post;
+  const thumbnailUrl = thumbnail ?? images?.[0]?.url;
+  const displayDiscountRate = discountRate ?? 0;
 
   return (
     <article className="bg-white flex gap-[15px] items-start px-lg py-sm border-b border-gray-100">
@@ -35,7 +36,7 @@ export function MyReportCard({ post }: MyReportCardProps) {
         {/* 할인율 + 가격 */}
         <div className="flex items-baseline gap-2xs">
           <span className="text-body2 font-bold text-secondary-500">
-            {discountRate}%
+            {displayDiscountRate}%
           </span>
           <span className="text-h3 font-bold text-gray-900">
             {price.toLocaleString()}원

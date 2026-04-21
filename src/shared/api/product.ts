@@ -19,6 +19,7 @@ export type Comment = {
 };
 
 export type PostListParams = {
+  sort?: 'latest' | 'most_liked' | 'most_bookmarked' | 'most_sold_out';
   limit?: number;
   cursor?: string;
   productId?: string;

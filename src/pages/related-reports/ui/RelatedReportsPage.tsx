@@ -11,7 +11,8 @@ type RelatedReportsPageProps = {
 };
 
 function ProductSummary({ post }: { post: Post }) {
-  const imageUrl = post.images[0]?.url;
+  const imageUrl = post.thumbnail ?? post.images?.[0]?.url;
+  const displayDiscountRate = post.discountRate ?? (post.originalPrice ? Math.round((1 - post.price / post.originalPrice) * 100) : 0);
   return (
     <div className="bg-white flex gap-4 items-center px-5 py-3 shrink-0">
       {imageUrl ? (
@@ -24,9 +25,9 @@ function ProductSummary({ post }: { post: Post }) {
       <div className="flex flex-col justify-between h-14 flex-1 min-w-0">
         <span className="font-bold text-h2 text-gray-900 truncate">{post.productName}</span>
         <div className="flex gap-2 items-baseline whitespace-nowrap">
-          <span className="font-bold text-subtitle text-secondary-500">{post.discountRate}%</span>
+          <span className="font-bold text-subtitle text-secondary-500">{displayDiscountRate}%</span>
           <span className="font-bold text-h2 text-gray-900">{post.price.toLocaleString()}원</span>
-          <span className="text-subtitle text-gray-400 line-through">{post.originalPrice.toLocaleString()}원</span>
+          <span className="text-subtitle text-gray-400 line-through">{(post.originalPrice ?? 0).toLocaleString()}원</span>
         </div>
       </div>
     </div>

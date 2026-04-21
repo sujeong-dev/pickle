@@ -110,20 +110,25 @@ export function DealCard({ post, href, wishlistButton, className }: DealCardProp
     // TODO: Swagger 미존재 — 백엔드 확인 필요
     isVerified,
     avatarUrl,
-    relatedPostCount,
     createdAt,
     content,
     productName,
-    discountRate,
     price,
     originalPrice,
+    thumbnail,
+    avgRating,
+    groupInfo,
+    discountRate,
     images,
     reviewCount,
     rating,
     likeCount,
     commentCount,
   } = post;
-  const thumbnailUrl = images[0]?.url;
+  const thumbnailUrl = thumbnail ?? images?.[0]?.url;
+  const displayDiscountRate = discountRate ?? (originalPrice ? Math.round((1 - price / originalPrice) * 100) : 0);
+  const displayRating = avgRating ?? rating ?? 0;
+  const relatedCount = groupInfo?.count;
 
   return (
     <article className={cn("bg-white flex flex-col gap-[2px] w-full relative", className)}>
@@ -145,7 +150,7 @@ export function DealCard({ post, href, wishlistButton, className }: DealCardProp
 
       {/* Content */}
       <div className="px-5">
-        <p className="text-[15.4px] text-gray-800">{content}</p>
+        <p className="text-[15.4px] text-gray-800">{content ?? ''}</p>
       </div>
 
       {/* Product image */}
@@ -160,13 +165,13 @@ export function DealCard({ post, href, wishlistButton, className }: DealCardProp
       {/* Product info */}
       <div className="flex gap-3 items-center px-5 py-3">
         <div className="size-[46px] rounded-[6px] bg-secondary-500 flex items-center justify-center shrink-0 px-1">
-          <span className="font-bold text-subtitle text-white leading-none">{discountRate}%</span>
+          <span className="font-bold text-subtitle text-white leading-none">{displayDiscountRate}%</span>
         </div>
         <div className="flex flex-col justify-between h-[46px] flex-1 min-w-0">
           <span className="font-bold text-subtitle text-gray-900">{productName}</span>
           <div className="flex gap-[6px] items-baseline whitespace-nowrap">
             <span className="font-bold text-h2 text-gray-900">{price.toLocaleString()}원</span>
-            <span className="text-caption text-gray-400 line-through">{originalPrice.toLocaleString()}원</span>
+            <span className="text-caption text-gray-400 line-through">{(originalPrice ?? 0).toLocaleString()}원</span>
           </div>
         </div>
       </div>
@@ -178,7 +183,7 @@ export function DealCard({ post, href, wishlistButton, className }: DealCardProp
         <div className="flex-1" />
         <div className="flex items-center gap-[2px]">
           <StarIcon size={13} />
-          <span className="font-bold text-body2 text-[#F59E0B]">{rating}</span>
+          <span className="font-bold text-body2 text-[#F59E0B]">{displayRating}</span>
         </div>
         <ChevronRightIcon size={16} />
       </div>
@@ -203,8 +208,7 @@ export function DealCard({ post, href, wishlistButton, className }: DealCardProp
       </div>
 
       {/* Related reports row */}
-      {/* TODO: Swagger 미존재 — 백엔드 확인 필요 */}
-      {relatedPostCount != null && relatedPostCount > 0 && (
+      {relatedCount != null && relatedCount > 0 && (
         <Link href={ROUTES.relatedReports(id)} className="relative z-10 flex items-center justify-between px-5 py-3 bg-primary-50">
           <div className="flex gap-2 items-center">
             <div className="flex -space-x-[18px]">
@@ -222,7 +226,7 @@ export function DealCard({ post, href, wishlistButton, className }: DealCardProp
                 </div>
               ))}
             </div>
-            <span className="font-medium text-body2 text-primary-500">같은 상품 제보 {relatedPostCount}건 더</span>
+            <span className="font-medium text-body2 text-primary-500">같은 상품 제보 {relatedCount}건 더</span>
           </div>
           <ChevronRightIcon size={16} />
         </Link>
