@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Post } from "../model/types";
 import { cn } from "@/shared/lib/utils";
+import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
 import { ROUTES } from "@/shared/config/routes";
 import { StarIcon } from "@/shared/ui";
 
@@ -130,7 +131,7 @@ export function DealCard({ post, href, wishlistButton, className }: DealCardProp
             {/* TODO: Swagger 미존재 — 백엔드 확인 필요 */}
             {isVerified && <VerifiedBadge />}
           </div>
-          <span className="text-[11.5px] text-gray-500">{createdAt}</span>
+          <span className="text-[11.5px] text-gray-500">{formatRelativeTime(createdAt)}</span>
         </div>
       </div>
 

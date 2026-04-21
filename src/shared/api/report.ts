@@ -31,7 +31,12 @@ export type CreatePostBody = {
   productName: string
   price: number
   imageKeys: string[]
-  content?: string
+  productCode?: string
+  originalPrice?: number
+  discountAmount?: number
+  discountStartAt?: string
+  discountEndAt?: string
+  description?: string
 }
 
 export type Post = {

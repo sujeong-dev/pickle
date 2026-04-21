@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BackHeader, StarIcon, RemoveButton } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
+import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
 import { WishlistButton } from "@/features/wishlist";
 import { ReportSoldoutModal, useReportSoldout, useReportSoldoutMutation } from "@/features/report-soldout";
 import { togglePostLike, createPostComment, deletePostComment, postKeys } from "@/shared/api";
@@ -265,7 +266,7 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
                 {/* TODO: Swagger 미존재 — 백엔드 확인 필요 */}
                 {isVerified && <VerifiedBadge />}
               </div>
-              <span className="text-[11.5px] text-gray-500">{createdAt}</span>
+              <span className="text-[11.5px] text-gray-500">{formatRelativeTime(createdAt)}</span>
             </div>
           </div>
 

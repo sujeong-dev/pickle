@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { ReceiptReview } from "../model/types";
 import { StarIcon } from "@/shared/ui";
+import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
 
 type MyReceiptReviewCardProps = {
   review: ReceiptReview;
@@ -17,7 +18,7 @@ export function MyReceiptReviewCard({ review }: MyReceiptReviewCardProps) {
           <StarIcon size={16} color="#FF9500" />
           <span className="text-h2 font-bold text-warning">{rating}</span>
         </div>
-        <span className="text-caption text-gray-500">{createdAt}</span>
+        <span className="text-caption text-gray-500">{formatRelativeTime(createdAt)}</span>
       </div>
 
       {/* Row 2: 항목 수 + 구분자 + 합계 금액 */}

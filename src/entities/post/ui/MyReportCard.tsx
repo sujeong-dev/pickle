@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { Post } from "../model/types";
 import { ThumbsUpIcon, CommentIcon } from "@/shared/ui";
+import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
 
 type MyReportCardProps = {
   post: Post;
@@ -45,7 +46,7 @@ export function MyReportCard({ post }: MyReportCardProps) {
 
         {/* 메타 정보 */}
         <div className="flex items-center gap-xs">
-          <span className="text-caption text-gray-500">{createdAt}</span>
+          <span className="text-caption text-gray-500">{formatRelativeTime(createdAt)}</span>
           <span className="text-caption text-gray-400">·</span>
           <div className="flex items-center gap-xs">
             <div className="flex items-center gap-2xs text-gray-500">

@@ -6,6 +6,7 @@ type ButtonSize = "sm" | "md" | "lg";
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
+  width?: string;
 }
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -26,6 +27,7 @@ const variantStyles: Record<ButtonVariant, string> = {
 export function Button({
   variant = "primary",
   size = "lg",
+  width = "full",
   disabled,
   className,
   children,
@@ -36,6 +38,7 @@ export function Button({
       disabled={disabled}
       className={cn(
         "flex items-center justify-center font-medium overflow-hidden",
+        width ? `w-${width}`: "w-full",
         sizeStyles[size],
         disabled ? "bg-gray-200 text-gray-400" : variantStyles[variant],
         className,

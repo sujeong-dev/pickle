@@ -6,8 +6,9 @@ export function useReportStep2() {
   const [representativeIdx, setRepresentativeIdx] = useState(0);
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
-  const [store, setStore] = useState("");
-  const [branch, setBranch] = useState("");
+  const [productCode, setProductCode] = useState("");
+  const [originalPrice, setOriginalPrice] = useState("");
+  const [description, setDescription] = useState("");
 
   const addPhoto = (file: File, r2Key: string) => {
     setPhotos((prev) => {
@@ -37,14 +38,16 @@ export function useReportStep2() {
     representativeIdx,
     productName,
     price,
-    store,
-    branch,
+    productCode,
+    originalPrice,
+    description,
     addPhoto,
     removePhoto,
     setRepresentativeIdx,
     setProductName,
     setPrice,
-    setStore,
-    setBranch,
+    setProductCode,
+    setOriginalPrice,
+    setDescription,
   };
 }

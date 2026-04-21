@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { Post } from "../model/types";
+import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
 
 type SavedDealCardProps = {
   post: Post;
@@ -66,7 +67,7 @@ export function SavedDealCard({ post }: SavedDealCardProps) {
         </div>
 
         <div className="flex items-center gap-xs">
-          <span className="text-caption text-gray-500">{createdAt}</span>
+          <span className="text-caption text-gray-500">{formatRelativeTime(createdAt)}</span>
           <span className="text-caption text-gray-400">·</span>
           <span className="text-caption text-gray-500">{authorNickname}</span>
         </div>

@@ -1,5 +1,6 @@
 import type { Post } from "../model/types";
 import { cn } from "@/shared/lib/utils";
+import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
 
 type RelatedReportCardProps = {
   post: Post;
@@ -79,7 +80,7 @@ export function RelatedReportCard({ post, className }: RelatedReportCardProps) {
             {/* TODO: Swagger 미존재 — 백엔드 확인 필요 */}
             {isVerified && <VerifiedBadge />}
           </div>
-          <span className="text-[11.5px] text-gray-500">{createdAt}</span>
+          <span className="text-[11.5px] text-gray-500">{formatRelativeTime(createdAt)}</span>
         </div>
       </div>
 

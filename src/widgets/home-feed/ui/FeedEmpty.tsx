@@ -25,7 +25,7 @@ export function FeedEmpty() {
         <p className="font-bold text-[21.2px] leading-[31.7px] text-gray-800">아직 제보가 없어요</p>
         <p className="text-[15.4px] leading-[23px] text-gray-500">첫 번째 할인 제보를 공유해보세요!</p>
       </div>
-      <Button size='md' className="px-2xl" onClick={() => router.push(ROUTES.report)}>
+      <Button size='md' width='w-[120px]' onClick={() => router.push(ROUTES.report)}>
         제보하기
       </Button>
     </div>
