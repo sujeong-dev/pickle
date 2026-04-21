@@ -6,86 +6,86 @@ const mockPosts: Post[] = [
   {
     id: '1',
     authorNickname: '할인사냥꾼',
-    // TODO: Swagger 미존재 — 백엔드 확인 필요
-    isVerified: true,
-    createdAt: '2시간 전',
-    content: '양재점 물티슈 세일 중이에요! 재고 많으니 서두르세요',
+    createdAt: '2024-01-01T10:00:00Z',
     productName: '커클랜드 시그니처 물티슈',
-    discountRate: 24,
-    originalPrice: 16900,
     price: 12900,
     store: '코스트코',
     branch: '양재점',
-    images: [],
-    reviewCount: 3,
-    rating: 4.7,
     likeCount: 47,
     commentCount: 3,
-    // TODO: Swagger 미존재 — 백엔드 확인 필요
-    relatedPostCount: 3,
+    reviewCount: 3,
+    isMine: false,
+    originalPrice: 16900,
+    avgRating: 4.7,
+    soldOutStatus: 'normal',
+    groupInfo: { count: 3, minPrice: 12900, maxPrice: 14900 },
+    // TODO fields
+    isVerified: true,
+    content: '양재점 물티슈 세일 중이에요! 재고 많으니 서두르세요',
+    discountRate: 24,
   },
   {
     id: '2',
     authorNickname: '알뜰주부',
-    // TODO: Swagger 미존재 — 백엔드 확인 필요
-    isVerified: true,
-    createdAt: '4시간 전',
-    content: '오늘 코스트코 잠실점 갔다가 발견했어요. 1+1 행사 중이라 진짜 이득이에요!',
+    createdAt: '2024-01-01T08:00:00Z',
     productName: '코코넛오일 1.6L',
-    discountRate: 15,
-    originalPrice: 22900,
     price: 19500,
     store: '코스트코',
     branch: '잠실점',
-    images: [],
-    reviewCount: 5,
-    rating: 4.5,
     likeCount: 32,
     commentCount: 11,
-    // TODO: Swagger 미존재 — 백엔드 확인 필요
-    relatedPostCount: 2,
+    reviewCount: 5,
+    isMine: false,
+    originalPrice: 22900,
+    avgRating: 4.5,
+    soldOutStatus: 'normal',
+    groupInfo: { count: 2, minPrice: 19500, maxPrice: 21000 },
+    // TODO fields
+    isVerified: true,
+    content: '오늘 코스트코 잠실점 갔다가 발견했어요. 1+1 행사 중이라 진짜 이득이에요!',
+    discountRate: 15,
   },
   {
     id: '3',
     authorNickname: '절약왕',
-    // TODO: Swagger 미존재 — 백엔드 확인 필요
-    isVerified: false,
-    createdAt: '1일 전',
-    content: '목동점 세제 특가 나왔어요. 1개 구매 시 1개 증정!',
+    createdAt: '2024-01-01T01:00:00Z',
     productName: '다우니 섬유유연제 3L',
-    discountRate: 30,
-    originalPrice: 18900,
     price: 13200,
     store: '코스트코',
     branch: '목동점',
-    images: [],
-    reviewCount: 8,
-    rating: 4.2,
     likeCount: 61,
     commentCount: 19,
-    // TODO: Swagger 미존재 — 백엔드 확인 필요
-    relatedPostCount: 1,
+    reviewCount: 8,
+    isMine: false,
+    originalPrice: 18900,
+    avgRating: 4.2,
+    soldOutStatus: 'warning',
+    groupInfo: { count: 1, minPrice: 13200, maxPrice: 13200 },
+    // TODO fields
+    isVerified: false,
+    content: '목동점 세제 특가 나왔어요. 1개 구매 시 1개 증정!',
+    discountRate: 30,
   },
   {
     id: '4',
     authorNickname: '코스트코마니아',
-    // TODO: Swagger 미존재 — 백엔드 확인 필요
-    isVerified: true,
-    createdAt: '3시간 전',
-    content: '하남점 올리브오일 세일 중! 유통기한 넉넉합니다.',
+    createdAt: '2024-01-01T09:00:00Z',
     productName: '커클랜드 엑스트라버진 올리브오일',
-    discountRate: 20,
-    originalPrice: 34900,
     price: 27900,
     store: '코스트코',
     branch: '하남점',
-    images: [],
-    reviewCount: 12,
-    rating: 4.8,
     likeCount: 89,
     commentCount: 34,
-    // TODO: Swagger 미존재 — 백엔드 확인 필요
-    relatedPostCount: 4,
+    reviewCount: 12,
+    isMine: false,
+    originalPrice: 34900,
+    avgRating: 4.8,
+    soldOutStatus: 'normal',
+    groupInfo: { count: 4, minPrice: 27900, maxPrice: 31000 },
+    // TODO fields
+    isVerified: true,
+    content: '하남점 올리브오일 세일 중! 유통기한 넉넉합니다.',
+    discountRate: 20,
   },
 ];
 
@@ -121,9 +121,19 @@ export const productHandlers = [
   http.get('*/posts', ({ request }) => {
     const url = new URL(request.url);
     const limit = Number(url.searchParams.get('limit') ?? 10);
+    const sort = url.searchParams.get('sort') ?? 'latest';
+
+    let sorted = [...mockPosts];
+    if (sort === 'most_liked') {
+      sorted = sorted.sort((a, b) => b.likeCount - a.likeCount);
+    }
+    // latest: return in order (most recent createdAt first)
+    if (sort === 'latest') {
+      sorted = sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
 
     const response: PostListResponse = {
-      items: mockPosts,
+      items: sorted,
       limit,
       hasNext: false,
       nextCursor: null,
