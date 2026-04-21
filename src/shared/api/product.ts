@@ -1,5 +1,5 @@
 import { api } from './kyInstance';
-import type { Post } from '@/entities/post';
+import type { Post, PostDetail } from '@/entities/post';
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -57,8 +57,8 @@ export function getPosts(params?: PostListParams): Promise<PostListResponse> {
   return api.get('posts', { searchParams: params as Record<string, string | number> }).json<PostListResponse>();
 }
 
-export function getPostDetail(id: string): Promise<Post> {
-  return api.get(`posts/${id}`).json<Post>();
+export function getPostDetail(id: string): Promise<PostDetail> {
+  return api.get(`posts/${id}`).json<PostDetail>();
 }
 
 export function togglePostLike(postId: string): Promise<LikeResponse> {

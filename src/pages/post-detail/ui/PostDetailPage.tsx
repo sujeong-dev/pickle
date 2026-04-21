@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BackHeader, StarIcon, RemoveButton } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
 import { WishlistButton } from "@/features/wishlist";
 import { ReportSoldoutModal, useReportSoldout, useReportSoldoutMutation } from "@/features/report-soldout";
 import { togglePostLike, createPostComment, deletePostComment, postKeys } from "@/shared/api";
+import type { PostImage } from "@/entities/post";
 import { usePostDetail, usePostComments } from "../api/usePostDetail";
 
 type PostDetailPageProps = {
@@ -69,15 +71,53 @@ function ChevronRightIcon() {
   );
 }
 
-function ImageCarousel() {
+function PostImageCarousel({ images }: { images: PostImage[] }) {
+  const [currentIdx, setCurrentIdx] = useState(0);
+
+  if (images.length === 0) {
+    return <div className="relative w-full aspect-375/225 bg-gray-200 shrink-0" />;
+  }
+
   return (
-    <div className="relative w-full aspect-375/225 bg-gray-200 shrink-0">
-      {/* dots */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 items-center">
-        <div className="h-2 w-6 rounded-full bg-white" />
-        <div className="size-2 rounded-full bg-white/50" />
-        <div className="size-2 rounded-full bg-white/50" />
-      </div>
+    <div className="relative w-full aspect-375/225 shrink-0 bg-gray-200 overflow-hidden">
+      <Image
+        src={images[currentIdx].url}
+        alt={`상품 이미지 ${currentIdx + 1}`}
+        fill
+        className="object-cover"
+      />
+      {images.length > 1 && (
+        <>
+          {/* 좌우 탭 영역 */}
+          <button
+            type="button"
+            aria-label="이전 이미지"
+            className="absolute left-0 inset-y-0 w-1/3"
+            onClick={() => setCurrentIdx((i) => Math.max(0, i - 1))}
+          />
+          <button
+            type="button"
+            aria-label="다음 이미지"
+            className="absolute right-0 inset-y-0 w-1/3"
+            onClick={() => setCurrentIdx((i) => Math.min(images.length - 1, i + 1))}
+          />
+          {/* 하단 dot indicator */}
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 items-center">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={`이미지 ${i + 1}`}
+                onClick={() => setCurrentIdx(i)}
+                className={cn(
+                  "rounded-full transition-all",
+                  i === currentIdx ? "h-2 w-6 bg-white" : "size-2 bg-white/50"
+                )}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -103,6 +143,11 @@ function PostDetailSkeleton() {
   );
 }
 
+function formatExpiredAt(expiredAt: string): string {
+  const date = new Date(expiredAt);
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+}
+
 // ── page ────────────────────────────────────────────────────
 
 export function PostDetailPage({ postId }: PostDetailPageProps) {
@@ -119,7 +164,6 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
     mutationFn: () => togglePostLike(postId),
     onSuccess: (data) => {
       setLikedOverride(data.isLiked);
-      // TODO: likeCount는 Swagger LikeResponse에 없음 — 백엔드 확인 필요
       if (data.likeCount != null) setLocalLikeCount(data.likeCount);
     },
   });
@@ -169,7 +213,6 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
 
   const {
     authorNickname,
-    // TODO: Swagger 미존재 — 백엔드 확인 필요
     isVerified,
     createdAt,
     productName,
@@ -179,12 +222,18 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
     avgRating,
     reviewCount,
     likeCount: serverLikeCount,
+    images,
+    description,
+    expiredAt,
+    soldOutCount,
   } = post;
-  const liked = likedOverride ?? (post.isLiked ?? false);
+
+  const liked = likedOverride ?? post.isLiked;
   const displayLikeCount = localLikeCount ?? serverLikeCount;
   const comments = commentsData?.items ?? [];
   const displayRating = avgRating ?? 0;
   const filledStars = Math.round(displayRating);
+  const displayDiscountRate = discountRate ?? (originalPrice ? Math.round((1 - price / originalPrice) * 100) : 0);
 
   return (
     <div className="bg-white flex flex-col h-dvh">
@@ -192,7 +241,18 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
 
       <div className="flex-1 overflow-y-auto min-h-0">
         {/* Image carousel */}
-        <ImageCarousel />
+        <PostImageCarousel images={images} />
+
+        {/* 거래 만료일 배너 */}
+        {expiredAt && (
+          <div className="bg-amber-50 flex items-center gap-2 px-5 py-2.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#92400E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <span className="text-body2 text-amber-800">{formatExpiredAt(expiredAt)}까지 거래 가능</span>
+          </div>
+        )}
 
         {/* Product info */}
         <div className="flex flex-col gap-2 px-6 py-5">
@@ -212,10 +272,15 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
           {/* Product name & price */}
           <h1 className="font-bold text-h2 text-gray-900 leading-normal">{productName}</h1>
           <div className="flex gap-2 items-baseline whitespace-nowrap">
-            <span className="font-bold text-subtitle text-secondary-500">{discountRate ?? 0}%</span>
+            <span className="font-bold text-subtitle text-secondary-500">{displayDiscountRate}%</span>
             <span className="font-bold text-h2 text-gray-900">{price.toLocaleString()}원</span>
             <span className="text-subtitle text-gray-400 line-through">{(originalPrice ?? 0).toLocaleString()}원</span>
           </div>
+
+          {/* Description */}
+          {description && (
+            <p className="text-[15px] text-gray-700 leading-relaxed mt-1">{description}</p>
+          )}
         </div>
 
         {/* Action bar */}
@@ -251,10 +316,13 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
               <span className={cn("font-semibold text-body2", isReported ? "text-gray-400" : "text-secondary-500")}>
                 {isReported ? "제보 완료" : "품절 제보하기"}
               </span>
+              {soldOutCount > 0 && !isReported && (
+                <span className="text-body2 text-secondary-400">{soldOutCount}명</span>
+              )}
             </button>
           </div>
           <div className="flex gap-3 items-center">
-            <WishlistButton postId={post.id} initialBookmarked={post.isBookmarked ?? false} />
+            <WishlistButton postId={post.id} initialBookmarked={post.isBookmarked} />
             <button type="button" aria-label="공유하기"><ShareIcon /></button>
           </div>
         </div>

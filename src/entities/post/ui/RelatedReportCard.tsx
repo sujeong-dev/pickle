@@ -63,7 +63,7 @@ export function RelatedReportCard({ post, className }: RelatedReportCardProps) {
     // TODO: Swagger 미존재 — 백엔드 확인 필요
     isVerified,
     createdAt,
-    content,
+    description,
     likeCount,
     commentCount,
   } = post;
@@ -85,7 +85,7 @@ export function RelatedReportCard({ post, className }: RelatedReportCardProps) {
 
       {/* Content */}
       <div className="px-5">
-        <p className="text-[15.4px] text-gray-800 leading-5.75">{content ?? ''}</p>
+        <p className="text-[15.4px] text-gray-800 leading-5.75">{description ?? ''}</p>
       </div>
 
       {/* Actions row */}

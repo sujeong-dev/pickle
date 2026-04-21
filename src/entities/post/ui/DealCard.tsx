@@ -99,7 +99,7 @@ export function DealCard({ post, href, wishlistButton, className }: DealCardProp
     // TODO: Swagger 미존재 — 백엔드 확인 필요
     isVerified,
     createdAt,
-    content,
+    description,
     productName,
     price,
     originalPrice,
@@ -136,7 +136,7 @@ export function DealCard({ post, href, wishlistButton, className }: DealCardProp
 
       {/* Content */}
       <div className="px-5">
-        <p className="text-[15.4px] text-gray-800">{content ?? ''}</p>
+        <p className="text-[15.4px] text-gray-800">{description ?? ''}</p>
       </div>
 
       {/* Product image */}
