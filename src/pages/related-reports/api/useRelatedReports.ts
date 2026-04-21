@@ -1,17 +1,20 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getRelatedPosts } from "@/shared/api";
+import { getPosts } from "@/shared/api";
+import type { PostListParams } from "@/shared/api";
 
-export const relatedReportKeys = {
-  all: ['related-reports'] as const,
-  byProduct: (productId: string) => [...relatedReportKeys.all, productId] as const,
+type RelatedParams = Pick<PostListParams, 'branch' | 'productCode'>;
+
+const relatedReportKeys = {
+  byParams: (params: RelatedParams) =>
+    ['post', 'related', params.branch ?? '', params.productCode ?? ''] as const,
 };
 
-export function useRelatedReports(productId: string) {
+export function useRelatedReports(params: RelatedParams) {
   return useQuery({
-    queryKey: relatedReportKeys.byProduct(productId),
-    queryFn: () => getRelatedPosts(productId),
-    enabled: Boolean(productId),
+    queryKey: relatedReportKeys.byParams(params),
+    queryFn: () => getPosts(params),
+    enabled: Boolean(params.branch || params.productCode),
   });
 }

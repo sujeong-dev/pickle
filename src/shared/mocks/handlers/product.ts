@@ -118,18 +118,22 @@ export const productHandlers = [
     const url = new URL(request.url);
     const limit = Number(url.searchParams.get('limit') ?? 10);
     const sort = url.searchParams.get('sort') ?? 'latest';
+    const branch = url.searchParams.get('branch');
+    const productCode = url.searchParams.get('productCode');
 
-    let sorted = [...mockPosts];
+    let filtered = [...mockPosts];
+
+    if (branch) filtered = filtered.filter((p) => p.branch === branch);
+    if (productCode) filtered = filtered.filter((p) => p.productCode === productCode);
+
     if (sort === 'most_liked') {
-      sorted = sorted.sort((a, b) => b.likeCount - a.likeCount);
-    }
-    // latest: return in order (most recent createdAt first)
-    if (sort === 'latest') {
-      sorted = sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      filtered = filtered.sort((a, b) => b.likeCount - a.likeCount);
+    } else {
+      filtered = filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
 
     const response: PostListResponse = {
-      items: sorted,
+      items: filtered,
       limit,
       hasNext: false,
       nextCursor: null,

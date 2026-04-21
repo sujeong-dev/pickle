@@ -24,7 +24,6 @@ export type {
 export {
   getPosts,
   getPostDetail,
-  getRelatedPosts,
   togglePostLike,
   togglePostBookmark,
   reportPostSoldout,

@@ -22,7 +22,8 @@ export type PostListParams = {
   sort?: 'latest' | 'most_liked' | 'most_bookmarked' | 'most_sold_out';
   limit?: number;
   cursor?: string;
-  productId?: string;
+  branch?: string;
+  productCode?: string;
 };
 
 export type PostListResponse = {
@@ -85,6 +86,3 @@ export function deletePostComment(postId: string, commentId: string): Promise<vo
   return api.delete(`posts/${postId}/comments/${commentId}`).json<void>();
 }
 
-export function getRelatedPosts(productId: string): Promise<PostListResponse> {
-  return api.get('posts', { searchParams: { productId } }).json<PostListResponse>();
-}

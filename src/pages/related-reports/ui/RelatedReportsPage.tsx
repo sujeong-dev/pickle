@@ -7,7 +7,8 @@ import { BackHeader } from "@/shared/ui";
 import { useRelatedReports } from "../api/useRelatedReports";
 
 type RelatedReportsPageProps = {
-  productId: string;
+  branch?: string;
+  productCode?: string;
 };
 
 function ProductSummary({ post }: { post: Post }) {
@@ -44,8 +45,8 @@ function RelatedReportsSkeleton() {
   );
 }
 
-export function RelatedReportsPage({ productId }: RelatedReportsPageProps) {
-  const { data, isLoading, isError } = useRelatedReports(productId);
+export function RelatedReportsPage({ branch, productCode }: RelatedReportsPageProps) {
+  const { data, isLoading, isError } = useRelatedReports({ branch, productCode });
 
   const posts = data?.items ?? [];
   const firstPost = posts[0];

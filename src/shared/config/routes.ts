@@ -10,7 +10,12 @@ export const ROUTES = {
   reviewDetail: (reviewId: string) => `/review/${reviewId}`,
   reviewWrite: '/review/register',
   postDetail: (postId: string) => `/post/${postId}`,
-  relatedReports: (productId: string) => `/product/${productId}/related`,
+  relatedReports: (postId: string, params?: { branch?: string; productCode?: string }) => {
+    const qs = new URLSearchParams(
+      Object.entries(params ?? {}).filter((e): e is [string, string] => e[1] != null && e[1] !== '')
+    ).toString();
+    return `/product/${postId}/related${qs ? `?${qs}` : ''}`;
+  },
   mypage: '/mypage',
   mypageMyReports: '/mypage/my-reports',
   mypageMyReceiptReviews: '/mypage/my-receipt-reviews',

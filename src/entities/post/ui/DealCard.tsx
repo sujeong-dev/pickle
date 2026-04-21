@@ -112,6 +112,8 @@ export function DealCard({ post, href, likeButton, wishlistButton, className }: 
     reviewCount,
     likeCount,
     commentCount,
+    branch,
+    productCode,
   } = post;
   const thumbnailUrl = thumbnail;
   const displayDiscountRate = discountRate ?? (originalPrice ? Math.round((1 - price / originalPrice) * 100) : 0);
@@ -199,7 +201,7 @@ export function DealCard({ post, href, likeButton, wishlistButton, className }: 
 
       {/* Related reports row */}
       {relatedCount != null && relatedCount > 0 && (
-        <Link href={ROUTES.relatedReports(id)} className="relative flex items-center justify-between px-5 py-3 bg-primary-50">
+        <Link href={ROUTES.relatedReports(id, { branch: branch ?? undefined, productCode: productCode ?? undefined })} className="relative flex items-center justify-between px-5 py-3 bg-primary-50">
           <div className="flex gap-2 items-center">
             <div className="flex -space-x-[18px]">
               {[0, 1].map((i) => (
