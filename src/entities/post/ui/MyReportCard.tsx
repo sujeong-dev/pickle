@@ -7,8 +7,8 @@ type MyReportCardProps = {
 };
 
 export function MyReportCard({ post }: MyReportCardProps) {
-  const { productName, discountRate, price, thumbnail, images, createdAt, likeCount, commentCount } = post;
-  const thumbnailUrl = thumbnail ?? images?.[0]?.url;
+  const { productName, discountRate, price, thumbnail, createdAt, likeCount, commentCount } = post;
+  const thumbnailUrl = thumbnail;
   const displayDiscountRate = discountRate ?? 0;
 
   return (

@@ -11,7 +11,7 @@ type RelatedReportsPageProps = {
 };
 
 function ProductSummary({ post }: { post: Post }) {
-  const imageUrl = post.thumbnail ?? post.images?.[0]?.url;
+  const imageUrl = post.thumbnail;
   const displayDiscountRate = post.discountRate ?? (post.originalPrice ? Math.round((1 - post.price / post.originalPrice) * 100) : 0);
   return (
     <div className="bg-white flex gap-4 items-center px-5 py-3 shrink-0">

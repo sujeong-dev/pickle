@@ -31,9 +31,8 @@ export function SavedDealCard({ post }: SavedDealCardProps) {
     price,
     thumbnail,
     discountRate,
-    images,
   } = post;
-  const thumbnailUrl = thumbnail ?? images?.[0]?.url;
+  const thumbnailUrl = thumbnail;
   const displayDiscountRate = discountRate ?? 0;
 
   return (

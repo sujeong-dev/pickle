@@ -19,10 +19,9 @@ const mockPosts: Post[] = [
     avgRating: 4.7,
     soldOutStatus: 'normal',
     groupInfo: { count: 3, minPrice: 12900, maxPrice: 14900 },
-    // TODO fields
-    isVerified: true,
     content: '양재점 물티슈 세일 중이에요! 재고 많으니 서두르세요',
     discountRate: 24,
+    isVerified: true,
   },
   {
     id: '2',
@@ -40,10 +39,9 @@ const mockPosts: Post[] = [
     avgRating: 4.5,
     soldOutStatus: 'normal',
     groupInfo: { count: 2, minPrice: 19500, maxPrice: 21000 },
-    // TODO fields
-    isVerified: true,
     content: '오늘 코스트코 잠실점 갔다가 발견했어요. 1+1 행사 중이라 진짜 이득이에요!',
     discountRate: 15,
+    isVerified: true,
   },
   {
     id: '3',
@@ -61,10 +59,9 @@ const mockPosts: Post[] = [
     avgRating: 4.2,
     soldOutStatus: 'warning',
     groupInfo: { count: 1, minPrice: 13200, maxPrice: 13200 },
-    // TODO fields
-    isVerified: false,
     content: '목동점 세제 특가 나왔어요. 1개 구매 시 1개 증정!',
     discountRate: 30,
+    isVerified: false,
   },
   {
     id: '4',
@@ -82,10 +79,9 @@ const mockPosts: Post[] = [
     avgRating: 4.8,
     soldOutStatus: 'normal',
     groupInfo: { count: 4, minPrice: 27900, maxPrice: 31000 },
-    // TODO fields
-    isVerified: true,
     content: '하남점 올리브오일 세일 중! 유통기한 넉넉합니다.',
     discountRate: 20,
+    isVerified: true,
   },
 ];
 

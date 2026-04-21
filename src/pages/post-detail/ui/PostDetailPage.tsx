@@ -178,13 +178,12 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
     discountRate,
     avgRating,
     reviewCount,
-    rating,
     likeCount: serverLikeCount,
   } = post;
   const liked = likedOverride ?? (post.isLiked ?? false);
   const displayLikeCount = localLikeCount ?? serverLikeCount;
   const comments = commentsData?.items ?? [];
-  const displayRating = avgRating ?? rating ?? 0;
+  const displayRating = avgRating ?? 0;
   const filledStars = Math.round(displayRating);
 
   return (

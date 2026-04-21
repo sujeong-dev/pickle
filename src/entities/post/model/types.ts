@@ -28,12 +28,9 @@ export type Post = {
   // ── TODO: Swagger 미존재 또는 목록 응답 미포함 — 백엔드 확인 필요 ──
   content?: string;       // 목록 응답에 없음 (상세 응답에 존재할 것)
   discountRate?: number;  // 목록 응답에 없음 (UI에서 price/originalPrice로 계산)
-  images?: PostImage[];   // 목록에 없음, thumbnail로 대체. 상세에 있을 것
-  rating?: number;        // avgRating으로 대체됨 (레거시 대응용)
   isLiked?: boolean;      // 목록 응답 미포함, 상세 응답 확인 필요
   isBookmarked?: boolean; // 목록 응답 미포함, 상세 응답 확인 필요
   isVerified?: boolean;   // Swagger 전체 미존재
-  avatarUrl?: string;     // Swagger 전체 미존재
 };
 
 export type ReceiptReviewItem = {
