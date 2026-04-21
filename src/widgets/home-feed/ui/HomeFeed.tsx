@@ -7,6 +7,7 @@ import { Tab } from "@/shared/ui";
 import { FeedEmpty } from "./FeedEmpty";
 import { ROUTES } from "@/shared/config/routes";
 import { WishlistButton } from "@/features/wishlist";
+import { LikeButton } from "@/features/post-like";
 import { usePosts } from "../api/usePosts";
 
 const TABS = [
@@ -61,7 +62,8 @@ export function HomeFeed() {
                 key={post.id}
                 post={post}
                 href={ROUTES.postDetail(post.id)}
-                wishlistButton={<WishlistButton postId={post.id} />}
+                likeButton={<LikeButton postId={post.id} initialLiked={post.isLiked ?? false} initialCount={post.likeCount} />}
+                wishlistButton={<WishlistButton postId={post.id} initialBookmarked={post.isBookmarked ?? false} />}
               />
             ))}
           </div>

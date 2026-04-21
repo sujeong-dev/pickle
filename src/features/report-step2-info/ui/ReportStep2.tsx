@@ -28,16 +28,18 @@ type ReportStep2Props = {
   representativeIdx: number;
   productName: string;
   price: string;
-  store: string;
-  branch: string;
+  productCode: string;
+  originalPrice: string;
+  description: string;
   ocrResult?: OcrResult | null;
   onAddPhoto: (file: File, r2Key: string) => void;
   onRemovePhoto: (idx: number) => void;
   onSetRepresentative: (idx: number) => void;
   onProductNameChange: (v: string) => void;
   onPriceChange: (v: string) => void;
-  onStoreChange: (v: string) => void;
-  onBranchChange: (v: string) => void;
+  onProductCodeChange: (v: string) => void;
+  onOriginalPriceChange: (v: string) => void;
+  onDescriptionChange: (v: string) => void;
 };
 
 export function ReportStep2({
@@ -45,21 +47,22 @@ export function ReportStep2({
   representativeIdx,
   productName,
   price,
-  store,
-  branch,
+  productCode,
+  originalPrice,
+  description,
   ocrResult,
   onAddPhoto,
   onRemovePhoto,
   onSetRepresentative,
   onProductNameChange,
   onPriceChange,
-  onStoreChange,
-  onBranchChange,
+  onProductCodeChange,
+  onOriginalPriceChange,
+  onDescriptionChange,
 }: ReportStep2Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { mutateAsync: getPresigned } = useUploadPresigned();
 
-  // Auto-fill form fields from OCR result when it becomes available
   useEffect(() => {
     if (!ocrResult || ocrResult.status !== "completed") return;
     if (ocrResult.result?.productName && !productName) {
@@ -68,7 +71,6 @@ export function ReportStep2({
     if (ocrResult.result?.price !== undefined && !price) {
       onPriceChange(String(ocrResult.result.price));
     }
-  // Only run when ocrResult changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ocrResult]);
 
@@ -81,7 +83,7 @@ export function ReportStep2({
       await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
       onAddPhoto(file, r2Key);
     } catch {
-      // Error is handled centrally by kyInstance (toast shown)
+      // Error is handled centrally by kyInstance
     }
   };
 
@@ -89,9 +91,7 @@ export function ReportStep2({
     <div className='flex flex-col gap-3'>
       {/* Photo section */}
       <div className='flex flex-col gap-1'>
-        <span className='text-[14px] font-semibold text-gray-900'>
-          상품사진
-        </span>
+        <span className='text-[14px] font-semibold text-gray-900'>상품사진</span>
         <div className='grid grid-cols-3 gap-1'>
           {photos.length < 5 && (
             <button
@@ -100,16 +100,11 @@ export function ReportStep2({
               className='aspect-square bg-gray-100 border border-dashed border-gray-300 rounded-[8px] flex flex-col gap-0.5 items-center justify-center'
             >
               <CameraIcon />
-              <span className='text-[13px] text-gray-400'>
-                {photos.length}/5
-              </span>
+              <span className='text-[13px] text-gray-400'>{photos.length}/5</span>
             </button>
           )}
           {photos.map((file, idx) => (
-            <div
-              key={idx}
-              className='aspect-square rounded-[8px] relative overflow-hidden bg-gray-200'
-            >
+            <div key={idx} className='aspect-square rounded-[8px] relative overflow-hidden bg-gray-200'>
               <Image
                 src={URL.createObjectURL(file)}
                 alt={`상품사진 ${idx + 1}`}
@@ -117,7 +112,6 @@ export function ReportStep2({
                 unoptimized
                 className='object-cover'
               />
-              {/* Representative / set representative badge */}
               {idx === representativeIdx ? (
                 <div className='absolute top-1.5 left-1.5 bg-primary-500 rounded-[2px] flex gap-0.5 items-center px-1 py-0.5'>
                   <StarIcon size={8} color="white" />
@@ -132,7 +126,6 @@ export function ReportStep2({
                   <span className='text-[8px] text-white'>대표 설정</span>
                 </button>
               )}
-              {/* Remove button */}
               <button
                 type='button'
                 onClick={() => onRemovePhoto(idx)}
@@ -149,9 +142,16 @@ export function ReportStep2({
       {/* Form fields */}
       <div className='flex flex-col gap-3'>
         <div className='flex flex-col gap-1'>
-          <label className='text-[14px] font-semibold text-gray-900'>
-            상품명
-          </label>
+          <label className='text-[14px] font-semibold text-gray-900'>상품코드</label>
+          <Input
+            value={productCode}
+            onChange={(e) => onProductCodeChange(e.target.value)}
+            onClear={() => onProductCodeChange('')}
+            placeholder='상품코드를 입력해주세요'
+          />
+        </div>
+        <div className='flex flex-col gap-1'>
+          <label className='text-[14px] font-semibold text-gray-900'>상품명</label>
           <Input
             value={productName}
             onChange={(e) => onProductNameChange(e.target.value)}
@@ -160,37 +160,32 @@ export function ReportStep2({
           />
         </div>
         <div className='flex flex-col gap-1'>
-          <label className='text-[14px] font-semibold text-gray-900'>
-            가격
-          </label>
+          <label className='text-[14px] font-semibold text-gray-900'>할인가</label>
           <Input
             value={price}
             onChange={(e) => onPriceChange(e.target.value)}
             onClear={() => onPriceChange('')}
-            placeholder='가격을 입력해주세요'
+            placeholder='할인가를 입력해주세요'
             inputMode='numeric'
           />
         </div>
         <div className='flex flex-col gap-1'>
-          <label className='text-[14px] font-semibold text-gray-900'>
-            매장
-          </label>
+          <label className='text-[14px] font-semibold text-gray-900'>원가</label>
           <Input
-            value={store}
-            onChange={(e) => onStoreChange(e.target.value)}
-            onClear={() => onStoreChange('')}
-            placeholder='매장명을 입력해주세요 (예: 코스트코)'
+            value={originalPrice}
+            onChange={(e) => onOriginalPriceChange(e.target.value)}
+            onClear={() => onOriginalPriceChange('')}
+            placeholder='원가를 입력해주세요'
+            inputMode='numeric'
           />
         </div>
         <div className='flex flex-col gap-1'>
-          <label className='text-[14px] font-semibold text-gray-900'>
-            지점
-          </label>
+          <label className='text-[14px] font-semibold text-gray-900'>한 줄 리뷰</label>
           <Input
-            value={branch}
-            onChange={(e) => onBranchChange(e.target.value)}
-            onClear={() => onBranchChange('')}
-            placeholder='지점명을 입력해주세요 (예: 양재점)'
+            value={description}
+            onChange={(e) => onDescriptionChange(e.target.value)}
+            onClear={() => onDescriptionChange('')}
+            placeholder='한 줄 리뷰를 입력해주세요'
           />
         </div>
       </div>
@@ -199,7 +194,6 @@ export function ReportStep2({
         ref={inputRef}
         type='file'
         accept='image/*'
-        capture='environment'
         className='hidden'
         onChange={handleFileChange}
       />

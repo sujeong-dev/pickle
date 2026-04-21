@@ -11,7 +11,6 @@ type Step = 1 | 2;
 
 const STEP_LABELS = ["할인표", "상품정보"];
 
-
 export function ReportPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
@@ -35,15 +34,17 @@ export function ReportPage() {
     representativeIdx,
     productName,
     price,
-    store,
-    branch,
+    productCode,
+    originalPrice,
+    description,
     addPhoto,
     removePhoto: removeProductPhoto,
     setRepresentativeIdx,
     setProductName,
     setPrice,
-    setStore,
-    setBranch,
+    setProductCode,
+    setOriginalPrice,
+    setDescription,
   } = useReportStep2();
 
   const { mutateAsync: createReport, isPending: isSubmitting } = useCreateReport();
@@ -59,13 +60,20 @@ export function ReportPage() {
       return;
     }
 
-    // Step 2: submit
+    const orderedKeys = [
+      photoR2Keys[representativeIdx],
+      ...photoR2Keys.filter((_, i) => i !== representativeIdx),
+    ];
+
     await createReport({
+      store: "costco",
+      branch: "송도점",
       productName,
       price: Number(price),
-      store,
-      branch,
-      imageKeys: photoR2Keys,
+      imageKeys: orderedKeys,
+      productCode: productCode || undefined,
+      originalPrice: originalPrice ? Number(originalPrice) : undefined,
+      description: description || undefined,
     });
 
     setShowSuccess(true);
@@ -74,7 +82,7 @@ export function ReportPage() {
   const canNext =
     step === 1
       ? photo !== null
-      : photos.length > 0 && !!productName && !!price && !!store && !!branch;
+      : photos.length > 0 && !!productName && !!price;
 
   if (showSuccess) {
     return (
@@ -94,7 +102,6 @@ export function ReportPage() {
         <StepIndicator steps={STEP_LABELS} currentStep={step} />
       </div>
 
-      {/* Content */}
       <main className="flex-1 overflow-y-auto min-h-0 px-5 py-6">
         {step === 1 && (
           <ReportStep1
@@ -115,21 +122,22 @@ export function ReportPage() {
             representativeIdx={representativeIdx}
             productName={productName}
             price={price}
-            store={store}
-            branch={branch}
+            productCode={productCode}
+            originalPrice={originalPrice}
+            description={description}
             ocrResult={ocrResult}
             onAddPhoto={addPhoto}
             onRemovePhoto={removeProductPhoto}
             onSetRepresentative={setRepresentativeIdx}
             onProductNameChange={setProductName}
             onPriceChange={setPrice}
-            onStoreChange={setStore}
-            onBranchChange={setBranch}
+            onProductCodeChange={setProductCode}
+            onOriginalPriceChange={setOriginalPrice}
+            onDescriptionChange={setDescription}
           />
         )}
       </main>
 
-      {/* Bottom button */}
       <div className="shrink-0 px-6 pb-8 pt-3">
         <Button onClick={handleNext} disabled={!canNext || isSubmitting}>
           {step === 1 ? "다음" : isSubmitting ? "제보 중..." : "제보하기"}

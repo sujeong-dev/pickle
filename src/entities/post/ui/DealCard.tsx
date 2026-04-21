@@ -9,6 +9,7 @@ import { StarIcon } from "@/shared/ui";
 type DealCardProps = {
   post: Post;
   href?: string;
+  likeButton?: React.ReactNode;
   wishlistButton?: React.ReactNode;
   className?: string;
 };
@@ -93,7 +94,7 @@ function ReceiptIcon() {
   );
 }
 
-export function DealCard({ post, href, wishlistButton, className }: DealCardProps) {
+export function DealCard({ post, href, likeButton, wishlistButton, className }: DealCardProps) {
   const {
     id,
     authorNickname,
@@ -176,12 +177,14 @@ export function DealCard({ post, href, wishlistButton, className }: DealCardProp
       </div>
 
       {/* Actions row */}
-      <div className="relative z-10 flex items-center justify-between px-5 py-3">
+      <div className="relative flex items-center justify-between px-5 py-3">
         <div className="flex gap-5 items-center">
-          <div className="flex gap-[6px] items-center">
-            <ThumbsUpIcon />
-            <span className="text-subtitle text-gray-500">{likeCount}</span>
-          </div>
+          {likeButton ?? (
+            <div className="flex gap-[6px] items-center">
+              <ThumbsUpIcon />
+              <span className="text-subtitle text-gray-500">{likeCount}</span>
+            </div>
+          )}
           <div className="flex gap-[6px] items-center">
             <CommentIcon />
             <span className="text-subtitle text-gray-500">{commentCount}</span>
@@ -196,7 +199,7 @@ export function DealCard({ post, href, wishlistButton, className }: DealCardProp
 
       {/* Related reports row */}
       {relatedCount != null && relatedCount > 0 && (
-        <Link href={ROUTES.relatedReports(id)} className="relative z-10 flex items-center justify-between px-5 py-3 bg-primary-50">
+        <Link href={ROUTES.relatedReports(id)} className="relative flex items-center justify-between px-5 py-3 bg-primary-50">
           <div className="flex gap-2 items-center">
             <div className="flex -space-x-[18px]">
               {[0, 1].map((i) => (
