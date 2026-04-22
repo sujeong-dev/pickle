@@ -3,9 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { BackHeader, StarIcon, RemoveButton } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
 import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
+import { ROUTES } from "@/shared/config/routes";
 import { WishlistButton } from "@/features/wishlist";
 import { ReportSoldoutModal, useReportSoldout, useReportSoldoutMutation } from "@/features/report-soldout";
 import { togglePostLike, createPostComment, deletePostComment, postKeys } from "@/shared/api";
@@ -228,6 +230,7 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
     description,
     expiredAt,
     soldOutCount,
+    productId,
   } = post;
 
   const liked = likedOverride ?? post.isLiked;
@@ -330,22 +333,41 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
         </div>
 
         {/* Reviews row */}
-        <div className="flex items-center justify-between px-5 py-3">
-          <div className="flex gap-1.5 items-center">
-            <ReceiptIcon />
-            <span className="font-bold text-body2 text-gray-900">영수증 인증 후기</span>
-          </div>
-          <div className="flex gap-1.5 items-center">
-            <div className="flex items-center gap-0.5">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <StarIcon key={i} size={16} filled={i < filledStars} />
-              ))}
+        {productId ? (
+          <Link href={ROUTES.postReviews(postId, productId)} className="flex items-center justify-between px-5 py-3">
+            <div className="flex gap-1.5 items-center">
+              <ReceiptIcon />
+              <span className="font-bold text-body2 text-gray-900">영수증 인증 후기</span>
             </div>
-            <span className="font-bold text-subtitle text-[#F59E0B]">{displayRating}</span>
-            <span className="text-body2 text-gray-500">{reviewCount}건</span>
-            <ChevronRightIcon />
+            <div className="flex gap-1.5 items-center">
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <StarIcon key={i} size={16} filled={i < filledStars} />
+                ))}
+              </div>
+              <span className="font-bold text-subtitle text-[#F59E0B]">{displayRating}</span>
+              <span className="text-body2 text-gray-500">{reviewCount}건</span>
+              <ChevronRightIcon />
+            </div>
+          </Link>
+        ) : (
+          <div className="flex items-center justify-between px-5 py-3">
+            <div className="flex gap-1.5 items-center">
+              <ReceiptIcon />
+              <span className="font-bold text-body2 text-gray-900">영수증 인증 후기</span>
+            </div>
+            <div className="flex gap-1.5 items-center">
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <StarIcon key={i} size={16} filled={i < filledStars} />
+                ))}
+              </div>
+              <span className="font-bold text-subtitle text-[#F59E0B]">{displayRating}</span>
+              <span className="text-body2 text-gray-500">{reviewCount}건</span>
+              <ChevronRightIcon />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Comments section */}
         <div className="flex flex-col gap-2 px-5 py-3 border-t border-gray-100">

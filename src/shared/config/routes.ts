@@ -10,6 +10,7 @@ export const ROUTES = {
   reviewDetail: (reviewId: string) => `/review/${reviewId}`,
   reviewWrite: '/review/register',
   postDetail: (postId: string) => `/post/${postId}`,
+  postReviews: (postId: string, productId: string) => `/post/${postId}/reviews?productId=${productId}`,
   relatedReports: (postId: string, params?: { branch?: string; productCode?: string }) => {
     const qs = new URLSearchParams(
       Object.entries(params ?? {}).filter((e): e is [string, string] => e[1] != null && e[1] !== '')

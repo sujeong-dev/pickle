@@ -64,6 +64,7 @@ export function HomeFeed() {
                 href={ROUTES.postDetail(post.id)}
                 likeButton={<LikeButton postId={post.id} initialLiked={post.isLiked ?? false} initialCount={post.likeCount} />}
                 wishlistButton={<WishlistButton postId={post.id} initialBookmarked={post.isBookmarked ?? false} />}
+                reviewsHref={post.productId ? ROUTES.postReviews(post.id, post.productId) : undefined}
               />
             ))}
           </div>

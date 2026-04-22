@@ -11,6 +11,7 @@ type DealCardProps = {
   href?: string;
   likeButton?: React.ReactNode;
   wishlistButton?: React.ReactNode;
+  reviewsHref?: string;
   className?: string;
 };
 
@@ -119,7 +120,7 @@ function ReceiptIcon() {
   );
 }
 
-export function DealCard({ post, href, likeButton, wishlistButton, className }: DealCardProps) {
+export function DealCard({ post, href, likeButton, wishlistButton, reviewsHref, className }: DealCardProps) {
   const {
     id,
     authorNickname,
@@ -198,16 +199,29 @@ export function DealCard({ post, href, likeButton, wishlistButton, className }: 
       </div>
 
       {/* Review row */}
-      <div className="flex items-center gap-2 px-3 py-2 bg-[#FFFBEB] rounded-[6px] mx-0">
-        <ReceiptIcon />
-        <span className="font-medium text-body2 text-[#92400E]">영수증 인증 후기 {reviewCount}건</span>
-        <div className="flex-1" />
-        <div className="flex items-center gap-[2px]">
-          <StarIcon size={13} />
-          <span className="font-bold text-body2 text-[#F59E0B]">{displayRating}</span>
+      {reviewCount > 0 && (reviewsHref ? (
+        <Link href={reviewsHref} className="relative z-[1] flex items-center gap-2 px-3 py-2 bg-[#FFFBEB] rounded-[6px] mx-0">
+          <ReceiptIcon />
+          <span className="font-medium text-body2 text-[#92400E]">영수증 인증 후기 {reviewCount}건</span>
+          <div className="flex-1" />
+          <div className="flex items-center gap-[2px]">
+            <StarIcon size={13} />
+            <span className="font-bold text-body2 text-[#F59E0B]">{displayRating}</span>
+          </div>
+          <ChevronRightIcon size={16} />
+        </Link>
+      ) : (
+        <div className="flex items-center gap-2 px-3 py-2 bg-[#FFFBEB] rounded-[6px] mx-0">
+          <ReceiptIcon />
+          <span className="font-medium text-body2 text-[#92400E]">영수증 인증 후기 {reviewCount}건</span>
+          <div className="flex-1" />
+          <div className="flex items-center gap-[2px]">
+            <StarIcon size={13} />
+            <span className="font-bold text-body2 text-[#F59E0B]">{displayRating}</span>
+          </div>
+          <ChevronRightIcon size={16} />
         </div>
-        <ChevronRightIcon size={16} />
-      </div>
+      ))}
 
       {/* Actions row */}
       <div className="relative flex items-center justify-between px-5 py-3">

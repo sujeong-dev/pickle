@@ -13,7 +13,7 @@ const mockPosts: Post[] = [
     branch: '양재점',
     likeCount: 47,
     commentCount: 3,
-    reviewCount: 3,
+    reviewCount: 0,
     isMine: false,
     originalPrice: 16900,
     avgRating: 4.7,
@@ -22,6 +22,7 @@ const mockPosts: Post[] = [
     description: '양재점 물티슈 세일 중이에요! 재고 많으니 서두르세요',
     discountRate: 24,
     isVerified: true,
+    productId: 'product-1',
   },
   {
     id: '2',
