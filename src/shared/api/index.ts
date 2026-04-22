@@ -38,6 +38,7 @@ export type {
   PostListResponse,
   LikeResponse,
   BookmarkResponse,
+  SoldOutResponse,
   CommentListResponse,
 } from './product'
 export { getReviews, getReviewDetail } from './review'

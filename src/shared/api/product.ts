@@ -75,8 +75,8 @@ export function togglePostBookmark(postId: string): Promise<BookmarkResponse> {
   return api.post(`posts/${postId}/bookmark`).json<BookmarkResponse>();
 }
 
-export function reportPostSoldout(postId: string): Promise<void> {
-  return api.post(`posts/${postId}/sold-out`).json<void>();
+export function reportPostSoldout(postId: string): Promise<SoldOutResponse> {
+  return api.post(`posts/${postId}/sold-out`).json<SoldOutResponse>();
 }
 
 export function getPostComments(postId: string): Promise<CommentListResponse> {

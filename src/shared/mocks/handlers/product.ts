@@ -197,7 +197,7 @@ export const productHandlers = [
     if (!post) {
       return HttpResponse.json({ message: '제보를 찾을 수 없어요.' }, { status: 404 });
     }
-    return new HttpResponse(null, { status: 204 });
+    return HttpResponse.json({ postId, soldOutStatus: 'warning' });
   }),
 
   http.get('*/posts/:postId/comments', ({ params }) => {
