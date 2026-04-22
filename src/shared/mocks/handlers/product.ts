@@ -57,7 +57,7 @@ const mockPosts: Post[] = [
     isMine: false,
     originalPrice: 18900,
     avgRating: 4.2,
-    soldOutStatus: 'warning',
+    soldOutStatus: 'sold_out',
     groupInfo: { count: 1, minPrice: 13200, maxPrice: 13200 },
     description: '목동점 세제 특가 나왔어요. 1개 구매 시 1개 증정!',
     discountRate: 30,
@@ -150,8 +150,8 @@ export const productHandlers = [
     return HttpResponse.json({
       ...post,
       images: [
-        { id: 'img1', url: 'https://picsum.photos/seed/pickle1/375/225', orderNum: 0 },
-        { id: 'img2', url: 'https://picsum.photos/seed/pickle2/375/225', orderNum: 1 },
+        { id: 'img1', url: '', orderNum: 0 },
+        { id: 'img2', url: '', orderNum: 1 },
       ],
       expiredAt: '2025-12-31T23:59:59Z',
       soldOutCount: 2,

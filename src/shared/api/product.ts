@@ -45,6 +45,11 @@ export type BookmarkResponse = {
   isBookmarked: boolean;
 };
 
+export type SoldOutResponse = {
+  postId: string;
+  soldOutStatus: 'normal' | 'warning' | 'sold_out';
+};
+
 export type CommentListResponse = {
   items: Comment[];
   limit: number;
