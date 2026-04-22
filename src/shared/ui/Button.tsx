@@ -38,7 +38,7 @@ export function Button({
       disabled={disabled}
       className={cn(
         "flex items-center justify-center font-medium overflow-hidden",
-        width ? `w-[${width}]`: "w-full",
+        width !== 'full' ? `w-[${width}]`: "w-full",
         sizeStyles[size],
         disabled ? "bg-gray-200 text-gray-400" : variantStyles[variant],
         className,
