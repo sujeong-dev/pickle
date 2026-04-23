@@ -65,11 +65,16 @@ export function ReportStep2({
 
   useEffect(() => {
     if (!ocrResult || ocrResult.status !== "completed") return;
-    if (ocrResult.result?.productName && !productName) {
-      onProductNameChange(ocrResult.result.productName);
+    const result = ocrResult.result;
+    if (result?.productName && !productName) {
+      onProductNameChange(result.productName);
     }
-    if (ocrResult.result?.price !== undefined && !price) {
-      onPriceChange(String(ocrResult.result.price));
+    if (result?.price !== undefined && !price) {
+      onPriceChange(String(result.price));
+      if (result.discountRate !== undefined && !originalPrice) {
+        const calcOriginal = Math.round(result.price / (1 - result.discountRate / 100));
+        onOriginalPriceChange(String(calcOriginal));
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ocrResult]);

@@ -65,14 +65,18 @@ export function ReportPage() {
       ...photoR2Keys.filter((_, i) => i !== representativeIdx),
     ];
 
+    const numPrice = Number(price);
+    const numOriginalPrice = originalPrice ? Number(originalPrice) : undefined;
+
     await createReport({
       store: "costco",
       branch: "송도점",
       productName,
-      price: Number(price),
+      price: numPrice,
       imageKeys: orderedKeys,
       productCode: productCode || undefined,
-      originalPrice: originalPrice ? Number(originalPrice) : undefined,
+      originalPrice: numOriginalPrice,
+      discountAmount: numOriginalPrice !== undefined ? numOriginalPrice - numPrice : undefined,
       description: description || undefined,
     });
 
