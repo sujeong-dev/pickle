@@ -1,5 +1,10 @@
+import { Suspense } from "react";
 import { ReviewPage } from "@/pages/review";
 
 export default function Page() {
-  return <ReviewPage />;
+  return (
+    <Suspense>
+      <ReviewPage />
+    </Suspense>
+  );
 }
