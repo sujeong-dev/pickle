@@ -2,16 +2,18 @@ import { http, HttpResponse } from 'msw'
 
 export const receiptHandlers = [
   // POST /receipts — 영수증 등록
-  http.post('*/receipts', async () => {
+  http.post('*/receipts', async ({ request }) => {
+    const body = await request.json() as Record<string, unknown>
     return HttpResponse.json({
       id: `mock-receipt-${Date.now()}`,
-      items: [
-        { name: '커클랜드 물티슈', price: 12900, quantity: 1, discountedPrice: 10320 },
-        { name: '코카콜라 500ml', price: 1500, quantity: 3, discountedPrice: 1200 },
-        { name: '포카칩 오리지널', price: 2500, quantity: 2 },
-      ],
-      totalAmount: 28920,
-    })
+      store: body.store ?? 'costco',
+      branch: body.branch ?? '',
+      totalAmount: body.totalAmount ?? 0,
+      itemCount: body.itemCount ?? 0,
+      purchasedAt: body.purchasedAt ?? new Date().toISOString(),
+      isVerified: false,
+      createdAt: new Date().toISOString(),
+    }, { status: 201 })
   }),
 
   // POST /reviews — 후기 등록

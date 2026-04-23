@@ -61,7 +61,6 @@ export type {
 } from './user'
 export { registerReceipt, createReview, updateReview, deleteReview } from './receipt'
 export type {
-  ReceiptItem,
   RegisterReceiptBody,
   RegisterReceiptResponse,
   CreateReviewBody,

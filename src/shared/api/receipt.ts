@@ -3,13 +3,6 @@ import type { Review } from '@/entities/review';
 
 // ── Types ────────────────────────────────────────────────────
 
-export type ReceiptItem = {
-  name: string;
-  price: number;
-  quantity: number;
-  discountedPrice?: number;
-};
-
 export type RegisterReceiptBody = {
   store: string;
   branch: string;
@@ -20,14 +13,22 @@ export type RegisterReceiptBody = {
 
 export type RegisterReceiptResponse = {
   id: string;
-  items: ReceiptItem[];
+  store: string;
+  branch: string;
   totalAmount: number;
+  itemCount: number;
+  purchasedAt: string;
+  isVerified: boolean;
+  createdAt: string;
 };
 
 export type CreateReviewBody = {
   receiptId: string;
   productName: string;
   rating: number;
+  productCode?: string;
+  price?: number;
+  content?: string;
   imageKeys?: string[];
 };
 

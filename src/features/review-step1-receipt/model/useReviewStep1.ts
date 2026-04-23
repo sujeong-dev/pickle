@@ -1,17 +1,24 @@
 import { useState } from "react";
-import type { ReceiptItem } from "@/shared/api/receipt";
 
-export type ReceiptData = {
-  receiptId: string;
-  items: ReceiptItem[];
+export type OcrItem = {
+  name: string;
+  price: number;
+  quantity: number;
+};
+
+export type OcrReceiptData = {
+  branch: string;
   totalAmount: number;
+  itemCount: number;
+  purchasedAt: string;
+  items: OcrItem[];
 };
 
 export function useReviewStep1() {
-  const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
+  const [ocrData, setOcrData] = useState<OcrReceiptData | null>(null);
 
   return {
-    receiptData,
-    setReceiptData,
+    ocrData,
+    setOcrData,
   };
 }

@@ -1,30 +1,24 @@
-import { useMemo } from "react";
-import type { ReceiptItem } from "@/shared/api/receipt";
+import { useEffect, useState } from "react";
+import type { OcrItem } from "@/features/review-step1-receipt";
 
-export type ReviewItem = {
+export type EditableItem = {
   name: string;
-  price: string;
+  price: number;
+  quantity: number;
 };
 
-const MOCK_ITEMS: ReviewItem[] = [
-  { name: "커클랜드 물티슈", price: "12,900원" },
-  { name: "커클랜드 물티슈", price: "12,900원" },
-  { name: "커클랜드 물티슈", price: "12,900원" },
-  { name: "커클랜드 물티슈", price: "12,900원" },
-];
+export function useReviewStep2(ocrItems: OcrItem[]) {
+  const [items, setItems] = useState<EditableItem[]>([]);
 
-function formatPrice(price: number): string {
-  return `${price.toLocaleString("ko-KR")}원`;
-}
+  useEffect(() => {
+    setItems(ocrItems.map((item) => ({ ...item })));
+  }, [ocrItems]);
 
-export function useReviewStep2(receiptItems?: ReceiptItem[]) {
-  const items = useMemo<ReviewItem[]>(() => {
-    if (!receiptItems || receiptItems.length === 0) return MOCK_ITEMS;
-    return receiptItems.map((item) => ({
-      name: item.name,
-      price: formatPrice(item.discountedPrice ?? item.price),
-    }));
-  }, [receiptItems]);
+  const updateItem = (idx: number, name: string, price: number) => {
+    setItems((prev) =>
+      prev.map((item, i) => (i === idx ? { ...item, name, price } : item))
+    );
+  };
 
-  return { items };
+  return { items, updateItem };
 }
