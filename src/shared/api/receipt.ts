@@ -3,33 +3,29 @@ import type { Review } from '@/entities/review';
 
 // ── Types ────────────────────────────────────────────────────
 
+export type ReceiptItem = {
+  name: string;
+  price: number;
+  quantity: number;
+  discountedPrice?: number;
+};
+
 export type RegisterReceiptBody = {
-  store: string;
-  branch: string;
-  totalAmount: number;
-  itemCount: number;
-  purchasedAt: string;
+  imageUrl: string;
 };
 
 export type RegisterReceiptResponse = {
   id: string;
-  store: string;
-  branch: string;
+  items: ReceiptItem[];
   totalAmount: number;
-  itemCount: number;
-  purchasedAt: string;
-  isVerified: boolean;
-  createdAt: string;
 };
 
 export type CreateReviewBody = {
-  receiptId: string;
-  productName: string;
+  postId: string;
   rating: number;
-  productCode?: string;
-  price?: number;
-  content?: string;
-  imageKeys?: string[];
+  content: string;
+  receiptId?: string;
+  imageUrls?: string[];
 };
 
 export type UpdateReviewBody = {

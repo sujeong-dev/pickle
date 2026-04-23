@@ -2,14 +2,16 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
-import { recognizeReceiptText } from "@/shared/lib/googleVision";
+import { recognizeReceiptWithAnnotations } from "@/shared/lib/googleVision";
+import { maskCardNumbers } from "@/shared/lib/maskCardNumbers";
 import { parseCostcoReceipt } from "@/shared/lib/parseCostcoReceipt";
 import type { OcrReceiptData, OcrItem } from "../model/useReviewStep1";
 
-type View = "upload" | "processing" | "error" | "form";
+type View = "upload" | "processing" | "confirm" | "error" | "form";
 
 type ReviewStep1Props = {
   onReceiptDataChange: (data: OcrReceiptData) => void;
+  onMaskedImageReady?: (blob: Blob) => void;
 };
 
 function CameraIcon() {
@@ -57,9 +59,10 @@ async function fileToBase64(file: File): Promise<string> {
   });
 }
 
-export function ReviewStep1({ onReceiptDataChange }: ReviewStep1Props) {
+export function ReviewStep1({ onReceiptDataChange, onMaskedImageReady }: ReviewStep1Props) {
   const [view, setView] = useState<View>("upload");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [pendingData, setPendingData] = useState<OcrReceiptData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [branch, setBranch] = useState("");
@@ -75,13 +78,21 @@ export function ReviewStep1({ onReceiptDataChange }: ReviewStep1Props) {
     setView("processing");
     try {
       const base64 = await fileToBase64(file);
-      const text = await recognizeReceiptText(base64);
-      const parsed = parseCostcoReceipt(text);
+      const { fullText, wordAnnotations } = await recognizeReceiptWithAnnotations(base64);
+      const parsed = parseCostcoReceipt(fullText);
       if (!parsed.branch && !parsed.totalAmount && parsed.items.length === 0) {
         setView("error");
         return;
       }
-      onReceiptDataChange(parsed);
+      try {
+        const maskedBlob = await maskCardNumbers(file, wordAnnotations);
+        setPreviewUrl(URL.createObjectURL(maskedBlob));
+        onMaskedImageReady?.(maskedBlob);
+      } catch {
+        // 마스킹 실패해도 OCR 결과는 계속 사용
+      }
+      setPendingData(parsed);
+      setView("confirm");
     } catch {
       setView("error");
     }
@@ -160,6 +171,44 @@ export function ReviewStep1({ onReceiptDataChange }: ReviewStep1Props) {
             </svg>
             <span className="text-body2 text-gray-500">영수증 인식 중...</span>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (view === "confirm") {
+    return (
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-1">
+          <h2 className="font-bold text-h2 text-gray-900">영수증을 확인해주세요</h2>
+          <p className="text-body2 text-gray-500">개인정보가 가려진 상태로 저장돼요.</p>
+        </div>
+        {previewUrl && (
+          <div className="w-full rounded-[10px] overflow-hidden border border-gray-200">
+            <Image
+              src={previewUrl}
+              alt="마스킹된 영수증"
+              width={600}
+              height={800}
+              className="w-full h-auto object-contain"
+            />
+          </div>
+        )}
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={handleRetake}
+            className="flex-1 h-14 rounded-[10px] bg-primary-50 text-primary-500 font-semibold text-body1"
+          >
+            다시 촬영
+          </button>
+          <button
+            type="button"
+            onClick={() => pendingData && onReceiptDataChange(pendingData)}
+            className="flex-1 h-14 rounded-[10px] bg-primary-500 text-white font-semibold text-body1"
+          >
+            다음
+          </button>
         </div>
       </div>
     );

@@ -21,6 +21,7 @@ export function ReviewWritePage() {
   const [itemIdx, setItemIdx] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
   const [receiptId, setReceiptId] = useState<string | null>(null);
+  const [maskedReceiptBlob, setMaskedReceiptBlob] = useState<Blob | null>(null);
 
   const { ocrData, setOcrData } = useReviewStep1();
   const ocrItems = useMemo(() => ocrData?.items ?? [], [ocrData]);
@@ -135,7 +136,10 @@ export function ReviewWritePage() {
 
       {step === 1 && (
         <main className="flex-1 overflow-y-auto min-h-0 px-5 py-6">
-          <ReviewStep1 onReceiptDataChange={handleOcrDataChange} />
+          <ReviewStep1
+            onReceiptDataChange={handleOcrDataChange}
+            onMaskedImageReady={setMaskedReceiptBlob}
+          />
         </main>
       )}
 
