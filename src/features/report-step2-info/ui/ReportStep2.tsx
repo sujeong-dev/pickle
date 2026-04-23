@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from "react";
 import Image from "next/image";
-import { Input, StarIcon } from "@/shared/ui";
+import { Input, StarIcon, Textarea } from "@/shared/ui";
 import { useUploadPresigned } from "@/features/report-step1-photo/api/useOcr";
 import type { OcrResult } from "@/shared/api/report";
 
@@ -96,7 +96,9 @@ export function ReportStep2({
     <div className='flex flex-col gap-3'>
       {/* Photo section */}
       <div className='flex flex-col gap-1'>
-        <span className='text-[14px] font-semibold text-gray-900'>상품사진</span>
+        <span className='text-[14px] font-semibold text-gray-900'>
+          상품사진
+        </span>
         <div className='grid grid-cols-3 gap-1'>
           {photos.length < 5 && (
             <button
@@ -105,11 +107,16 @@ export function ReportStep2({
               className='aspect-square bg-gray-100 border border-dashed border-gray-300 rounded-[8px] flex flex-col gap-0.5 items-center justify-center'
             >
               <CameraIcon />
-              <span className='text-[13px] text-gray-400'>{photos.length}/5</span>
+              <span className='text-[13px] text-gray-400'>
+                {photos.length}/5
+              </span>
             </button>
           )}
           {photos.map((file, idx) => (
-            <div key={idx} className='aspect-square rounded-[8px] relative overflow-hidden bg-gray-200'>
+            <div
+              key={idx}
+              className='aspect-square rounded-[8px] relative overflow-hidden bg-gray-200'
+            >
               <Image
                 src={URL.createObjectURL(file)}
                 alt={`상품사진 ${idx + 1}`}
@@ -119,7 +126,7 @@ export function ReportStep2({
               />
               {idx === representativeIdx ? (
                 <div className='absolute top-1.5 left-1.5 bg-primary-500 rounded-[2px] flex gap-0.5 items-center px-1 py-0.5'>
-                  <StarIcon size={8} color="white" />
+                  <StarIcon size={8} color='white' />
                   <span className='text-[8px] font-bold text-white'>대표</span>
                 </div>
               ) : (
@@ -147,7 +154,9 @@ export function ReportStep2({
       {/* Form fields */}
       <div className='flex flex-col gap-3'>
         <div className='flex flex-col gap-1'>
-          <label className='text-[14px] font-semibold text-gray-900'>상품코드</label>
+          <label className='text-[14px] font-semibold text-gray-900'>
+            상품코드
+          </label>
           <Input
             value={productCode}
             onChange={(e) => onProductCodeChange(e.target.value)}
@@ -156,7 +165,9 @@ export function ReportStep2({
           />
         </div>
         <div className='flex flex-col gap-1'>
-          <label className='text-[14px] font-semibold text-gray-900'>상품명</label>
+          <label className='text-[14px] font-semibold text-gray-900'>
+            상품명
+          </label>
           <Input
             value={productName}
             onChange={(e) => onProductNameChange(e.target.value)}
@@ -165,7 +176,9 @@ export function ReportStep2({
           />
         </div>
         <div className='flex flex-col gap-1'>
-          <label className='text-[14px] font-semibold text-gray-900'>할인가</label>
+          <label className='text-[14px] font-semibold text-gray-900'>
+            할인가
+          </label>
           <Input
             value={price}
             onChange={(e) => onPriceChange(e.target.value)}
@@ -175,7 +188,9 @@ export function ReportStep2({
           />
         </div>
         <div className='flex flex-col gap-1'>
-          <label className='text-[14px] font-semibold text-gray-900'>원가</label>
+          <label className='text-[14px] font-semibold text-gray-900'>
+            원가
+          </label>
           <Input
             value={originalPrice}
             onChange={(e) => onOriginalPriceChange(e.target.value)}
@@ -185,12 +200,13 @@ export function ReportStep2({
           />
         </div>
         <div className='flex flex-col gap-1'>
-          <label className='text-[14px] font-semibold text-gray-900'>한 줄 리뷰</label>
-          <Input
+          <label className='text-[14px] font-semibold text-gray-900'>
+            제보 글
+          </label>
+          <Textarea
             value={description}
             onChange={(e) => onDescriptionChange(e.target.value)}
-            onClear={() => onDescriptionChange('')}
-            placeholder='한 줄 리뷰를 입력해주세요'
+            placeholder='어떤 할인을 발견하셨나요? 매장 상황, 재고, 꿀팁을 자유롭게 적어주세요'
           />
         </div>
       </div>

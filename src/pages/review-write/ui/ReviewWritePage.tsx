@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/shared/config/routes";
 import { Button, PageHeader, StepIndicator, SuccessScreen } from "@/shared/ui";
@@ -23,7 +23,8 @@ export function ReviewWritePage() {
   const [receiptId, setReceiptId] = useState<string | null>(null);
 
   const { ocrData, setOcrData } = useReviewStep1();
-  const { items: editableItems, updateItem } = useReviewStep2(ocrData?.items ?? []);
+  const ocrItems = useMemo(() => ocrData?.items ?? [], [ocrData]);
+  const { items: editableItems, updateItem } = useReviewStep2(ocrItems);
   const { reviews, setRating, setComment, addPhoto, removePhoto, setRepresentative } =
     useReviewStep3(editableItems.length);
 
