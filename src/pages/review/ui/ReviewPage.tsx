@@ -26,12 +26,11 @@ const reviewKeys = {
 
 export function ReviewPage() {
   const searchParams = useSearchParams();
-  const postId = searchParams?.get("postId") ?? "";
+  const postId = searchParams?.get("postId") ?? undefined;
 
   const { data, isLoading } = useQuery({
-    queryKey: reviewKeys.list(postId),
+    queryKey: reviewKeys.list(postId ?? ""),
     queryFn: () => getReviews({ productId: postId }),
-    enabled: !!postId,
   });
 
   const reviews = data?.items ?? [];

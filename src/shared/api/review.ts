@@ -14,16 +14,17 @@ export type ReviewListResponse = {
 };
 
 export type ReviewListParams = {
-  productId: string;
+  productId?: string;
   limit?: number;
   cursor?: string;
 };
 
-export function getReviews({ productId, limit, cursor }: ReviewListParams): Promise<ReviewListResponse> {
-  const searchParams: Record<string, string | number> = { productId };
+export function getReviews({ productId, limit, cursor }: ReviewListParams = {}): Promise<ReviewListResponse> {
+  const searchParams: Record<string, string | number> = {};
+  if (productId) searchParams.productId = productId;
   if (limit !== undefined) searchParams.limit = limit;
   if (cursor !== undefined) searchParams.cursor = cursor;
-  return api.get('reviews', { searchParams }).json<ReviewListResponse>();
+  return api.get('reviews', Object.keys(searchParams).length ? { searchParams } : undefined).json<ReviewListResponse>();
 }
 
 export function getReviewDetail(id: string): Promise<ReviewDetail> {
