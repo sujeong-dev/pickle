@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { BackHeader, StarIcon, TrashIcon } from "@/shared/ui";
+import { BackHeader, StarIcon, TrashIcon, UserAvatar } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
 import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
 import { ROUTES } from "@/shared/config/routes";
@@ -125,16 +125,6 @@ function PostImageCarousel({ images }: { images: PostImage[] }) {
   );
 }
 
-function Avatar() {
-  return (
-    <div className="size-11.5 rounded-full bg-primary-50 flex items-center justify-center shrink-0">
-      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#2D8A5A" fillOpacity="0.5" />
-        <path d="M20 21C20 18.2386 16.4183 16 12 16C7.58172 16 4 18.2386 4 21" stroke="#2D8A5A" strokeWidth="2" strokeLinecap="round" />
-      </svg>
-    </div>
-  );
-}
 
 function PostDetailSkeleton() {
   return (
@@ -241,150 +231,222 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
   const displayDiscountRate = discountRate ?? (originalPrice ? Math.round((1 - price / originalPrice) * 100) : 0);
 
   return (
-    <div className="bg-white flex flex-col h-dvh">
+    <div className='bg-white flex flex-col h-dvh'>
       <BackHeader />
 
-      <div className="flex-1 overflow-y-auto min-h-0">
+      <div className='flex-1 overflow-y-auto min-h-0'>
         {/* Image carousel */}
         <PostImageCarousel images={images} />
 
         {/* 거래 만료일 배너 */}
         {expiredAt && (
-          <div className="bg-amber-50 flex items-center gap-2 px-5 py-2.5">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#92400E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
+          <div className='bg-amber-50 flex items-center gap-2 px-5 py-2.5'>
+            <svg
+              width='14'
+              height='14'
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='#92400E'
+              strokeWidth='2'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              aria-hidden='true'
+            >
+              <circle cx='12' cy='12' r='10' />
+              <polyline points='12 6 12 12 16 14' />
             </svg>
-            <span className="text-body2 text-amber-800">{formatExpiredAt(expiredAt)}까지 거래 가능</span>
+            <span className='text-body2 text-amber-800'>
+              {formatExpiredAt(expiredAt)}까지 거래 가능
+            </span>
           </div>
         )}
 
         {/* Product info */}
-        <div className="flex flex-col gap-2 px-6 py-5">
+        <div className='flex flex-col gap-2 px-6 py-5'>
           {/* Author */}
-          <div className="flex gap-2.5 items-center">
-            <Avatar />
-            <div className="flex flex-col gap-0.5">
-              <div className="flex gap-1 items-center">
-                <span className="font-semibold text-subtitle text-gray-900">{authorNickname}</span>
+          <div className='flex gap-2.5 items-center'>
+            <UserAvatar src={post.authorProfileImage} size={46} />
+            <div className='flex flex-col gap-0.5'>
+              <div className='flex gap-1 items-center'>
+                <span className='font-semibold text-subtitle text-gray-900'>
+                  {authorNickname}
+                </span>
                 {/* TODO: Swagger 미존재 — 백엔드 확인 필요 */}
                 {isVerified && <VerifiedBadge />}
               </div>
-              <span className="text-[11.5px] text-gray-500">{formatRelativeTime(createdAt)}</span>
+              <span className='text-[11.5px] text-gray-500'>
+                {formatRelativeTime(createdAt)}
+              </span>
             </div>
           </div>
 
           {/* Product name & price */}
-          <h1 className="font-bold text-h2 text-gray-900 leading-normal">{productName}</h1>
-          <div className="flex gap-2 items-baseline whitespace-nowrap">
-            <span className="font-bold text-subtitle text-secondary-500">{displayDiscountRate}%</span>
-            <span className="font-bold text-h2 text-gray-900">{price.toLocaleString()}원</span>
-            <span className="text-subtitle text-gray-400 line-through">{(originalPrice ?? 0).toLocaleString()}원</span>
+          <h1 className='font-bold text-h2 text-gray-900 leading-normal'>
+            {productName}
+          </h1>
+          <div className='flex gap-2 items-baseline whitespace-nowrap'>
+            <span className='font-bold text-subtitle text-secondary-500'>
+              {displayDiscountRate}%
+            </span>
+            <span className='font-bold text-h2 text-gray-900'>
+              {price.toLocaleString()}원
+            </span>
+            <span className='text-subtitle text-gray-400 line-through'>
+              {(originalPrice ?? 0).toLocaleString()}원
+            </span>
           </div>
 
           {/* Description */}
           {description && (
-            <p className="text-[15px] text-gray-700 leading-relaxed mt-1">{description}</p>
+            <p className='text-[15px] text-gray-700 leading-relaxed mt-1'>
+              {description}
+            </p>
           )}
         </div>
 
         {/* Action bar */}
-        <div className="flex items-center justify-between px-5 py-3 border-y border-gray-100">
-          <div className="flex gap-1 items-center">
+        <div className='flex items-center justify-between px-5 py-3 border-y border-gray-100'>
+          <div className='flex gap-1 items-center'>
             <button
-              type="button"
+              type='button'
               onClick={() => {
                 const nowLiked = !liked;
                 setLikedOverride(nowLiked);
-                setLocalLikeCount(nowLiked ? displayLikeCount + 1 : displayLikeCount - 1);
+                setLocalLikeCount(
+                  nowLiked ? displayLikeCount + 1 : displayLikeCount - 1,
+                );
                 toggleLike();
               }}
-              className="flex gap-2 items-center p-2 rounded"
+              className='flex gap-2 items-center p-2 rounded'
             >
               <ThumbsUpIcon filled={liked} />
-              <span className={cn("text-subtitle", liked ? "text-primary-500 font-semibold" : "text-gray-500")}>{displayLikeCount}</span>
+              <span
+                className={cn(
+                  'text-subtitle',
+                  liked ? 'text-primary-500 font-semibold' : 'text-gray-500',
+                )}
+              >
+                {displayLikeCount}
+              </span>
             </button>
             <button
-              type="button"
+              type='button'
               onClick={isReported ? undefined : openSoldout}
               disabled={isReported || isReportingPending}
               className={cn(
-                "flex gap-1 items-center px-2 py-2 rounded",
-                isReported ? "bg-gray-100 cursor-default" : "bg-secondary-50",
+                'flex gap-1 items-center px-2 py-2 rounded',
+                isReported ? 'bg-gray-100 cursor-default' : 'bg-secondary-50',
               )}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isReported ? "#BDBDBD" : "#E0421A"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                <line x1="12" y1="9" x2="12" y2="13" />
-                <line x1="12" y1="17" x2="12.01" y2="17" />
+              <svg
+                width='16'
+                height='16'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke={isReported ? '#BDBDBD' : '#E0421A'}
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                aria-hidden='true'
+              >
+                <path d='M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z' />
+                <line x1='12' y1='9' x2='12' y2='13' />
+                <line x1='12' y1='17' x2='12.01' y2='17' />
               </svg>
-              <span className={cn("font-semibold text-body2", isReported ? "text-gray-400" : "text-secondary-500")}>
-                {isReported ? "제보 완료" : "품절 제보하기"}
+              <span
+                className={cn(
+                  'font-semibold text-body2',
+                  isReported ? 'text-gray-400' : 'text-secondary-500',
+                )}
+              >
+                {isReported ? '제보 완료' : '품절 제보하기'}
               </span>
               {soldOutCount > 0 && !isReported && (
-                <span className="text-body2 text-secondary-400">{soldOutCount}명</span>
+                <span className='text-body2 text-secondary-400'>
+                  {soldOutCount}명
+                </span>
               )}
             </button>
           </div>
-          <div className="flex gap-3 items-center">
-            <WishlistButton postId={post.id} initialBookmarked={post.isBookmarked} />
-            <button type="button" aria-label="공유하기"><ShareIcon /></button>
+          <div className='flex gap-3 items-center'>
+            <WishlistButton
+              postId={post.id}
+              initialBookmarked={post.isBookmarked}
+            />
+            <button type='button' aria-label='공유하기'>
+              <ShareIcon />
+            </button>
           </div>
         </div>
 
         {/* Reviews row */}
         {productId ? (
-          <Link href={ROUTES.postReviews(postId, productId)} className="flex items-center justify-between px-5 py-3">
-            <div className="flex gap-1.5 items-center">
+          <Link
+            href={ROUTES.postReviews(postId, productId)}
+            className='flex items-center justify-between px-5 py-3'
+          >
+            <div className='flex gap-1.5 items-center'>
               <ReceiptIcon />
-              <span className="font-bold text-body2 text-gray-900">영수증 인증 후기</span>
+              <span className='font-bold text-body2 text-gray-900'>
+                영수증 인증 후기
+              </span>
             </div>
-            <div className="flex gap-1.5 items-center">
-              <div className="flex items-center gap-0.5">
+            <div className='flex gap-1.5 items-center'>
+              <div className='flex items-center gap-0.5'>
                 {Array.from({ length: 5 }).map((_, i) => (
                   <StarIcon key={i} size={16} filled={i < filledStars} />
                 ))}
               </div>
-              <span className="font-bold text-subtitle text-[#F59E0B]">{displayRating}</span>
-              <span className="text-body2 text-gray-500">{reviewCount}건</span>
+              <span className='font-bold text-subtitle text-[#F59E0B]'>
+                {displayRating}
+              </span>
+              <span className='text-body2 text-gray-500'>{reviewCount}건</span>
               <ChevronRightIcon />
             </div>
           </Link>
         ) : (
-          <div className="flex items-center justify-between px-5 py-3">
-            <div className="flex gap-1.5 items-center">
+          <div className='flex items-center justify-between px-5 py-3'>
+            <div className='flex gap-1.5 items-center'>
               <ReceiptIcon />
-              <span className="font-bold text-body2 text-gray-900">영수증 인증 후기</span>
+              <span className='font-bold text-body2 text-gray-900'>
+                영수증 인증 후기
+              </span>
             </div>
-            <div className="flex gap-1.5 items-center">
-              <div className="flex items-center gap-0.5">
+            <div className='flex gap-1.5 items-center'>
+              <div className='flex items-center gap-0.5'>
                 {Array.from({ length: 5 }).map((_, i) => (
                   <StarIcon key={i} size={16} filled={i < filledStars} />
                 ))}
               </div>
-              <span className="font-bold text-subtitle text-[#F59E0B]">{displayRating}</span>
-              <span className="text-body2 text-gray-500">{reviewCount}건</span>
+              <span className='font-bold text-subtitle text-[#F59E0B]'>
+                {displayRating}
+              </span>
+              <span className='text-body2 text-gray-500'>{reviewCount}건</span>
               <ChevronRightIcon />
             </div>
           </div>
         )}
 
         {/* Comments section */}
-        <div className="flex flex-col gap-2 px-5 py-3 border-t border-gray-100">
-          <span className="font-bold text-body2 text-black">댓글 {comments.length}</span>
+        <div className='flex flex-col gap-2 px-5 py-3 border-t border-gray-100'>
+          <span className='font-bold text-body2 text-black'>
+            댓글 {comments.length}
+          </span>
           {comments.map((c) => (
-            <div key={c.id} className="flex gap-3 items-start">
-              <div className="size-8 rounded-full bg-gray-100 shrink-0" />
-              <div className="flex flex-col gap-1.5 flex-1">
-                <span className="font-semibold text-[13.5px] text-gray-800">{c.authorNickname}</span>
-                <span className="text-[13.5px] text-gray-700">{c.content}</span>
+            <div key={c.id} className='flex gap-3 items-start'>
+              <UserAvatar size={32} />
+              <div className='flex flex-col gap-1.5 flex-1'>
+                <span className='font-semibold text-[13.5px] text-gray-800'>
+                  {c.authorNickname}
+                </span>
+                <span className='text-[13.5px] text-gray-700'>{c.content}</span>
               </div>
               {c.isMine && (
                 <button
-                  type="button"
-                  aria-label="댓글 삭제"
+                  type='button'
+                  aria-label='댓글 삭제'
                   onClick={() => removeComment(c.id)}
-                  className="text-gray-400 shrink-0"
+                  className='text-gray-400 shrink-0'
                 >
                   <TrashIcon />
                 </button>
@@ -394,27 +456,40 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
         </div>
       </div>
 
-      <ReportSoldoutModal open={isSoldoutOpen} onClose={closeSoldout} onReport={handleReport} />
+      <ReportSoldoutModal
+        open={isSoldoutOpen}
+        onClose={closeSoldout}
+        onReport={handleReport}
+      />
 
       {/* Comment input bar */}
-      <div className="flex items-center gap-3 px-5 py-3 border-t border-gray-200 shrink-0">
+      <div className='flex items-center gap-3 px-5 py-3 border-t border-gray-200 shrink-0'>
         <input
-          type="text"
+          type='text'
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="댓글을 입력해주세요"
-          className="flex-1 h-12 rounded-[10px] bg-gray-200 px-3 text-body2 text-gray-900 placeholder:text-gray-400 outline-none"
+          placeholder='댓글을 입력해주세요'
+          className='flex-1 h-12 rounded-[10px] bg-gray-200 px-3 text-body2 text-gray-900 placeholder:text-gray-400 outline-none'
         />
         <button
-          type="button"
+          type='button'
           disabled={!comment.trim() || isSubmittingComment}
-          onClick={() => { if (comment.trim()) submitComment(comment); }}
+          onClick={() => {
+            if (comment.trim()) submitComment(comment);
+          }}
           className={cn(
-            "size-12.5 rounded-full flex items-center justify-center shrink-0 transition-colors",
-            comment.trim() ? "bg-primary-500" : "bg-gray-200",
+            'size-12.5 rounded-full flex items-center justify-center shrink-0 transition-colors',
+            comment.trim() ? 'bg-primary-500' : 'bg-gray-200',
           )}
         >
-          <span className={cn("text-[15.4px]", comment.trim() ? "text-white font-semibold" : "text-gray-400")}>등록</span>
+          <span
+            className={cn(
+              'text-[15.4px]',
+              comment.trim() ? 'text-white font-semibold' : 'text-gray-400',
+            )}
+          >
+            등록
+          </span>
         </button>
       </div>
     </div>

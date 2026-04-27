@@ -11,5 +11,7 @@ export { StarIcon } from "./icons/StarIcon";
 export { ThumbsUpIcon } from "./icons/ThumbsUpIcon";
 export { CommentIcon } from "./icons/CommentIcon";
 export { TrashIcon } from "./icons/TrashIcon";
+export { UserAvatarIcon } from "./icons/UserAvatarIcon";
+export { UserAvatar } from "./UserAvatar";
 export { SuccessScreen } from "./SuccessScreen";
 export { Tab } from "./Tab";

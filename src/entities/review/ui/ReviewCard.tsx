@@ -1,16 +1,7 @@
 import Image from "next/image";
 import type { Review } from "../model/types";
-import { StarIcon } from "@/shared/ui";
+import { StarIcon, UserAvatar } from "@/shared/ui";
 import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
-
-function UserAvatarIcon() {
-  return (
-    <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#2D8A5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
 
 function LikeIcon() {
   return (
@@ -29,16 +20,14 @@ function CommentIcon() {
   );
 }
 
-export function ReviewCard({ authorNickname, createdAt, content, productName, rating, likeCount, commentCount, images }: Review) {
+export function ReviewCard({ authorNickname, authorProfileImage, createdAt, content, productName, rating, likeCount, commentCount, images }: Review) {
   const thumbnailUrl = images?.[0]?.url;
 
   return (
     <div className="bg-white flex flex-col gap-[2px] w-full">
       {/* 유저 정보 */}
       <div className="flex gap-[10px] items-center px-5 py-3">
-        <div className="bg-primary-50 flex items-center justify-center rounded-full shrink-0 size-[46px]">
-          <UserAvatarIcon />
-        </div>
+        <UserAvatar src={authorProfileImage} size={46} />
         <div className="flex flex-col gap-[2px] flex-1 min-w-0">
           <span className="font-semibold text-[16px] text-gray-900 truncate">{authorNickname}</span>
           <span className="text-gray-500 text-[11.5px] leading-[17px]">{formatRelativeTime(createdAt)}</span>

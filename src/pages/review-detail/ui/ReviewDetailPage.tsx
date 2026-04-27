@@ -11,7 +11,7 @@ import {
   createReviewComment,
   deleteReviewComment,
 } from "@/shared/api";
-import { TrashIcon } from "@/shared/ui";
+import { TrashIcon, UserAvatar } from "@/shared/ui";
 import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
 import type { ReviewComment } from "@/shared/api/review";
 
@@ -22,15 +22,6 @@ const reviewDetailKeys = {
 const reviewCommentKeys = {
   list: (id: string) => ["review", "comments", id] as const,
 };
-
-function UserAvatarIcon({ size = 20 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#2D8A5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
 
 function SendIcon() {
   return (
@@ -50,9 +41,7 @@ type CommentItemProps = {
 function CommentItem({ comment, onDelete, isDeleting }: CommentItemProps) {
   return (
     <div className="flex gap-2.5 py-3 border-b border-gray-100">
-      <div className="bg-primary-50 flex items-center justify-center rounded-full shrink-0 size-8">
-        <UserAvatarIcon size={16} />
-      </div>
+      <UserAvatar src={comment.authorProfileImage} size={32} />
       <div className="flex flex-col gap-1 flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 min-w-0">

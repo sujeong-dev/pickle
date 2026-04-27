@@ -4,7 +4,7 @@ import type { Post } from "../model/types";
 import { cn } from "@/shared/lib/utils";
 import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
 import { ROUTES } from "@/shared/config/routes";
-import { StarIcon } from "@/shared/ui";
+import { StarIcon, UserAvatar } from "@/shared/ui";
 
 type DealCardProps = {
   post: Post;
@@ -14,26 +14,6 @@ type DealCardProps = {
   reviewsHref?: string;
   className?: string;
 };
-
-function Avatar({ name }: { name: string }) {
-  return (
-    <div className="size-[46px] rounded-full bg-primary-50 flex items-center justify-center shrink-0">
-      <svg width="23" height="23" viewBox="0 0 24 24" fill="none" aria-hidden="true" aria-label={name}>
-        <path
-          d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z"
-          fill="#2D8A5A"
-          fillOpacity="0.5"
-        />
-        <path
-          d="M20 21C20 18.2386 16.4183 16 12 16C7.58172 16 4 18.2386 4 21"
-          stroke="#2D8A5A"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-      </svg>
-    </div>
-  );
-}
 
 function VerifiedBadge() {
   return (
@@ -124,6 +104,7 @@ export function DealCard({ post, href, likeButton, wishlistButton, reviewsHref, 
   const {
     id,
     authorNickname,
+    authorProfileImage,
     // TODO: Swagger 미존재 — 백엔드 확인 필요
     isVerified,
     createdAt,
@@ -154,7 +135,7 @@ export function DealCard({ post, href, likeButton, wishlistButton, reviewsHref, 
       )}
       {/* Author row */}
       <div className="flex gap-2.5 items-center px-5 py-3">
-        <Avatar name={authorNickname} />
+        <UserAvatar src={authorProfileImage} size={46} />
         <div className="flex flex-col gap-0.5 flex-1 min-w-0">
           <div className="flex gap-1 items-center">
             <span className="font-semibold text-subtitle text-gray-900 whitespace-nowrap">{authorNickname}</span>

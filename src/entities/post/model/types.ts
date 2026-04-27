@@ -6,6 +6,7 @@ export type Post = {
   // ── Swagger GET /posts 응답 필드 ─────────────────────────────
   id: string;
   authorNickname: string;
+  authorProfileImage?: string | null;
   createdAt: string;
   productName: string;
   price: number;
@@ -37,6 +38,7 @@ export type PostDetail = {
   // ── 목록(Post)과 공통 필드 ─────────────────────────────────
   id: string;
   authorNickname: string;
+  authorProfileImage?: string | null;
   createdAt: string;
   productName: string;
   price: number;
