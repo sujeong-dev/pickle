@@ -54,11 +54,11 @@ export interface PaginationParams {
 }
 
 export function getMyProfile(): Promise<UserProfile> {
-  return api.get('api/users/me').json<UserProfile>()
+  return api.get('users/me').json<UserProfile>()
 }
 
 export function deleteMyAccount(): Promise<void> {
-  return api.delete('api/users/me').json<void>()
+  return api.delete('users/me').json<void>()
 }
 
 export function getMyPosts(params?: PaginationParams): Promise<PaginatedResponse<MyPost>> {

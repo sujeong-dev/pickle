@@ -41,8 +41,8 @@ export type {
   SoldOutResponse,
   CommentListResponse,
 } from './product'
-export { getReviews, getReviewDetail } from './review'
-export type { ReviewDetail, ReviewListResponse, ReviewListParams } from './review'
+export { getReviews, getReviewDetail, getReviewComments, createReviewComment, deleteReviewComment } from './review'
+export type { ReviewDetail, ReviewListResponse, ReviewListParams, ReviewComment, ReviewCommentListResponse } from './review'
 export { postKeys } from './postKeys'
 export {
   getMyProfile,

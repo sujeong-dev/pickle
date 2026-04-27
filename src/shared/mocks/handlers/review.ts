@@ -12,7 +12,6 @@ export const reviewHandlers = [
           productName: '커클랜드 물티슈',
           rating: 5.0,
           images: [],
-          // TODO: Swagger 미존재 — 백엔드 확인 필요
           likeCount: 47,
           commentCount: 24,
         },
@@ -94,5 +93,58 @@ export const reviewHandlers = [
       { message: '존재하지 않는 후기입니다.' },
       { status: 404 },
     );
+  }),
+
+  http.get('*/reviews/:reviewId/comments', () => {
+    return HttpResponse.json({
+      items: [
+        {
+          id: 'c1',
+          content: '저도 오늘 샀어요! 정말 좋더라구요 ㅎㅎ',
+          createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+          authorNickname: '피클러버',
+          authorProfileImage: null,
+          isMine: false,
+        },
+        {
+          id: 'c2',
+          content: '어느 지점에서 구매하셨어요? 저희 동네는 없던데',
+          createdAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+          authorNickname: '코스트코단골',
+          authorProfileImage: null,
+          isMine: false,
+        },
+        {
+          id: 'c3',
+          content: '저도 같이 구매했어요!',
+          createdAt: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
+          authorNickname: '나',
+          authorProfileImage: null,
+          isMine: true,
+        },
+      ],
+      limit: 20,
+      hasNext: false,
+      nextCursor: null,
+    });
+  }),
+
+  http.post('*/reviews/:reviewId/comments', async ({ request }) => {
+    const body = await request.json() as { content: string };
+    return HttpResponse.json(
+      {
+        id: `c-${Date.now()}`,
+        content: body.content,
+        createdAt: new Date().toISOString(),
+        authorNickname: '나',
+        authorProfileImage: null,
+        isMine: true,
+      },
+      { status: 201 },
+    );
+  }),
+
+  http.delete('*/reviews/:reviewId/comments/:commentId', ({ params }) => {
+    return HttpResponse.json({ id: params.commentId });
   }),
 ];

@@ -24,6 +24,7 @@ export type CreateReviewBody = {
   postId: string;
   rating: number;
   content: string;
+  productName: string;
   receiptId?: string;
   imageUrls?: string[];
 };
