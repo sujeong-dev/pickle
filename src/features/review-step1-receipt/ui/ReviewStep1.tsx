@@ -70,6 +70,7 @@ export function ReviewStep1({ onReceiptDataChange, onMaskedImageReady }: ReviewS
   const [manualItems, setManualItems] = useState<OcrItem[]>([]);
   const [itemName, setItemName] = useState("");
   const [itemPrice, setItemPrice] = useState("");
+  const [itemCode, setItemCode] = useState("");
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -108,9 +109,13 @@ export function ReviewStep1({ onReceiptDataChange, onMaskedImageReady }: ReviewS
     const name = itemName.trim();
     const price = Number(itemPrice);
     if (!name || !price) return;
-    setManualItems((prev) => [...prev, { name, price, quantity: 1 }]);
+    setManualItems((prev) => [
+      ...prev,
+      { name, price, quantity: 1, productCode: itemCode.trim() || undefined },
+    ]);
     setItemName("");
     setItemPrice("");
+    setItemCode("");
   };
 
   const handleManualSubmit = () => {
@@ -303,7 +308,15 @@ export function ReviewStep1({ onReceiptDataChange, onMaskedImageReady }: ReviewS
             value={itemPrice}
             onChange={(e) => setItemPrice(e.target.value)}
             placeholder="가격"
-            className="w-28 h-12 px-3 rounded-[10px] border border-gray-200 text-body2 outline-none focus:border-primary-500"
+            className="w-24 h-12 px-3 rounded-[10px] border border-gray-200 text-body2 outline-none focus:border-primary-500"
+          />
+        </div>
+        <div className="flex gap-2">
+          <input
+            value={itemCode}
+            onChange={(e) => setItemCode(e.target.value)}
+            placeholder="상품코드 (선택)"
+            className="flex-1 h-12 px-3 rounded-[10px] border border-gray-200 text-body2 outline-none focus:border-primary-500"
           />
           <button
             type="button"
@@ -318,8 +331,13 @@ export function ReviewStep1({ onReceiptDataChange, onMaskedImageReady }: ReviewS
           <div className="flex flex-col gap-1">
             {manualItems.map((item, idx) => (
               <div key={idx} className="flex items-center justify-between border-b border-gray-100 py-2">
-                <span className="text-body2 text-gray-800">{item.name}</span>
-                <span className="font-semibold text-body2 text-gray-900">{item.price.toLocaleString()}원</span>
+                <div className="flex flex-col">
+                  <span className="text-body2 text-gray-800">{item.name}</span>
+                  {item.productCode && (
+                    <span className="text-caption text-gray-400">{item.productCode}</span>
+                  )}
+                </div>
+                <span className="font-semibold text-body2 text-gray-900 shrink-0 ml-2">{item.price.toLocaleString()}원</span>
               </div>
             ))}
           </div>

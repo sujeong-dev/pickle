@@ -4,6 +4,7 @@ export type OcrItem = {
   name: string;
   price: number;
   quantity: number;
+  productCode?: string;
 };
 
 export type OcrReceiptData = {

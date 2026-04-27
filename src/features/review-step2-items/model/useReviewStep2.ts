@@ -5,6 +5,7 @@ export type EditableItem = {
   name: string;
   price: number;
   quantity: number;
+  productCode?: string;
 };
 
 export function useReviewStep2(ocrItems: OcrItem[]) {
@@ -14,9 +15,9 @@ export function useReviewStep2(ocrItems: OcrItem[]) {
     setItems(ocrItems.map((item) => ({ ...item })));
   }, [ocrItems]);
 
-  const updateItem = (idx: number, name: string, price: number) => {
+  const updateItem = (idx: number, name: string, price: number, productCode?: string) => {
     setItems((prev) =>
-      prev.map((item, i) => (i === idx ? { ...item, name, price } : item))
+      prev.map((item, i) => (i === idx ? { ...item, name, price, productCode } : item))
     );
   };
 
