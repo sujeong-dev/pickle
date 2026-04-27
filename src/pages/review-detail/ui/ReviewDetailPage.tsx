@@ -11,6 +11,7 @@ import {
   createReviewComment,
   deleteReviewComment,
 } from "@/shared/api";
+import { TrashIcon } from "@/shared/ui";
 import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
 import type { ReviewComment } from "@/shared/api/review";
 
@@ -27,17 +28,6 @@ function UserAvatarIcon({ size = 20 }: { size?: number }) {
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#2D8A5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
-
-function TrashIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <polyline points="3 6 5 6 21 6" />
-      <path d="M19 6l-1 14H6L5 6" />
-      <path d="M10 11v6M14 11v6" />
-      <path d="M9 6V4h6v2" />
     </svg>
   );
 }

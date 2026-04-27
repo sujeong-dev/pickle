@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { BackHeader, StarIcon, RemoveButton } from "@/shared/ui";
+import { BackHeader, StarIcon, TrashIcon } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
 import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
 import { ROUTES } from "@/shared/config/routes";
@@ -379,7 +379,16 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
                 <span className="font-semibold text-[13.5px] text-gray-800">{c.authorNickname}</span>
                 <span className="text-[13.5px] text-gray-700">{c.content}</span>
               </div>
-              {c.isMine && <RemoveButton size="sm" aria-label="댓글 삭제" onClick={() => removeComment(c.id)} />}
+              {c.isMine && (
+                <button
+                  type="button"
+                  aria-label="댓글 삭제"
+                  onClick={() => removeComment(c.id)}
+                  className="text-gray-400 shrink-0"
+                >
+                  <TrashIcon />
+                </button>
+              )}
             </div>
           ))}
         </div>
