@@ -160,13 +160,13 @@ export function SetBoundaryStep({ onPrev, onComplete }: SetBoundaryStepProps) {
 
       {/* Bottom buttons */}
       <div className="flex-none px-5 pb-5 flex gap-2">
-        <button
+        {/* <button
           type="button"
           onClick={onPrev}
           className="flex-1 h-14 rounded-[10px] bg-gray-200 text-gray-400 text-xl font-medium"
         >
           이전
-        </button>
+        </button> */}
         <Button
           variant="primary"
           size="lg"
