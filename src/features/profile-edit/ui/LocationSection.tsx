@@ -7,10 +7,19 @@ import { SetBoundaryStep, type SelectedLocation } from "@/features/set-boundary"
 import { useMyProfile } from "../api/useProfile";
 import { useUpdateLocation } from "../api/useUpdateLocation";
 
+function PinIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#424242" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+
 function ChevronRightIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#BDBDBD" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M6 4l4 4-4 4" />
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9E9E9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="9 18 15 12 9 6" />
     </svg>
   );
 }
@@ -39,21 +48,20 @@ export function LocationSection() {
 
   return (
     <>
-      <div className="bg-white px-5 shrink-0">
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="w-full flex flex-col gap-[6px] pt-[14px] pb-[17px] border-b border-gray-100 text-left"
-        >
-          <span className="text-[13.5px] font-semibold text-gray-500">내 동네</span>
-          <div className="flex items-center justify-between">
-            <span className={isSet ? "text-body1 text-gray-900" : "text-body1 text-gray-400"}>
-              {isSet ? `${sido} ${sigungu}` : "동네를 설정해주세요"}
-            </span>
-            <ChevronRightIcon />
-          </div>
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="w-full flex items-center gap-4 border-b border-gray-100 px-5 py-[13px] bg-white"
+      >
+        <div className="shrink-0 size-6 flex items-center justify-center">
+          <PinIcon />
+        </div>
+        <span className="flex-1 text-[16px] text-gray-900 text-left">내 동네 설정</span>
+        <span className="text-[14px] text-gray-500 shrink-0">
+          {isSet ? `${sido} ${sigungu}` : "설정 안 됨"}
+        </span>
+        <ChevronRightIcon />
+      </button>
 
       <BottomSheet open={open} onClose={() => setOpen(false)}>
         <div className="h-[80vh] flex flex-col">

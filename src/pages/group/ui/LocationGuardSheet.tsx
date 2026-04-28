@@ -17,7 +17,7 @@ export function LocationGuardSheet() {
   const router = useRouter();
 
   const goHome = () => router.replace(ROUTES.home);
-  const goProfile = () => router.replace(ROUTES.mypageProfileEdit);
+  const goProfile = () => router.replace(ROUTES.mypage);
 
   return (
     <BottomSheet open onClose={goHome}>

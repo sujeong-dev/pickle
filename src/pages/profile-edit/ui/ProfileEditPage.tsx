@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Input, Toast, Button, SuccessScreen } from "@/shared/ui";
 import { ROUTES } from "@/shared/config/routes";
-import { useMyProfile, useWithdraw, LocationSection } from "@/features/profile-edit";
+import { useMyProfile, useWithdraw } from "@/features/profile-edit";
 import { useUpdateNickname, useNicknameCheck } from "@/features/set-nickname";
 import { logout } from "@/shared/api";
 import { clearTokens } from "@/shared/model";
@@ -202,9 +202,6 @@ export function ProfileEditPage() {
             )}
           </div>
         </div>
-
-        {/* 내 동네 섹션 */}
-        <LocationSection />
 
         {/* 하단 푸터 */}
         <div className="flex items-center justify-center flex-1 min-h-[128px]">

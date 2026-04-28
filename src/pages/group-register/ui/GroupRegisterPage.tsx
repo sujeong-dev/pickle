@@ -19,7 +19,7 @@ export function GroupRegisterPage() {
     if (isProfileLoading) return;
     if (!isLocationVerified) {
       useToastStore.getState().show("동네 인증 후 모집을 등록할 수 있어요.");
-      router.replace(ROUTES.mypageProfileEdit);
+      router.replace(ROUTES.mypage);
     }
   }, [isProfileLoading, isLocationVerified, router]);
 

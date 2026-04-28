@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BottomNav } from "@/widgets/bottom-nav";
 import { ROUTES } from "@/shared/config/routes";
-import { useMyProfile } from "@/features/profile-edit";
+import { useMyProfile, LocationSection } from "@/features/profile-edit";
 
 // ── Icons ──────────────────────────────────────────
 
@@ -147,6 +147,11 @@ export function MyPage() {
             href={ROUTES.mypageMyReceiptReviews}
           />
           <ActivityRow icon={<HeartIcon />} label='찜한 제보' count={bookmarkCount} href={ROUTES.mypageWishlist} />
+        </section>
+
+        {/* My location */}
+        <section className='bg-white shrink-0'>
+          <LocationSection />
         </section>
 
         {/* Settings section */}
