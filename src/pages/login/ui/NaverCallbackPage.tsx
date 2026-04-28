@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useNaverLogin } from "@/features/social-login";
-import { useTokenStore } from "@/shared/model";
-import { useSignupFlowStore } from "@/pages/sign-up/model/signupFlowStore";
+import { useTokenStore, useToastStore } from "@/shared/model";
+import { getAuthErrorMessage } from "@/shared/api";
 import { ROUTES } from "@/shared/config/routes";
 
 export function NaverCallbackPage() {
@@ -15,7 +15,6 @@ export function NaverCallbackPage() {
 
   const { mutate: loginWithNaver } = useNaverLogin();
   const { setAccessToken, setRefreshToken } = useTokenStore();
-  const { setSignupToken } = useSignupFlowStore();
 
   useEffect(() => {
     if (!code || !state) {
@@ -24,18 +23,15 @@ export function NaverCallbackPage() {
     }
     loginWithNaver({ code, state }, {
       onSuccess: (data) => {
-        if (data.signupRequired && data.signupToken) {
-          setSignupToken(data.signupToken);
-          router.replace(`${ROUTES.signUp}?step=nickname`);
-        } else if (data.accessToken && data.refreshToken) {
-          setAccessToken(data.accessToken);
-          setRefreshToken(data.refreshToken);
-          router.replace(ROUTES.home);
-        } else {
-          router.replace(ROUTES.login);
-        }
+        setAccessToken(data.accessToken);
+        setRefreshToken(data.refreshToken);
+        router.replace(ROUTES.home);
       },
-      onError: () => router.replace(ROUTES.login),
+      onError: async (error) => {
+        const message = await getAuthErrorMessage(error);
+        useToastStore.getState().show(message);
+        router.replace(ROUTES.login);
+      },
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

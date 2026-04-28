@@ -9,6 +9,7 @@ export {
   logout,
   checkNickname,
   updateNickname,
+  getAuthErrorMessage,
 } from './auth'
 export type {
   AuthorizeResponse,
@@ -20,6 +21,7 @@ export type {
   SignupBody,
   SignupNewUserBody,
   UpdateNicknameBody,
+  AuthErrorBody,
 } from './auth'
 export {
   getPosts,

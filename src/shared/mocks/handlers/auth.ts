@@ -16,21 +16,28 @@ export const authHandlers = [
   }),
 
   // POST /api/auth/kakao/login
-  // signupRequired: true 로 변경하면 회원가입 플로우 테스트 가능
   http.post('/api/auth/kakao/login', () => {
     return HttpResponse.json({
-      signupRequired: false,
       accessToken: 'mock-access-token',
       refreshToken: 'mock-refresh-token',
+      user: {
+        id: 'mock-user-id',
+        nickname: '피클러',
+        isNewUser: false,
+      },
     })
   }),
 
   // POST /api/auth/naver/login
   http.post('/api/auth/naver/login', () => {
     return HttpResponse.json({
-      signupRequired: false,
       accessToken: 'mock-access-token',
       refreshToken: 'mock-refresh-token',
+      user: {
+        id: 'mock-user-id',
+        nickname: '피클러',
+        isNewUser: false,
+      },
     })
   }),
 

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { KakaoLoginButton, NaverLoginButton } from "@/features/social-login";
+import { LoginToast } from "./LoginToast";
 
 export function LoginPage() {
   return (
@@ -29,6 +30,7 @@ export function LoginPage() {
           시작 시 이용약관 및 개인정보처리방침에 동의합니다.
         </p>
       </div>
+      <LoginToast />
     </main>
   );
 }
