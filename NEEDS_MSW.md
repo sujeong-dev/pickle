@@ -25,3 +25,7 @@
 ## receipt
 - handlers: src/shared/mocks/handlers/receipt.ts
 - export: receiptHandlers
+
+## group
+- handlers: src/shared/mocks/handlers/group.ts
+- export: groupHandlers

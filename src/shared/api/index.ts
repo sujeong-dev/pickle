@@ -77,3 +77,24 @@ export type {
   CreatePostBody,
   Post,
 } from './report'
+export {
+  groupKeys,
+  getGroups,
+  getGroupDetail,
+  createGroup,
+  updateGroup,
+  deleteGroup,
+  updateGroupParticipation,
+  updateGroupStatus,
+} from './group'
+export type {
+  GroupListParams,
+  GroupListResponse,
+  CreateGroupBody,
+  UpdateGroupBody,
+  UpdateParticipationBody,
+  UpdateParticipationResponse,
+  UpdateGroupStatusBody,
+  UpdateGroupStatusResponse,
+  DeleteGroupResponse,
+} from './group'

@@ -17,6 +17,10 @@ export const ROUTES = {
     ).toString();
     return `/product/${postId}/related${qs ? `?${qs}` : ''}`;
   },
+  group: '/group',
+  groupRegister: '/group/register',
+  groupDetail: (groupId: string) => `/group/${groupId}`,
+  groupEdit: (groupId: string) => `/group/${groupId}/edit`,
   mypage: '/mypage',
   mypageMyReports: '/mypage/my-reports',
   mypageMyReceiptReviews: '/mypage/my-receipt-reviews',

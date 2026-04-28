@@ -19,9 +19,9 @@ function HomeIcon({ active }: { active: boolean }) {
   );
 }
 
-function GroupIcon() {
+function GroupIcon({ active }: { active: boolean }) {
   return (
-    <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#BDBDBD" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke={active ? "#2D8A5A" : "#BDBDBD"} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
       <circle cx="9" cy="7" r="4" />
       <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -98,9 +98,9 @@ export function BottomNav({ activeTab = "home" }: BottomNavProps) {
         active={activeTab === "home"}
       />
       <NavItem
-        href="#"
+        href={ROUTES.group}
         label="소분"
-        icon={<GroupIcon />}
+        icon={<GroupIcon active={activeTab === "split"} />}
         active={activeTab === "split"}
       />
       <div className="flex items-center justify-center pt-[3px]">
