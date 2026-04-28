@@ -118,7 +118,6 @@ export function GroupDetailPage({ groupId }: Props) {
   const isMine = group.isMine;
   const isOpen = group.status === "open";
   const isFull = group.currentCount >= group.targetCount;
-  const isPast = new Date(group.meetAt).getTime() < Date.now();
 
   function handleToggle() {
     if (!group) return;
@@ -277,10 +276,6 @@ export function GroupDetailPage({ groupId }: Props) {
         ) : !isOpen ? (
           <Button variant="outline" disabled>
             마감된 모집이에요
-          </Button>
-        ) : isPast ? (
-          <Button variant="outline" disabled>
-            약속 시간이 지났어요
           </Button>
         ) : group.isParticipating ? (
           <Button variant="outline" onClick={handleToggle} disabled={isToggling}>
