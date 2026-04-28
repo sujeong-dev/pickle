@@ -86,6 +86,7 @@ export {
   deleteGroup,
   updateGroupParticipation,
   updateGroupStatus,
+  getGroupErrorMessage,
 } from './group'
 export type {
   GroupListParams,

@@ -1,4 +1,6 @@
+import { HTTPError } from 'ky';
 import { api } from './kyInstance';
+import type { AuthErrorBody } from './auth';
 import type {
   GroupCategory,
   GroupStatus,
@@ -118,4 +120,24 @@ export function updateGroupStatus(
   return api
     .patch(`groups/${id}/status`, { json: body })
     .json<UpdateGroupStatusResponse>();
+}
+
+export async function getGroupErrorMessage(error: unknown): Promise<string> {
+  if (!(error instanceof HTTPError)) return '요청에 실패했어요.';
+  let body: Partial<AuthErrorBody> = {};
+  try {
+    body = await error.response.clone().json();
+  } catch {}
+
+  const status = error.response.status;
+  if (status === 403) return '본인 모집글에서만 가능한 작업이에요.';
+  if (status === 404) return '존재하지 않는 모집글이에요.';
+  if (status === 409) {
+    const path = body.path ?? '';
+    if (path.includes('/participation')) return '참여할 수 없는 상태예요. (정원 초과 / 마감 / 시간 경과)';
+    if (path.includes('/status')) return '이미 마감된 모집이에요.';
+    return '모집 중일 때만 수정할 수 있어요.';
+  }
+  if (status === 400) return body.error === 'VALIDATION_ERROR' ? '입력값을 다시 확인해주세요.' : '잘못된 요청이에요.';
+  return '요청에 실패했어요.';
 }
