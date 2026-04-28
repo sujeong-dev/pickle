@@ -52,6 +52,7 @@ export {
   getMyPosts,
   getMyReviews,
   getMyBookmarks,
+  updateMyLocation,
 } from './user'
 export type {
   UserProfile,
@@ -60,6 +61,8 @@ export type {
   MyBookmark,
   PaginatedResponse,
   PaginationParams,
+  UpdateLocationBody,
+  UpdateLocationResponse,
 } from './user'
 export { registerReceipt, createReview, updateReview, deleteReview } from './receipt'
 export type {

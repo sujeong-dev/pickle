@@ -1,8 +1,13 @@
 import { http, HttpResponse } from 'msw'
 
+const userState: { sido: string | null; sigungu: string | null } = {
+  sido: null,
+  sigungu: null,
+}
+
 export const userHandlers = [
-  // GET /api/users/me
-  http.get('/api/users/me', () => {
+  // GET */users/me
+  http.get('*/users/me', () => {
     return HttpResponse.json({
       id: 'user-001',
       nickname: '할인사냥꾼',
@@ -10,16 +15,26 @@ export const userHandlers = [
       postCount: 12,
       reviewCount: 8,
       bookmarkCount: 24,
+      sido: userState.sido,
+      sigungu: userState.sigungu,
     })
   }),
 
-  // DELETE /api/users/me
-  http.delete('/api/users/me', () => {
+  // PUT */users/me/location
+  http.put('*/users/me/location', async ({ request }) => {
+    const body = (await request.json()) as { sido: string; sigungu: string }
+    userState.sido = body.sido
+    userState.sigungu = body.sigungu
+    return HttpResponse.json({ sido: body.sido, sigungu: body.sigungu })
+  }),
+
+  // DELETE */users/me
+  http.delete('*/users/me', () => {
     return new HttpResponse(null, { status: 204 })
   }),
 
-  // GET /api/users/me/posts
-  http.get('/api/users/me/posts', ({ request }) => {
+  // GET */users/me/posts
+  http.get('*/users/me/posts', ({ request }) => {
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('page') ?? 1)
     const size = Number(url.searchParams.get('size') ?? 10)
@@ -63,8 +78,8 @@ export const userHandlers = [
     })
   }),
 
-  // GET /api/users/me/reviews
-  http.get('/api/users/me/reviews', ({ request }) => {
+  // GET */users/me/reviews
+  http.get('*/users/me/reviews', ({ request }) => {
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('page') ?? 1)
     const size = Number(url.searchParams.get('size') ?? 10)
@@ -114,8 +129,8 @@ export const userHandlers = [
     })
   }),
 
-  // GET /api/users/me/bookmarks
-  http.get('/api/users/me/bookmarks', ({ request }) => {
+  // GET */users/me/bookmarks
+  http.get('*/users/me/bookmarks', ({ request }) => {
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('page') ?? 1)
     const size = Number(url.searchParams.get('size') ?? 10)

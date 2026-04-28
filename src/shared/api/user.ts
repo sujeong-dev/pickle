@@ -7,6 +7,18 @@ export interface UserProfile {
   postCount: number
   reviewCount: number
   bookmarkCount: number
+  sido?: string | null
+  sigungu?: string | null
+}
+
+export interface UpdateLocationBody {
+  sido: string
+  sigungu: string
+}
+
+export interface UpdateLocationResponse {
+  sido: string
+  sigungu: string
 }
 
 export interface MyPost {
@@ -59,6 +71,10 @@ export function getMyProfile(): Promise<UserProfile> {
 
 export function deleteMyAccount(): Promise<void> {
   return api.delete('users/me').json<void>()
+}
+
+export function updateMyLocation(body: UpdateLocationBody): Promise<UpdateLocationResponse> {
+  return api.put('users/me/location', { json: body }).json<UpdateLocationResponse>()
 }
 
 export function getMyPosts(params?: PaginationParams): Promise<PaginatedResponse<MyPost>> {
