@@ -1,33 +1,17 @@
 "use client";
 
-import { Tab } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
-import { GROUP_CATEGORY_LABEL } from "@/entities/group";
-import { useGroupFilterStore, type CategoryFilter } from "../model/useGroupFilterStore";
-
-const TABS: { label: string; value: CategoryFilter }[] = [
-  { label: "전체", value: "all" },
-  { label: GROUP_CATEGORY_LABEL.share, value: "share" },
-  { label: GROUP_CATEGORY_LABEL.split, value: "split" },
-  { label: GROUP_CATEGORY_LABEL.group_buy, value: "group_buy" },
-];
+import { useGroupFilterStore } from "../model/useGroupFilterStore";
 
 export function GroupFilterTabs() {
-  const category = useGroupFilterStore((s) => s.category);
   const status = useGroupFilterStore((s) => s.status);
-  const setCategory = useGroupFilterStore((s) => s.setCategory);
   const setStatus = useGroupFilterStore((s) => s.setStatus);
 
   const openOnly = status === "open";
 
   return (
-    <div className="bg-white shrink-0">
-      <Tab
-        tabs={TABS}
-        activeValue={category}
-        onChange={(v) => setCategory(v as CategoryFilter)}
-      />
-      <div className="flex items-center justify-end px-5 py-2">
+    <div className="bg-white shrink-0 border-b border-gray-100">
+      <div className="flex items-center justify-end px-5 py-3">
         <button
           type="button"
           onClick={() => setStatus(openOnly ? undefined : "open")}

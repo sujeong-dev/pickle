@@ -1,6 +1,5 @@
 import { http, HttpResponse } from 'msw';
 import type {
-  GroupCategory,
   GroupListItem,
   GroupDetail,
 } from '@/entities/group';
@@ -12,7 +11,6 @@ const mockGroups: GroupDetail[] = [
     id: 'g-1',
     store: 'costco',
     branch: '양재점',
-    category: 'share',
     productName: '커클랜드 닭가슴살 2.27kg',
     targetCount: 4,
     currentCount: 2,
@@ -33,7 +31,6 @@ const mockGroups: GroupDetail[] = [
     id: 'g-2',
     store: 'traders',
     branch: '하남점',
-    category: 'group_buy',
     productName: '바스 슬라이드 트레이 6입',
     targetCount: 3,
     currentCount: 1,
@@ -56,7 +53,6 @@ const mockGroups: GroupDetail[] = [
     id: 'g-3',
     store: 'costco',
     branch: '일산점',
-    category: 'split',
     productName: '코스트코 픽업 차량 분담',
     targetCount: 2,
     currentCount: 2,
@@ -87,12 +83,10 @@ export const groupHandlers = [
   http.get('*/groups', ({ request }) => {
     const url = new URL(request.url);
     const status = url.searchParams.get('status') as 'open' | 'done' | null;
-    const category = url.searchParams.get('category') as GroupCategory | null;
     const store = url.searchParams.get('store');
 
     let items = mockGroups.slice();
     if (status) items = items.filter((g) => g.status === status);
-    if (category) items = items.filter((g) => g.category === category);
     if (store) items = items.filter((g) => g.store === store);
 
     return HttpResponse.json({
@@ -127,7 +121,6 @@ export const groupHandlers = [
       id: `g-${Date.now()}`,
       store: body.store ?? null,
       branch: body.branch ?? null,
-      category: (body.category ?? 'share') as GroupCategory,
       productName: body.productName ?? '',
       targetCount: body.targetCount ?? 2,
       currentCount: 1,

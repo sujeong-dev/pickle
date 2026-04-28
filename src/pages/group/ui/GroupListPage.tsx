@@ -36,15 +36,11 @@ function ListSkeleton() {
 }
 
 export function GroupListPage() {
-  const category = useGroupFilterStore((s) => s.category);
   const status = useGroupFilterStore((s) => s.status);
   const { data: profile, isLoading: isProfileLoading } = useMyProfile();
   const isLocationVerified = Boolean(profile?.sido && profile?.sigungu);
 
-  const filters = {
-    category: category === "all" ? undefined : category,
-    status,
-  };
+  const filters = { status };
 
   return (
     <div className="bg-gray-50 flex flex-col h-dvh">

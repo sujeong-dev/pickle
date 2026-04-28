@@ -51,7 +51,6 @@ export function GroupEditPage({ groupId }: Props) {
         ) : (
           <GroupForm
             initial={{
-              category: group.category,
               productName: group.productName,
               store: group.store,
               branch: group.branch,

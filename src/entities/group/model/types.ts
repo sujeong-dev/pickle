@@ -1,12 +1,5 @@
-export type GroupCategory = 'share' | 'split' | 'group_buy';
 export type GroupStatus = 'open' | 'done';
 export type GroupStore = 'costco' | 'traders';
-
-export const GROUP_CATEGORY_LABEL: Record<GroupCategory, string> = {
-  share: '소분',
-  split: '분담',
-  group_buy: '공구',
-};
 
 export const GROUP_STATUS_LABEL: Record<GroupStatus, string> = {
   open: '모집중',
@@ -28,7 +21,6 @@ export type GroupListItem = {
   id: string;
   store: GroupStore | null;
   branch: string | null;
-  category: GroupCategory;
   productName: string;
   targetCount: number;
   currentCount: number;

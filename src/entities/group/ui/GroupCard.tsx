@@ -2,7 +2,6 @@ import Link from "next/link";
 import { cn } from "@/shared/lib/utils";
 import { formatMeetTime } from "@/shared/lib/formatMeetTime";
 import { ROUTES } from "@/shared/config/routes";
-import { CategoryBadge } from "./CategoryBadge";
 import { StatusBadge } from "./StatusBadge";
 import { GROUP_STORE_LABEL, type GroupListItem } from "../model/types";
 
@@ -41,7 +40,6 @@ type Props = {
 export function GroupCard({ group, className }: Props) {
   const {
     id,
-    category,
     productName,
     targetCount,
     currentCount,
@@ -69,7 +67,6 @@ export function GroupCard({ group, className }: Props) {
     >
       {/* 뱃지 행 */}
       <div className="flex items-center gap-1.5 mb-2">
-        <CategoryBadge category={category} />
         <StatusBadge status={status} />
         {isMine && (
           <span className="inline-flex items-center px-2 py-0.5 rounded font-semibold text-caption bg-primary-500 text-white">

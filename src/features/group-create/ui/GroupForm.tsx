@@ -4,18 +4,14 @@ import { useState } from "react";
 import { Button, Input, Textarea } from "@/shared/ui";
 import { cn } from "@/shared/lib/utils";
 import {
-  GROUP_CATEGORY_LABEL,
   GROUP_STORE_LABEL,
-  type GroupCategory,
   type GroupStore,
 } from "@/entities/group";
 import type { CreateGroupBody } from "@/shared/api";
 
-const CATEGORIES: GroupCategory[] = ["share", "split", "group_buy"];
 const STORES: GroupStore[] = ["costco", "traders"];
 
 export type GroupFormInitial = {
-  category?: GroupCategory;
   productName?: string;
   store?: GroupStore | null;
   branch?: string | null;
@@ -47,7 +43,6 @@ function localInputToIso(local: string): string {
 }
 
 export function GroupForm({ initial, submitLabel, isSubmitting, onSubmit }: Props) {
-  const [category, setCategory] = useState<GroupCategory>(initial?.category ?? "share");
   const [productName, setProductName] = useState(initial?.productName ?? "");
   const [store, setStore] = useState<GroupStore | "">(initial?.store ?? "");
   const [branch, setBranch] = useState(initial?.branch ?? "");
@@ -69,7 +64,6 @@ export function GroupForm({ initial, submitLabel, isSubmitting, onSubmit }: Prop
     e.preventDefault();
     if (!canSubmit || isSubmitting) return;
     const body: CreateGroupBody = {
-      category,
       productName: productName.trim(),
       targetCount,
       location: location.trim(),
@@ -84,27 +78,6 @@ export function GroupForm({ initial, submitLabel, isSubmitting, onSubmit }: Prop
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6 px-5 py-4 pb-32">
-      {/* 카테고리 */}
-      <Field label="카테고리" required>
-        <div className="grid grid-cols-3 gap-2">
-          {CATEGORIES.map((c) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => setCategory(c)}
-              className={cn(
-                "h-11 rounded-[10px] font-semibold text-body2 transition-colors",
-                category === c
-                  ? "bg-primary-500 text-white"
-                  : "bg-gray-100 text-gray-600",
-              )}
-            >
-              {GROUP_CATEGORY_LABEL[c]}
-            </button>
-          ))}
-        </div>
-      </Field>
-
       {/* 상품명 */}
       <Field label="상품명" required>
         <Input

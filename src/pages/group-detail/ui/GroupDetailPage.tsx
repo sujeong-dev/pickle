@@ -9,7 +9,6 @@ import { cn } from "@/shared/lib/utils";
 import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
 import { formatMeetTime } from "@/shared/lib/formatMeetTime";
 import {
-  CategoryBadge,
   StatusBadge,
   GROUP_STORE_LABEL,
 } from "@/entities/group";
@@ -184,7 +183,6 @@ export function GroupDetailPage({ groupId }: Props) {
         {/* 뱃지 + 제목 */}
         <div className="px-5 pt-2 pb-4">
           <div className="flex items-center gap-1.5 mb-3">
-            <CategoryBadge category={group.category} />
             <StatusBadge status={group.status} />
             {!isMine && group.isParticipating && (
               <span className="inline-flex items-center px-2 py-0.5 rounded font-semibold text-caption bg-primary-100 text-primary-700">

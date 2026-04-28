@@ -2,7 +2,6 @@ import { HTTPError } from 'ky';
 import { api } from './kyInstance';
 import type { AuthErrorBody } from './auth';
 import type {
-  GroupCategory,
   GroupStatus,
   GroupStore,
   GroupListItem,
@@ -11,7 +10,6 @@ import type {
 
 export interface GroupListParams {
   status?: GroupStatus;
-  category?: GroupCategory;
   store?: GroupStore;
   branch?: string;
   sido?: string;
@@ -27,7 +25,6 @@ export interface GroupListResponse {
 }
 
 export interface CreateGroupBody {
-  category: GroupCategory;
   productName: string;
   targetCount: number;
   location: string;
