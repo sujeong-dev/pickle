@@ -6,6 +6,8 @@ const userState: {
   dong: string | null
   longitude: number | null
   latitude: number | null
+
+
   profileImageUrl: string | null
 } = {
   sido: null,

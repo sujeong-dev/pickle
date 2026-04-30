@@ -2,12 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { Input, Toast, Button, SuccessScreen, UserAvatar } from "@/shared/ui";
 import { ROUTES } from "@/shared/config/routes";
-import { useMyProfile, useWithdraw, useUpdateProfileImage } from "@/features/profile-edit";
-import { useUpdateNickname, useNicknameCheck } from "@/features/set-nickname";
+import { useMyProfile, useWithdraw, useUpdateProfileImage, profileKeys } from "@/features/profile-edit";
+import { useUpdateNickname, useNicknameCheck, NicknameRulesPanel } from "@/features/set-nickname";
 import { logout } from "@/shared/api";
 import { clearTokens, useToastStore } from "@/shared/model";
+import { useDebouncedValue } from "@/shared/lib/useDebouncedValue";
 
 function ChevronLeftIcon() {
   return (
@@ -66,8 +68,9 @@ const WITHDRAW_REASONS = [
 
 export function ProfileEditPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data: profile } = useMyProfile();
-  const { mutate: updateNickname } = useUpdateNickname();
+  const { mutate: updateNickname, isPending: isSavingNickname } = useUpdateNickname();
   const { mutate: withdraw } = useWithdraw();
 
   const [nickname, setNickname] = useState('');
@@ -83,8 +86,13 @@ export function ProfileEditPage() {
 
   const savedNicknameFromServer = profile?.nickname ?? '';
   const isNicknameChanged = nickname.length > 0 && nickname !== savedNicknameFromServer;
-  const { data: nicknameCheckData } = useNicknameCheck(isNicknameChanged ? nickname : '');
-  const nicknameAvailable = isNicknameChanged ? (nicknameCheckData?.available ?? null) : null;
+  const debouncedNickname = useDebouncedValue(nickname, 200);
+  const isDebouncedReady = isNicknameChanged && debouncedNickname === nickname;
+  const { data: nicknameCheckData, isFetching: isCheckingNickname } = useNicknameCheck(
+    isDebouncedReady ? debouncedNickname : '',
+  );
+  const nicknameAvailable =
+    isDebouncedReady && !isCheckingNickname ? (nicknameCheckData?.available ?? null) : null;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { mutate: updateProfileImage, isPending: isUploadingAvatar } = useUpdateProfileImage();
   const showToast = useToastStore((s) => s.show);
@@ -100,21 +108,19 @@ export function ProfileEditPage() {
     return () => clearTimeout(timer);
   }, [toastVisible]);
 
-  const isDirty = nickname !== savedNickname &&
-    (isNicknameChanged ? nicknameAvailable === true : true);
+  const isDirty = isNicknameChanged && nicknameAvailable === true;
 
   function handleSave() {
-    if (nickname !== savedNickname) {
-      updateNickname(nickname, {
-        onSuccess: () => {
-          setSavedNickname(nickname);
-          setToastVisible(true);
-        },
-      });
-    } else {
-      setSavedNickname(nickname);
-      setToastVisible(true);
-    }
+    const trimmed = nickname.trim();
+    if (!trimmed || trimmed === savedNickname || nicknameAvailable !== true) return;
+    updateNickname(trimmed, {
+      onSuccess: () => {
+        setNickname(trimmed);
+        setSavedNickname(trimmed);
+        queryClient.invalidateQueries({ queryKey: profileKeys.me() });
+        setToastVisible(true);
+      },
+    });
   }
 
   function handleAvatarClick() {
@@ -164,9 +170,9 @@ export function ProfileEditPage() {
         <span className="font-bold text-h2 text-gray-900">프로필 수정</span>
         <button
           type="button"
-          className={`font-semibold text-body1 transition-colors ${isDirty ? "text-primary-500" : "text-gray-300 cursor-default"}`}
+          className={`font-semibold text-body1 transition-colors ${isDirty && !isSavingNickname ? "text-primary-500" : "text-gray-300 cursor-default"}`}
           onClick={handleSave}
-          disabled={!isDirty}
+          disabled={!isDirty || isSavingNickname}
         >
           저장
         </button>
@@ -206,12 +212,16 @@ export function ProfileEditPage() {
               onChange={(e) => setNickname(e.target.value)}
               onClear={() => setNickname("")}
               className="w-full"
+              maxLength={12}
             />
             {isNicknameChanged && nicknameAvailable !== null && (
               <span className={`text-caption ${nicknameAvailable ? "text-primary-500" : "text-secondary-500"}`}>
                 {nicknameAvailable ? "사용 가능한 닉네임이에요" : "이미 사용 중인 닉네임이에요"}
               </span>
             )}
+            <div className="pt-2">
+              <NicknameRulesPanel />
+            </div>
           </div>
         </div>
 
