@@ -1,30 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { recognizeReceiptWithAnnotations } from "@/shared/lib/googleVision";
 import { maskCardNumbers } from "@/shared/lib/maskCardNumbers";
-import { parseCostcoReceipt, type ParsedReceipt } from "@/shared/lib/parseCostcoReceipt";
-import type { OcrReceiptItem } from "@/shared/api";
+import { useToastStore } from "@/shared/model";
+import { getPresignedUrl, enqueueReceiptOcr, type OcrReceiptItem } from "@/shared/api";
 import type { OcrReceiptData } from "../model/useReviewStep1";
-
-function parsedToOcrData(parsed: ParsedReceipt, r2Key: string): OcrReceiptData {
-  return {
-    store: null,
-    branch: parsed.branch,
-    totalAmount: parsed.totalAmount,
-    itemCount: parsed.itemCount,
-    purchasedAt: parsed.purchasedAt,
-    r2Key,
-    items: parsed.items.map((it) => ({
-      productCode: "",
-      productName: it.name,
-      quantity: it.quantity,
-      unitPrice: it.price,
-      finalPrice: it.price * it.quantity,
-    })),
-  };
-}
+import { useReceiptOcr } from "../api/useReceiptOcr";
 
 type View = "upload" | "processing" | "confirm" | "error" | "form";
 
@@ -81,6 +64,8 @@ async function fileToBase64(file: File): Promise<string> {
 export function ReviewStep1({ onReceiptDataChange, onMaskedImageReady }: ReviewStep1Props) {
   const [view, setView] = useState<View>("upload");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [r2Key, setR2Key] = useState<string | null>(null);
+  const [jobId, setJobId] = useState<string | null>(null);
   const [pendingData, setPendingData] = useState<OcrReceiptData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -91,37 +76,96 @@ export function ReviewStep1({ onReceiptDataChange, onMaskedImageReady }: ReviewS
   const [itemPrice, setItemPrice] = useState("");
   const [itemCode, setItemCode] = useState("");
 
+  const ocrOutcome = useReceiptOcr(jobId);
+
+  useEffect(() => {
+    if (!jobId) return;
+    if (ocrOutcome.kind === "completed" && r2Key) {
+      setPendingData({ ...ocrOutcome.result, r2Key });
+      setView("confirm");
+      setJobId(null);
+    } else if (ocrOutcome.kind === "failed") {
+      useToastStore.getState().show("영수증 분석에 실패했어요. 다시 시도해주세요.");
+      resetAll();
+    } else if (ocrOutcome.kind === "timeout") {
+      useToastStore.getState().show("영수증 분석이 오래 걸리고 있어요. 다시 시도해주세요.");
+      resetAll();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ocrOutcome.kind, r2Key]);
+
+  const resetAll = () => {
+    setPreviewUrl(null);
+    setR2Key(null);
+    setJobId(null);
+    setPendingData(null);
+    setView("upload");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setPreviewUrl(URL.createObjectURL(file));
     setView("processing");
+
+    // 1) Google Vision으로 마스킹 좌표 추출
+    let wordAnnotations;
     try {
       const base64 = await fileToBase64(file);
-      const { fullText, wordAnnotations } = await recognizeReceiptWithAnnotations(base64);
-      const parsed = parseCostcoReceipt(fullText);
-      if (!parsed.branch && !parsed.totalAmount && parsed.items.length === 0) {
-        setView("error");
-        return;
-      }
-      try {
-        const maskedBlob = await maskCardNumbers(file, wordAnnotations);
-        setPreviewUrl(URL.createObjectURL(maskedBlob));
-        onMaskedImageReady?.(maskedBlob);
-      } catch {
-        // 마스킹 실패해도 OCR 결과는 계속 사용
-      }
-      setPendingData(parsedToOcrData(parsed, ""));
-      setView("confirm");
+      const result = await recognizeReceiptWithAnnotations(base64);
+      wordAnnotations = result.wordAnnotations;
     } catch {
-      setView("error");
+      useToastStore.getState().show("영수증 인식에 실패했어요. 다시 시도해주세요.");
+      resetAll();
+      return;
+    }
+
+    // 2) 회원번호 마스킹 — 실패 시 업로드 중단 (개인정보 보호)
+    let maskedBlob: Blob;
+    try {
+      maskedBlob = await maskCardNumbers(file, wordAnnotations);
+    } catch {
+      useToastStore.getState().show("영수증 마스킹에 실패했어요. 다시 시도해주세요.");
+      resetAll();
+      return;
+    }
+    setPreviewUrl(URL.createObjectURL(maskedBlob));
+    onMaskedImageReady?.(maskedBlob);
+
+    // 3) presigned URL 발급 → R2 업로드
+    let uploadedR2Key: string;
+    try {
+      const presigned = await getPresignedUrl({
+        fileType: maskedBlob.type || "image/jpeg",
+        purpose: "receipt",
+      });
+      const putRes = await fetch(presigned.uploadUrl, {
+        method: "PUT",
+        body: maskedBlob,
+        headers: { "Content-Type": maskedBlob.type || "image/jpeg" },
+      });
+      if (!putRes.ok) throw new Error("upload failed");
+      uploadedR2Key = presigned.r2Key;
+      setR2Key(uploadedR2Key);
+    } catch {
+      useToastStore.getState().show("영수증 업로드에 실패했어요. 다시 시도해주세요.");
+      resetAll();
+      return;
+    }
+
+    // 4) OCR 큐잉 → jobId 받고 폴링 시작
+    try {
+      const { jobId: newJobId } = await enqueueReceiptOcr({ r2Key: uploadedR2Key });
+      setJobId(newJobId);
+    } catch {
+      useToastStore.getState().show("영수증 분석 요청에 실패했어요.");
+      resetAll();
     }
   };
 
   const handleRetake = () => {
-    setPreviewUrl(null);
-    setView("upload");
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    resetAll();
   };
 
   const handleAddItem = () => {
@@ -144,13 +188,14 @@ export function ReviewStep1({ onReceiptDataChange, onMaskedImageReady }: ReviewS
   };
 
   const handleManualSubmit = () => {
+    // 수기 입력은 r2Key가 없어 추후 createReceipt가 실패할 수 있음 — 별도 정책 정의 필요
     onReceiptDataChange({
       store: null,
       branch,
       totalAmount: manualItems.reduce((s, i) => s + i.finalPrice, 0),
       itemCount: manualItems.length,
       purchasedAt,
-      r2Key: "",
+      r2Key: r2Key ?? "",
       items: manualItems,
     });
   };
