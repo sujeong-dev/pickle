@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 export type EditableItem = {
   name: string;
@@ -7,17 +7,22 @@ export type EditableItem = {
   productCode?: string;
 };
 
-export function useReviewStep2(ocrItems: EditableItem[]) {
-  const [items, setItems] = useState<EditableItem[]>([]);
+type Override = { name?: string; price?: number; productCode?: string };
 
-  useEffect(() => {
-    setItems(ocrItems.map((item) => ({ ...item })));
-  }, [ocrItems]);
+export function useReviewStep2(ocrItems: EditableItem[]) {
+  const [overrides, setOverrides] = useState<Record<number, Override>>({});
+
+  const items = useMemo<EditableItem[]>(
+    () =>
+      ocrItems.map((it, i) => ({
+        ...it,
+        ...overrides[i],
+      })),
+    [ocrItems, overrides],
+  );
 
   const updateItem = (idx: number, name: string, price: number, productCode?: string) => {
-    setItems((prev) =>
-      prev.map((item, i) => (i === idx ? { ...item, name, price, productCode } : item)),
-    );
+    setOverrides((prev) => ({ ...prev, [idx]: { name, price, productCode } }));
   };
 
   return { items, updateItem };
