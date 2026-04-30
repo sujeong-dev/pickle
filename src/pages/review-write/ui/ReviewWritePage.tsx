@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/shared/config/routes";
 import { Button, PageHeader, StepIndicator, SuccessScreen } from "@/shared/ui";
+import { useToastStore } from "@/shared/model";
 import { ReviewStep1, useReviewStep1 } from "@/features/review-step1-receipt";
 import type { OcrReceiptData } from "@/features/review-step1-receipt";
 import { ReviewStep2, useReviewStep2, useRegisterReceipt } from "@/features/review-step2-items";
@@ -21,7 +22,6 @@ export function ReviewWritePage() {
   const [itemIdx, setItemIdx] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
   const [receiptId, setReceiptId] = useState<string | null>(null);
-  const [maskedReceiptBlob, setMaskedReceiptBlob] = useState<Blob | null>(null);
 
   const { ocrData, setOcrData } = useReviewStep1();
   const ocrItems = useMemo(
@@ -57,19 +57,27 @@ export function ReviewWritePage() {
   const handleNext = async () => {
     if (step === 2) {
       if (!ocrData) return;
+      if (!ocrData.r2Key) {
+        useToastStore.getState().show("영수증 이미지가 업로드되지 않았어요. 다시 촬영해주세요.");
+        return;
+      }
       try {
+        const totalAmount = editableItems.reduce(
+          (sum, it) => sum + it.price * it.quantity,
+          0,
+        );
         const result = await registerReceipt({
           r2Key: ocrData.r2Key,
           store: "costco",
           branch: ocrData.branch,
-          totalAmount: ocrData.totalAmount,
+          totalAmount,
           itemCount: editableItems.length,
           purchasedAt: ocrData.purchasedAt,
         });
         setReceiptId(result.id);
         setStep(3);
       } catch {
-        // Error handled centrally by kyInstance
+        useToastStore.getState().show("영수증 등록에 실패했어요. 잠시 후 다시 시도해주세요.");
       }
     } else if (step === 3) {
       if (!isLastItem) {
@@ -146,10 +154,7 @@ export function ReviewWritePage() {
 
       {step === 1 && (
         <main className="flex-1 overflow-y-auto min-h-0 px-5 py-6">
-          <ReviewStep1
-            onReceiptDataChange={handleOcrDataChange}
-            onMaskedImageReady={setMaskedReceiptBlob}
-          />
+          <ReviewStep1 onReceiptDataChange={handleOcrDataChange} />
         </main>
       )}
 
