@@ -34,14 +34,18 @@ export function ReviewWritePage() {
       })),
     [ocrData],
   );
-  const { items: editableItems, updateItem } = useReviewStep2(ocrItems);
+  const { items: editableItems, updateItem, selectedIdxs, toggleSelect } = useReviewStep2(ocrItems);
+  const selectedItems = useMemo(
+    () => editableItems.filter((_, i) => selectedIdxs.has(i)),
+    [editableItems, selectedIdxs],
+  );
   const { reviews, setRating, setComment, addPhoto, removePhoto, setRepresentative } =
-    useReviewStep3(editableItems.length);
+    useReviewStep3(selectedItems.length);
 
   const { mutateAsync: registerReceipt, isPending: isRegistering } = useRegisterReceipt();
   const { mutateAsync: createReview, isPending: isSubmitting } = useCreateReview();
 
-  const isLastItem = itemIdx === editableItems.length - 1;
+  const isLastItem = itemIdx === selectedItems.length - 1;
 
   const handleBack = () => {
     if (step === 1) router.back();
@@ -62,16 +66,12 @@ export function ReviewWritePage() {
         return;
       }
       try {
-        const totalAmount = editableItems.reduce(
-          (sum, it) => sum + it.price * it.quantity,
-          0,
-        );
         const result = await registerReceipt({
           r2Key: ocrData.r2Key,
           store: "costco",
           branch: ocrData.branch,
-          totalAmount,
-          itemCount: editableItems.length,
+          totalAmount: ocrData.totalAmount,
+          itemCount: ocrData.itemCount,
           purchasedAt: ocrData.purchasedAt,
         });
         setReceiptId(result.id);
@@ -84,7 +84,7 @@ export function ReviewWritePage() {
         setItemIdx((i) => i + 1);
       } else {
         try {
-          for (let i = 0; i < editableItems.length; i++) {
+          for (let i = 0; i < selectedItems.length; i++) {
             const review = reviews[i];
 
             const r2Keys: string[] = [];
@@ -108,7 +108,7 @@ export function ReviewWritePage() {
 
             await createReview({
               receiptId: receiptId!,
-              productName: editableItems[i].name,
+              productName: selectedItems[i].name,
               rating: review.rating,
               content: review.comment ?? "",
               imageKeys: r2Keys.length > 0 ? r2Keys : undefined,
@@ -160,22 +160,30 @@ export function ReviewWritePage() {
 
       {step === 2 && (
         <>
-          <ReviewStep2 items={editableItems} onUpdateItem={updateItem} />
+          <ReviewStep2
+            items={editableItems}
+            selectedIdxs={selectedIdxs}
+            onToggleSelect={toggleSelect}
+            onUpdateItem={updateItem}
+          />
           <div className="shrink-0 px-5 pb-8 pt-3">
-            <Button onClick={handleNext} disabled={isStep2Pending || editableItems.length === 0}>
+            <Button
+              onClick={handleNext}
+              disabled={isStep2Pending || selectedIdxs.size === 0}
+            >
               {nextLabel}
             </Button>
           </div>
         </>
       )}
 
-      {step === 3 && reviews[itemIdx] && (
+      {step === 3 && reviews[itemIdx] && selectedItems[itemIdx] && (
         <>
           <ReviewStep3
-            itemName={editableItems[itemIdx].name}
-            itemPrice={`${editableItems[itemIdx].price.toLocaleString()}원`}
+            itemName={selectedItems[itemIdx].name}
+            itemPrice={`${selectedItems[itemIdx].price.toLocaleString()}원`}
             currentIdx={itemIdx}
-            total={editableItems.length}
+            total={selectedItems.length}
             photos={reviews[itemIdx].photos}
             representativeIdx={reviews[itemIdx].representativeIdx}
             rating={reviews[itemIdx].rating}
