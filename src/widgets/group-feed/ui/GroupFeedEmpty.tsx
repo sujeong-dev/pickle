@@ -1,7 +1,12 @@
-import Link from "next/link";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { Button } from "@/shared/ui";
 import { ROUTES } from "@/shared/config/routes";
 
 export function GroupFeedEmpty() {
+  const router = useRouter();
+
   return (
     <div className="flex flex-col items-center justify-center gap-3 px-5 py-16">
       <div className="size-16 rounded-full bg-primary-50 flex items-center justify-center">
@@ -15,12 +20,9 @@ export function GroupFeedEmpty() {
       <p className="text-subtitle text-gray-700">
         근처에 진행 중인 소분이 없어요
       </p>
-      <Link
-        href={ROUTES.groupRegister}
-        className="mt-2 px-5 py-2.5 rounded-full bg-primary-500 font-semibold text-body2 text-white"
-      >
+      <Button size="md" width="140px" onClick={() => router.push(ROUTES.groupRegister)}>
         모집 등록하기
-      </Link>
+      </Button>
     </div>
   );
 }
