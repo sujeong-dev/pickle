@@ -30,6 +30,14 @@ export interface UpdateLocationResponse {
   latitude: number
 }
 
+export interface UpdateProfileImageBody {
+  r2Key: string
+}
+
+export interface UpdateProfileImageResponse {
+  profileImageUrl: string
+}
+
 export interface MyPost {
   id: string
   productName: string
@@ -84,6 +92,10 @@ export function deleteMyAccount(): Promise<void> {
 
 export function updateMyLocation(body: UpdateLocationBody): Promise<UpdateLocationResponse> {
   return api.put('users/me/location', { json: body }).json<UpdateLocationResponse>()
+}
+
+export function updateMyProfileImage(body: UpdateProfileImageBody): Promise<UpdateProfileImageResponse> {
+  return api.patch('users/me/profile-image', { json: body }).json<UpdateProfileImageResponse>()
 }
 
 export function getMyPosts(params?: PaginationParams): Promise<PaginatedResponse<MyPost>> {

@@ -53,6 +53,7 @@ export {
   getMyReviews,
   getMyBookmarks,
   updateMyLocation,
+  updateMyProfileImage,
 } from './user'
 export type {
   UserProfile,
@@ -63,6 +64,8 @@ export type {
   PaginationParams,
   UpdateLocationBody,
   UpdateLocationResponse,
+  UpdateProfileImageBody,
+  UpdateProfileImageResponse,
 } from './user'
 export {
   enqueueReceiptOcr,

@@ -1,27 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Input, Toast, Button, SuccessScreen } from "@/shared/ui";
+import { Input, Toast, Button, SuccessScreen, UserAvatar } from "@/shared/ui";
 import { ROUTES } from "@/shared/config/routes";
-import { useMyProfile, useWithdraw } from "@/features/profile-edit";
+import { useMyProfile, useWithdraw, useUpdateProfileImage } from "@/features/profile-edit";
 import { useUpdateNickname, useNicknameCheck } from "@/features/set-nickname";
 import { logout } from "@/shared/api";
-import { clearTokens } from "@/shared/model";
+import { clearTokens, useToastStore } from "@/shared/model";
 
 function ChevronLeftIcon() {
   return (
     <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="#212121" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M15 18l-6-6 6-6" />
-    </svg>
-  );
-}
-
-function PersonIcon() {
-  return (
-    <svg width="50" height="50" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#2D8A5A" fillOpacity="0.5" />
-      <path d="M20 21C20 18.2386 16.4183 16 12 16C7.58172 16 4 18.2386 4 21" stroke="#2D8A5A" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -94,7 +85,9 @@ export function ProfileEditPage() {
   const isNicknameChanged = nickname.length > 0 && nickname !== savedNicknameFromServer;
   const { data: nicknameCheckData } = useNicknameCheck(isNicknameChanged ? nickname : '');
   const nicknameAvailable = isNicknameChanged ? (nicknameCheckData?.available ?? null) : null;
-  const [avatarChanged, setAvatarChanged] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { mutate: updateProfileImage, isPending: isUploadingAvatar } = useUpdateProfileImage();
+  const showToast = useToastStore((s) => s.show);
   const [toastVisible, setToastVisible] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
@@ -107,7 +100,7 @@ export function ProfileEditPage() {
     return () => clearTimeout(timer);
   }, [toastVisible]);
 
-  const isDirty = (nickname !== savedNickname || avatarChanged) &&
+  const isDirty = nickname !== savedNickname &&
     (isNicknameChanged ? nicknameAvailable === true : true);
 
   function handleSave() {
@@ -115,15 +108,28 @@ export function ProfileEditPage() {
       updateNickname(nickname, {
         onSuccess: () => {
           setSavedNickname(nickname);
-          setAvatarChanged(false);
           setToastVisible(true);
         },
       });
     } else {
       setSavedNickname(nickname);
-      setAvatarChanged(false);
       setToastVisible(true);
     }
+  }
+
+  function handleAvatarClick() {
+    if (isUploadingAvatar) return;
+    fileInputRef.current?.click();
+  }
+
+  function handleAvatarFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    updateProfileImage(file, {
+      onSuccess: () => showToast("프로필 사진이 변경됐어요"),
+      onError: () => showToast("프로필 사진 변경에 실패했어요"),
+    });
   }
 
   function handleWithdraw() {
@@ -171,17 +177,23 @@ export function ProfileEditPage() {
         {/* 아바타 섹션 */}
         <div className="bg-white flex items-center justify-center py-xl shrink-0">
           <div className="relative">
-            <div className="size-[100px] rounded-full bg-primary-50 flex items-center justify-center">
-              <PersonIcon />
-            </div>
+            <UserAvatar src={profile?.profileImageUrl} size={100} />
             <button
               type="button"
               aria-label="프로필 사진 변경"
-              className="absolute bottom-0 right-0 size-8 rounded-full bg-primary-500 border-2 border-white flex items-center justify-center"
-              onClick={() => setAvatarChanged(true)}
+              className="absolute bottom-0 right-0 size-8 rounded-full bg-primary-500 border-2 border-white flex items-center justify-center disabled:opacity-60"
+              onClick={handleAvatarClick}
+              disabled={isUploadingAvatar}
             >
               <CameraIcon />
             </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarFileChange}
+            />
           </div>
         </div>
 

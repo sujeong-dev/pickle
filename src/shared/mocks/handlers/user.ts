@@ -6,12 +6,14 @@ const userState: {
   dong: string | null
   longitude: number | null
   latitude: number | null
+  profileImageUrl: string | null
 } = {
   sido: null,
   sigungu: null,
   dong: null,
   longitude: null,
   latitude: null,
+  profileImageUrl: null,
 }
 
 export const userHandlers = [
@@ -20,7 +22,7 @@ export const userHandlers = [
     return HttpResponse.json({
       id: 'user-001',
       nickname: '할인사냥꾼',
-      profileImageUrl: undefined,
+      profileImageUrl: userState.profileImageUrl ?? undefined,
       postCount: 12,
       reviewCount: 8,
       bookmarkCount: 24,
@@ -30,6 +32,14 @@ export const userHandlers = [
       longitude: userState.longitude,
       latitude: userState.latitude,
     })
+  }),
+
+  // PATCH */users/me/profile-image
+  http.patch('*/users/me/profile-image', async ({ request }) => {
+    const body = (await request.json()) as { r2Key: string }
+    const url = `https://mock-r2.example.com/${body.r2Key}`
+    userState.profileImageUrl = url
+    return HttpResponse.json({ profileImageUrl: url })
   }),
 
   // PUT */users/me/location

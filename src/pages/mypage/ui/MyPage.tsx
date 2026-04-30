@@ -3,19 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BottomNav } from "@/widgets/bottom-nav";
+import { UserAvatar } from "@/shared/ui";
 import { ROUTES } from "@/shared/config/routes";
 import { useMyProfile, LocationSection } from "@/features/profile-edit";
 
 // ── Icons ──────────────────────────────────────────
-
-function PersonIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D8A5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
 
 function TagIcon() {
   return (
@@ -119,9 +111,7 @@ export function MyPage() {
             className='flex items-center gap-2'
             onClick={() => router.push(ROUTES.mypageProfileEdit)}
           >
-            <div className='bg-primary-50 rounded-full size-[42px] flex items-center justify-center shrink-0'>
-              <PersonIcon />
-            </div>
+            <UserAvatar src={profile?.profileImageUrl} size={42} />
             <span className='font-bold text-[20px] text-gray-900'>
               {nickname}
             </span>
