@@ -4,9 +4,9 @@ import { useState } from "react";
 import { ScanIcon } from "@/shared/ui/icons";
 import type { EditableItem } from "../model/useReviewStep2";
 
-function CheckIcon() {
+function CheckIcon({ stroke = "#2D8A5A" }: { stroke?: string }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2D8A5A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );
@@ -85,20 +85,27 @@ function EditModal({ item, onSave, onClose }: EditModalProps) {
 
 type ReviewStep2Props = {
   items: EditableItem[];
+  selectedIdxs: Set<number>;
+  onToggleSelect: (idx: number) => void;
   onUpdateItem: (idx: number, name: string, price: number, productCode?: string) => void;
 };
 
-export function ReviewStep2({ items, onUpdateItem }: ReviewStep2Props) {
+export function ReviewStep2({ items, selectedIdxs, onToggleSelect, onUpdateItem }: ReviewStep2Props) {
   const [editIdx, setEditIdx] = useState<number | null>(null);
 
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const selectedTotal = items.reduce(
+    (sum, item, idx) => (selectedIdxs.has(idx) ? sum + item.price * item.quantity : sum),
+    0,
+  );
 
   return (
     <>
       <div className="flex flex-col flex-1 min-h-0">
         <div className="bg-primary-50 flex items-center gap-2 px-5 py-2 shrink-0">
           <ScanIcon size={16} />
-          <span className="text-caption font-medium text-primary-500">{items.length}개 항목을 인식했어요!</span>
+          <span className="text-caption font-medium text-primary-500">
+            {items.length}개 항목 인식 — 후기를 등록할 상품을 선택해주세요
+          </span>
         </div>
 
         <div className="flex-1 overflow-y-auto min-h-0 px-5 py-4 flex flex-col gap-3">
@@ -108,35 +115,45 @@ export function ReviewStep2({ items, onUpdateItem }: ReviewStep2Props) {
           </div>
 
           <div className="flex flex-col gap-1">
-            {items.map((item, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => setEditIdx(idx)}
-                className="flex items-center gap-1 border-b border-gray-100 py-3 w-full text-left"
-              >
-                <div className="bg-primary-50 rounded-xs size-6 flex items-center justify-center shrink-0">
-                  <CheckIcon />
+            {items.map((item, idx) => {
+              const isSelected = selectedIdxs.has(idx);
+              return (
+                <div key={idx} className="flex items-center gap-2 border-b border-gray-100 py-3">
+                  <button
+                    type="button"
+                    onClick={() => onToggleSelect(idx)}
+                    aria-pressed={isSelected}
+                    aria-label={isSelected ? "선택 해제" : "선택"}
+                    className={
+                      isSelected
+                        ? "size-6 rounded-xs bg-primary-500 flex items-center justify-center shrink-0"
+                        : "size-6 rounded-xs border border-gray-300 flex items-center justify-center shrink-0"
+                    }
+                  >
+                    {isSelected && <CheckIcon stroke="white" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditIdx(idx)}
+                    className="flex flex-col flex-1 min-w-0 px-1 gap-0.5 text-left"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium text-body2 text-gray-900 truncate">{item.name}</span>
+                      <span className="font-bold text-subtitle text-gray-900 shrink-0">
+                        {item.price.toLocaleString("ko-KR")}원
+                      </span>
+                    </div>
+                    <span className="text-caption text-gray-400">{item.productCode ?? "-"}</span>
+                  </button>
                 </div>
-                <div className="flex flex-col flex-1 min-w-0 px-1 gap-0.5">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-body2 text-gray-900 truncate">{item.name}</span>
-                    <span className="font-bold text-subtitle text-gray-900 shrink-0 ml-2">
-                      {item.price.toLocaleString("ko-KR")}원
-                    </span>
-                  </div>
-                  {item.productCode && (
-                    <span className="text-caption text-gray-400">{item.productCode}</span>
-                  )}
-                </div>
-              </button>
-            ))}
+              );
+            })}
           </div>
 
           <div className="flex items-center justify-between mt-2">
-            <span className="text-body2 text-gray-600">총 {items.length}개 항목</span>
+            <span className="text-body2 text-gray-600">선택 {selectedIdxs.size}개</span>
             <span className="font-bold text-subtitle text-gray-900">
-              {total.toLocaleString("ko-KR")}원
+              {selectedTotal.toLocaleString("ko-KR")}원
             </span>
           </div>
         </div>
