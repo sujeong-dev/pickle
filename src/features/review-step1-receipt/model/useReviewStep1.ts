@@ -1,18 +1,8 @@
 import { useState } from "react";
+import type { OcrReceiptResult } from "@/shared/api";
 
-export type OcrItem = {
-  name: string;
-  price: number;
-  quantity: number;
-  productCode?: string;
-};
-
-export type OcrReceiptData = {
-  branch: string;
-  totalAmount: number;
-  itemCount: number;
-  purchasedAt: string;
-  items: OcrItem[];
+export type OcrReceiptData = OcrReceiptResult & {
+  r2Key: string;
 };
 
 export function useReviewStep1() {

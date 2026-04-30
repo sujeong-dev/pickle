@@ -64,16 +64,31 @@ export type {
   UpdateLocationBody,
   UpdateLocationResponse,
 } from './user'
-export { registerReceipt, createReview, updateReview, deleteReview } from './receipt'
+export {
+  enqueueReceiptOcr,
+  getReceiptOcrStatus,
+  createReceipt,
+  createReview,
+  updateReview,
+  deleteReview,
+} from './receipt'
 export type {
-  RegisterReceiptBody,
-  RegisterReceiptResponse,
+  ReceiptStore,
+  OcrReceiptItem,
+  OcrReceiptResult,
+  ReceiptOcrJobStatus,
+  ReceiptOcrStatusResponse,
+  EnqueueReceiptOcrBody,
+  EnqueueReceiptOcrResponse,
+  CreateReceiptBody,
+  CreateReceiptResponse,
   CreateReviewBody,
   UpdateReviewBody,
 } from './receipt'
 export { getPresignedUrl, requestOcr, getOcrStatus, createPost } from './report'
 export type {
   PresignedUrlBody,
+  PresignedUrlPurpose,
   PresignedUrlResponse,
   OcrJobResponse,
   OcrResult,

@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { getPresignedUrl, requestOcr, getOcrStatus } from '@/shared/api/report'
+import type { PresignedUrlPurpose } from '@/shared/api/report'
 
 export const ocrKeys = {
   all: ['ocr'] as const,
@@ -8,7 +9,7 @@ export const ocrKeys = {
 
 export function useUploadPresigned() {
   return useMutation({
-    mutationFn: (body: { fileType: string; purpose: string }) => getPresignedUrl(body),
+    mutationFn: (body: { fileType: string; purpose: PresignedUrlPurpose }) => getPresignedUrl(body),
   })
 }
 

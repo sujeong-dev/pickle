@@ -3,30 +3,68 @@ import type { Review } from '@/entities/review';
 
 // ── Types ────────────────────────────────────────────────────
 
-export type ReceiptItem = {
-  name: string;
-  price: number;
+export type ReceiptStore = 'costco' | 'traders';
+
+export type OcrReceiptItem = {
+  productCode: string;
+  productName: string;
   quantity: number;
-  discountedPrice?: number;
+  unitPrice: number;
+  finalPrice: number;
 };
 
-export type RegisterReceiptBody = {
-  imageUrl: string;
-};
-
-export type RegisterReceiptResponse = {
-  id: string;
-  items: ReceiptItem[];
+export type OcrReceiptResult = {
+  store: ReceiptStore | null;
+  branch: string;
   totalAmount: number;
+  itemCount: number;
+  purchasedAt: string; // YYYY-MM-DD
+  items: OcrReceiptItem[];
+};
+
+export type ReceiptOcrJobStatus = 'waiting' | 'active' | 'completed' | 'failed';
+
+export type ReceiptOcrStatusResponse = {
+  jobId: string;
+  status: ReceiptOcrJobStatus;
+  result?: OcrReceiptResult;
+  failedReason?: string;
+};
+
+export type EnqueueReceiptOcrBody = {
+  r2Key: string;
+};
+
+export type EnqueueReceiptOcrResponse = {
+  jobId: string;
+};
+
+export type CreateReceiptBody = {
+  r2Key: string;
+  store: ReceiptStore;
+  branch: string;
+  totalAmount: number;
+  itemCount: number;
+  purchasedAt: string; // YYYY-MM-DD
+};
+
+export type CreateReceiptResponse = {
+  id: string;
+  store: ReceiptStore;
+  branch: string;
+  totalAmount: number;
+  itemCount: number;
+  purchasedAt: string;
+  isVerified: boolean;
+  createdAt: string;
 };
 
 export type CreateReviewBody = {
-  postId: string;
+  receiptId: string;
   rating: number;
   content: string;
   productName: string;
-  receiptId?: string;
-  imageUrls?: string[];
+  imageKeys?: string[];
 };
 
 export type UpdateReviewBody = {
@@ -36,8 +74,16 @@ export type UpdateReviewBody = {
 
 // ── API Functions ─────────────────────────────────────────────
 
-export function registerReceipt(body: RegisterReceiptBody): Promise<RegisterReceiptResponse> {
-  return api.post('receipts', { json: body }).json<RegisterReceiptResponse>();
+export function enqueueReceiptOcr(body: EnqueueReceiptOcrBody): Promise<EnqueueReceiptOcrResponse> {
+  return api.post('ocr/receipt', { json: body }).json<EnqueueReceiptOcrResponse>();
+}
+
+export function getReceiptOcrStatus(jobId: string): Promise<ReceiptOcrStatusResponse> {
+  return api.get(`ocr/status/${jobId}`).json<ReceiptOcrStatusResponse>();
+}
+
+export function createReceipt(body: CreateReceiptBody): Promise<CreateReceiptResponse> {
+  return api.post('receipts', { json: body }).json<CreateReceiptResponse>();
 }
 
 export function createReview(body: CreateReviewBody): Promise<Review> {

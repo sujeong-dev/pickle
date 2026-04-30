@@ -4,8 +4,27 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { recognizeReceiptWithAnnotations } from "@/shared/lib/googleVision";
 import { maskCardNumbers } from "@/shared/lib/maskCardNumbers";
-import { parseCostcoReceipt } from "@/shared/lib/parseCostcoReceipt";
-import type { OcrReceiptData, OcrItem } from "../model/useReviewStep1";
+import { parseCostcoReceipt, type ParsedReceipt } from "@/shared/lib/parseCostcoReceipt";
+import type { OcrReceiptItem } from "@/shared/api";
+import type { OcrReceiptData } from "../model/useReviewStep1";
+
+function parsedToOcrData(parsed: ParsedReceipt, r2Key: string): OcrReceiptData {
+  return {
+    store: null,
+    branch: parsed.branch,
+    totalAmount: parsed.totalAmount,
+    itemCount: parsed.itemCount,
+    purchasedAt: parsed.purchasedAt,
+    r2Key,
+    items: parsed.items.map((it) => ({
+      productCode: "",
+      productName: it.name,
+      quantity: it.quantity,
+      unitPrice: it.price,
+      finalPrice: it.price * it.quantity,
+    })),
+  };
+}
 
 type View = "upload" | "processing" | "confirm" | "error" | "form";
 
@@ -67,7 +86,7 @@ export function ReviewStep1({ onReceiptDataChange, onMaskedImageReady }: ReviewS
 
   const [branch, setBranch] = useState("");
   const [purchasedAt, setPurchasedAt] = useState("");
-  const [manualItems, setManualItems] = useState<OcrItem[]>([]);
+  const [manualItems, setManualItems] = useState<OcrReceiptItem[]>([]);
   const [itemName, setItemName] = useState("");
   const [itemPrice, setItemPrice] = useState("");
   const [itemCode, setItemCode] = useState("");
@@ -92,7 +111,7 @@ export function ReviewStep1({ onReceiptDataChange, onMaskedImageReady }: ReviewS
       } catch {
         // 마스킹 실패해도 OCR 결과는 계속 사용
       }
-      setPendingData(parsed);
+      setPendingData(parsedToOcrData(parsed, ""));
       setView("confirm");
     } catch {
       setView("error");
@@ -111,7 +130,13 @@ export function ReviewStep1({ onReceiptDataChange, onMaskedImageReady }: ReviewS
     if (!name || !price) return;
     setManualItems((prev) => [
       ...prev,
-      { name, price, quantity: 1, productCode: itemCode.trim() || undefined },
+      {
+        productCode: itemCode.trim(),
+        productName: name,
+        quantity: 1,
+        unitPrice: price,
+        finalPrice: price,
+      },
     ]);
     setItemName("");
     setItemPrice("");
@@ -120,10 +145,12 @@ export function ReviewStep1({ onReceiptDataChange, onMaskedImageReady }: ReviewS
 
   const handleManualSubmit = () => {
     onReceiptDataChange({
+      store: null,
       branch,
-      totalAmount: manualItems.reduce((s, i) => s + i.price * i.quantity, 0),
+      totalAmount: manualItems.reduce((s, i) => s + i.finalPrice, 0),
       itemCount: manualItems.length,
       purchasedAt,
+      r2Key: "",
       items: manualItems,
     });
   };
@@ -332,12 +359,12 @@ export function ReviewStep1({ onReceiptDataChange, onMaskedImageReady }: ReviewS
             {manualItems.map((item, idx) => (
               <div key={idx} className="flex items-center justify-between border-b border-gray-100 py-2">
                 <div className="flex flex-col">
-                  <span className="text-body2 text-gray-800">{item.name}</span>
+                  <span className="text-body2 text-gray-800">{item.productName}</span>
                   {item.productCode && (
                     <span className="text-caption text-gray-400">{item.productCode}</span>
                   )}
                 </div>
-                <span className="font-semibold text-body2 text-gray-900 shrink-0 ml-2">{item.price.toLocaleString()}원</span>
+                <span className="font-semibold text-body2 text-gray-900 shrink-0 ml-2">{item.unitPrice.toLocaleString()}원</span>
               </div>
             ))}
           </div>

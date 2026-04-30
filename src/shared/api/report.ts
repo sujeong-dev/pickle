@@ -1,9 +1,11 @@
 import { api } from './kyInstance'
 
 // Types
+export type PresignedUrlPurpose = 'post' | 'receipt' | 'review' | 'profile'
+
 export type PresignedUrlBody = {
   fileType: string
-  purpose: string
+  purpose: PresignedUrlPurpose
 }
 
 export type PresignedUrlResponse = {

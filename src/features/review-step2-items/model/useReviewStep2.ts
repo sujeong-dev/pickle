@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import type { OcrItem } from "@/features/review-step1-receipt";
 
 export type EditableItem = {
   name: string;
@@ -8,7 +7,7 @@ export type EditableItem = {
   productCode?: string;
 };
 
-export function useReviewStep2(ocrItems: OcrItem[]) {
+export function useReviewStep2(ocrItems: EditableItem[]) {
   const [items, setItems] = useState<EditableItem[]>([]);
 
   useEffect(() => {
@@ -17,7 +16,7 @@ export function useReviewStep2(ocrItems: OcrItem[]) {
 
   const updateItem = (idx: number, name: string, price: number, productCode?: string) => {
     setItems((prev) =>
-      prev.map((item, i) => (i === idx ? { ...item, name, price, productCode } : item))
+      prev.map((item, i) => (i === idx ? { ...item, name, price, productCode } : item)),
     );
   };
 

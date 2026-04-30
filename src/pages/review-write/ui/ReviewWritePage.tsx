@@ -24,7 +24,16 @@ export function ReviewWritePage() {
   const [maskedReceiptBlob, setMaskedReceiptBlob] = useState<Blob | null>(null);
 
   const { ocrData, setOcrData } = useReviewStep1();
-  const ocrItems = useMemo(() => ocrData?.items ?? [], [ocrData]);
+  const ocrItems = useMemo(
+    () =>
+      (ocrData?.items ?? []).map((it) => ({
+        name: it.productName,
+        price: it.unitPrice,
+        quantity: it.quantity,
+        productCode: it.productCode,
+      })),
+    [ocrData],
+  );
   const { items: editableItems, updateItem } = useReviewStep2(ocrItems);
   const { reviews, setRating, setComment, addPhoto, removePhoto, setRepresentative } =
     useReviewStep3(editableItems.length);
@@ -47,13 +56,15 @@ export function ReviewWritePage() {
 
   const handleNext = async () => {
     if (step === 2) {
+      if (!ocrData) return;
       try {
         const result = await registerReceipt({
+          r2Key: ocrData.r2Key,
           store: "costco",
-          branch: ocrData?.branch ?? "",
-          totalAmount: ocrData?.totalAmount ?? 0,
+          branch: ocrData.branch,
+          totalAmount: ocrData.totalAmount,
           itemCount: editableItems.length,
-          purchasedAt: ocrData?.purchasedAt ?? "",
+          purchasedAt: ocrData.purchasedAt,
         });
         setReceiptId(result.id);
         setStep(3);
@@ -90,9 +101,8 @@ export function ReviewWritePage() {
             await createReview({
               receiptId: receiptId!,
               productName: editableItems[i].name,
-              price: editableItems[i].price,
               rating: review.rating,
-              content: review.comment || undefined,
+              content: review.comment ?? "",
               imageKeys: r2Keys.length > 0 ? r2Keys : undefined,
             });
           }
