@@ -3,7 +3,21 @@
 
 import Script from "next/script";
 import { useEffect, useRef, useCallback } from "react";
+import { useToastStore } from "@/shared/model";
 import type { SelectedLocation } from "../model/useSetBoundary";
+
+function getGeolocationErrorMessage(err: GeolocationPositionError): string {
+  switch (err.code) {
+    case err.PERMISSION_DENIED:
+      return "위치 권한이 차단되어 있어요. 브라우저 권한 설정을 확인해주세요.";
+    case err.POSITION_UNAVAILABLE:
+      return "위치를 확인할 수 없어요. 위치 서비스 또는 Wi-Fi를 확인해주세요.";
+    case err.TIMEOUT:
+      return "위치를 가져오는데 시간이 너무 오래 걸려요. 다시 시도해주세요.";
+    default:
+      return "위치를 가져오지 못했어요.";
+  }
+}
 
 declare global {
   interface Window {
@@ -139,7 +153,9 @@ export function NaverMap({ onLocationChange }: NaverMapProps) {
         fallbackCancelled = true;
         applyLocation(coords.latitude, coords.longitude);
       },
-      () => { /* 실패 시 fallback 유지 */ },
+      (err) => {
+        useToastStore.getState().show(getGeolocationErrorMessage(err));
+      },
       { enableHighAccuracy: true, maximumAge: Infinity },
     );
   }, [reverseGeocode, applyLocation, placeMarker]);
@@ -153,7 +169,9 @@ export function NaverMap({ onLocationChange }: NaverMapProps) {
     if (!navigator.geolocation || !mapInstanceRef.current) return;
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => applyLocation(coords.latitude, coords.longitude),
-      () => {},
+      (err) => {
+        useToastStore.getState().show(getGeolocationErrorMessage(err));
+      },
       { enableHighAccuracy: true, maximumAge: 0 },
     );
   }

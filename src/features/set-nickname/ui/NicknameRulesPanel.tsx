@@ -1,4 +1,4 @@
-\export function NicknameRulesPanel() {
+export function NicknameRulesPanel() {
   return (
     <div className="flex flex-col gap-2 bg-badge-caution-bg rounded-[6px] p-3 w-full">
       <div className="flex items-center gap-2">
