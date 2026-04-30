@@ -9,9 +9,9 @@ import { groupHandlers } from './handlers/group'
 export const handlers = [
   ...authHandlers,
   ...productHandlers,
+  ...receiptHandlers,
   ...reportHandlers,
   ...reviewHandlers,
-  ...receiptHandlers,
   ...userHandlers,
   ...groupHandlers,
 ]
