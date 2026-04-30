@@ -4,7 +4,7 @@ import type { Post } from "../model/types";
 import { cn } from "@/shared/lib/utils";
 import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
 import { ROUTES } from "@/shared/config/routes";
-import { StarIcon, UserAvatar } from "@/shared/ui";
+import { StarIcon, UserAvatar, UserAvatarIcon } from "@/shared/ui";
 
 type DealCardProps = {
   post: Post;
@@ -129,97 +129,151 @@ export function DealCard({ post, href, likeButton, wishlistButton, reviewsHref, 
   const relatedCount = groupInfo?.count;
 
   return (
-    <article className={cn("bg-white flex flex-col gap-[2px] w-full relative", className)}>
+    <article
+      className={cn(
+        'bg-white flex flex-col gap-[2px] w-full relative',
+        className,
+      )}
+    >
       {href && (
-        <Link href={href} aria-label="제보 상세보기" className="absolute inset-0 z-0" />
+        <Link
+          href={href}
+          aria-label='제보 상세보기'
+          className='absolute inset-0 z-0'
+        />
       )}
       {/* Author row */}
-      <div className="flex gap-2.5 items-center px-5 py-3">
+      <div className='flex gap-2.5 items-center px-5 py-3'>
         <UserAvatar src={authorProfileImage} size={46} />
-        <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-          <div className="flex gap-1 items-center">
-            <span className="font-semibold text-subtitle text-gray-900 whitespace-nowrap">{authorNickname}</span>
+        <div className='flex flex-col gap-0.5 flex-1 min-w-0'>
+          <div className='flex gap-1 items-center'>
+            <span className='font-semibold text-subtitle text-gray-900 whitespace-nowrap'>
+              {authorNickname}
+            </span>
             {/* TODO: Swagger 미존재 — 백엔드 확인 필요 */}
             {isVerified && <VerifiedBadge />}
           </div>
-          <span className="text-[11.5px] text-gray-500">{formatRelativeTime(createdAt)}</span>
+          <span className='text-[11.5px] text-gray-500'>
+            {formatRelativeTime(createdAt)}
+          </span>
         </div>
       </div>
 
       {/* Content */}
-      <div className="px-5">
-        <p className="text-[15.4px] text-gray-800">{description ?? ''}</p>
+      <div className='px-5'>
+        <p className='text-[15.4px] text-gray-800'>{description ?? ''}</p>
       </div>
 
       {/* Product image */}
       {thumbnailUrl ? (
-        <div className="relative w-full aspect-375/134 mt-0.5">
-          <Image src={thumbnailUrl} alt={productName} fill className="object-cover" />
-          {soldOutStatus === 'sold_out' && <div className="absolute top-2 left-2"><SoldOutBadge /></div>}
-          {soldOutStatus === 'warning' && <div className="absolute top-2 left-2"><SoldOutWarningBadge /></div>}
+        <div className='relative w-full aspect-375/134 mt-0.5'>
+          <Image
+            src={thumbnailUrl}
+            alt={productName}
+            fill
+            className='object-cover'
+          />
+          {soldOutStatus === 'sold_out' && (
+            <div className='absolute top-2 left-2'>
+              <SoldOutBadge />
+            </div>
+          )}
+          {soldOutStatus === 'warning' && (
+            <div className='absolute top-2 left-2'>
+              <SoldOutWarningBadge />
+            </div>
+          )}
         </div>
       ) : (
-        <div className="relative w-full aspect-375/134 bg-gray-200 mt-0.5">
-          {soldOutStatus === 'sold_out' && <div className="absolute top-2 left-2"><SoldOutBadge /></div>}
-          {soldOutStatus === 'warning' && <div className="absolute top-2 left-2"><SoldOutWarningBadge /></div>}
+        <div className='relative w-full aspect-375/134 bg-gray-200 mt-0.5'>
+          {soldOutStatus === 'sold_out' && (
+            <div className='absolute top-2 left-2'>
+              <SoldOutBadge />
+            </div>
+          )}
+          {soldOutStatus === 'warning' && (
+            <div className='absolute top-2 left-2'>
+              <SoldOutWarningBadge />
+            </div>
+          )}
         </div>
       )}
 
       {/* Product info */}
-      <div className="flex gap-3 items-center px-5 py-3">
-        <div className="size-[46px] rounded-[6px] bg-secondary-500 flex items-center justify-center shrink-0 px-1">
-          <span className="font-bold text-subtitle text-white leading-none">{displayDiscountRate}%</span>
+      <div className='flex gap-3 items-center px-5 py-3'>
+        <div className='size-[46px] rounded-[6px] bg-secondary-500 flex items-center justify-center shrink-0 px-1'>
+          <span className='font-bold text-subtitle text-white leading-none'>
+            {displayDiscountRate}%
+          </span>
         </div>
-        <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-          <span className="font-bold text-subtitle text-gray-900 truncate">{productName}</span>
-          <div className="flex gap-[6px] items-baseline whitespace-nowrap">
-            <span className="font-bold text-h2 text-gray-900">{price.toLocaleString()}원</span>
-            <span className="text-caption text-gray-400 line-through">{(originalPrice ?? 0).toLocaleString()}원</span>
+        <div className='flex flex-col gap-0.5 flex-1 min-w-0'>
+          <span className='font-bold text-subtitle text-gray-900 truncate'>
+            {productName}
+          </span>
+          <div className='flex gap-[6px] items-baseline whitespace-nowrap'>
+            <span className='font-bold text-h2 text-gray-900'>
+              {price.toLocaleString()}원
+            </span>
+            <span className='text-caption text-gray-400 line-through'>
+              {(originalPrice ?? 0).toLocaleString()}원
+            </span>
           </div>
         </div>
       </div>
 
       {/* Review row */}
-      {reviewCount > 0 && (reviewsHref ? (
-        <Link href={reviewsHref} className="relative z-[1] flex items-center gap-2 px-3 py-2 bg-[#FFFBEB] rounded-[6px] mx-0">
-          <ReceiptIcon />
-          <span className="font-medium text-body2 text-[#92400E]">영수증 인증 후기 {reviewCount}건</span>
-          <div className="flex-1" />
-          <div className="flex items-center gap-[2px]">
-            <StarIcon size={13} />
-            <span className="font-bold text-body2 text-[#F59E0B]">{displayRating}</span>
+      {reviewCount > 0 &&
+        (reviewsHref ? (
+          <Link
+            href={reviewsHref}
+            className='relative z-[1] flex items-center gap-2 px-3 py-2 bg-[#FFFBEB] rounded-[6px] mx-0'
+          >
+            <ReceiptIcon />
+            <span className='font-medium text-body2 text-[#92400E]'>
+              영수증 인증 후기 {reviewCount}건
+            </span>
+            <div className='flex-1' />
+            <div className='flex items-center gap-[2px]'>
+              <StarIcon size={13} />
+              <span className='font-bold text-body2 text-[#F59E0B]'>
+                {displayRating}
+              </span>
+            </div>
+            <ChevronRightIcon size={16} />
+          </Link>
+        ) : (
+          <div className='flex items-center gap-2 px-3 py-2 bg-[#FFFBEB] rounded-[6px] mx-0'>
+            <ReceiptIcon />
+            <span className='font-medium text-body2 text-[#92400E]'>
+              영수증 인증 후기 {reviewCount}건
+            </span>
+            <div className='flex-1' />
+            <div className='flex items-center gap-[2px]'>
+              <StarIcon size={13} />
+              <span className='font-bold text-body2 text-[#F59E0B]'>
+                {displayRating}
+              </span>
+            </div>
+            <ChevronRightIcon size={16} />
           </div>
-          <ChevronRightIcon size={16} />
-        </Link>
-      ) : (
-        <div className="flex items-center gap-2 px-3 py-2 bg-[#FFFBEB] rounded-[6px] mx-0">
-          <ReceiptIcon />
-          <span className="font-medium text-body2 text-[#92400E]">영수증 인증 후기 {reviewCount}건</span>
-          <div className="flex-1" />
-          <div className="flex items-center gap-[2px]">
-            <StarIcon size={13} />
-            <span className="font-bold text-body2 text-[#F59E0B]">{displayRating}</span>
-          </div>
-          <ChevronRightIcon size={16} />
-        </div>
-      ))}
+        ))}
 
       {/* Actions row */}
-      <div className="relative flex items-center justify-between px-5 py-3">
-        <div className="flex gap-5 items-center">
+      <div className='relative flex items-center justify-between px-5 py-3'>
+        <div className='flex gap-5 items-center'>
           {likeButton ?? (
-            <div className="flex gap-[6px] items-center">
+            <div className='flex gap-[6px] items-center'>
               <ThumbsUpIcon />
-              <span className="text-subtitle text-gray-500">{likeCount}</span>
+              <span className='text-subtitle text-gray-500'>{likeCount}</span>
             </div>
           )}
-          <div className="flex gap-[6px] items-center">
+          <div className='flex gap-[6px] items-center'>
             <CommentIcon />
-            <span className="text-subtitle text-gray-500">{commentCount}</span>
+            <span className='text-subtitle text-gray-500'>{commentCount}</span>
           </div>
         </div>
         {wishlistButton ?? (
-          <button type="button" aria-label="찜하기">
+          <button type='button' aria-label='찜하기'>
             <HeartIcon />
           </button>
         )}
@@ -227,24 +281,27 @@ export function DealCard({ post, href, likeButton, wishlistButton, reviewsHref, 
 
       {/* Related reports row */}
       {relatedCount != null && relatedCount > 0 && (
-        <Link href={ROUTES.relatedReports(id, { branch: branch ?? undefined, productCode: productCode ?? undefined })} className="relative flex items-center justify-between px-5 py-3 bg-primary-50">
-          <div className="flex gap-2 items-center">
-            <div className="flex -space-x-[18px]">
+        <Link
+          href={ROUTES.relatedReports(id, {
+            branch: branch ?? undefined,
+            productCode: productCode ?? undefined,
+          })}
+          className='relative flex items-center justify-between px-5 py-3 bg-primary-50'
+        >
+          <div className='flex gap-2 items-center'>
+            <div className='flex -space-x-[18px]'>
               {[0, 1].map((i) => (
                 <div
                   key={i}
-                  className="size-[42px] rounded-full bg-white border-[3px] border-white flex items-center justify-center"
+                  className='size-[42px] rounded-full bg-white border-[3px] border-white flex items-center justify-center'
                 >
-                  <div className="size-9 rounded-full bg-primary-50 flex items-center justify-center">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#2D8A5A" fillOpacity="0.5" />
-                      <path d="M20 21C20 18.2386 16.4183 16 12 16C7.58172 16 4 18.2386 4 21" stroke="#2D8A5A" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                  </div>
+                  <UserAvatarIcon size={24} />
                 </div>
               ))}
             </div>
-            <span className="font-medium text-body2 text-primary-500">같은 상품 제보 {relatedCount}건 더</span>
+            <span className='font-medium text-body2 text-primary-500'>
+              같은 상품 제보 {relatedCount}건 더
+            </span>
           </div>
           <ChevronRightIcon size={16} />
         </Link>
