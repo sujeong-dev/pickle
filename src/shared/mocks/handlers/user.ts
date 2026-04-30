@@ -1,8 +1,17 @@
 import { http, HttpResponse } from 'msw'
 
-const userState: { sido: string | null; sigungu: string | null } = {
+const userState: {
+  sido: string | null
+  sigungu: string | null
+  dong: string | null
+  longitude: number | null
+  latitude: number | null
+} = {
   sido: null,
   sigungu: null,
+  dong: null,
+  longitude: null,
+  latitude: null,
 }
 
 export const userHandlers = [
@@ -17,15 +26,33 @@ export const userHandlers = [
       bookmarkCount: 24,
       sido: userState.sido,
       sigungu: userState.sigungu,
+      dong: userState.dong,
+      longitude: userState.longitude,
+      latitude: userState.latitude,
     })
   }),
 
   // PUT */users/me/location
   http.put('*/users/me/location', async ({ request }) => {
-    const body = (await request.json()) as { sido: string; sigungu: string }
+    const body = (await request.json()) as {
+      sido: string
+      sigungu: string
+      dong: string
+      longitude: number
+      latitude: number
+    }
     userState.sido = body.sido
     userState.sigungu = body.sigungu
-    return HttpResponse.json({ sido: body.sido, sigungu: body.sigungu })
+    userState.dong = body.dong
+    userState.longitude = body.longitude
+    userState.latitude = body.latitude
+    return HttpResponse.json({
+      sido: body.sido,
+      sigungu: body.sigungu,
+      dong: body.dong,
+      longitude: body.longitude,
+      latitude: body.latitude,
+    })
   }),
 
   // DELETE */users/me

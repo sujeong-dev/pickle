@@ -34,9 +34,15 @@ export function LocationSection() {
   const isSet = Boolean(sido && sigungu);
 
   function handleComplete(location: SelectedLocation) {
-    if (!location.sido || !location.sigungu) return;
+    if (!location.sido || !location.sigungu || !location.dongName) return;
     updateLocation(
-      { sido: location.sido, sigungu: location.sigungu },
+      {
+        sido: location.sido,
+        sigungu: location.sigungu,
+        dong: location.dongName,
+        longitude: location.lng,
+        latitude: location.lat,
+      },
       {
         onSuccess: () => {
           useToastStore.getState().show("내 동네가 변경됐어요");

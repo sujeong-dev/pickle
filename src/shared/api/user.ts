@@ -9,16 +9,25 @@ export interface UserProfile {
   bookmarkCount: number
   sido?: string | null
   sigungu?: string | null
+  dong?: string | null
+  longitude?: number | null
+  latitude?: number | null
 }
 
 export interface UpdateLocationBody {
   sido: string
   sigungu: string
+  dong: string
+  longitude: number
+  latitude: number
 }
 
 export interface UpdateLocationResponse {
   sido: string
   sigungu: string
+  dong: string
+  longitude: number
+  latitude: number
 }
 
 export interface MyPost {
