@@ -8,6 +8,8 @@ export function useReportStep2() {
   const [price, setPrice] = useState("");
   const [productCode, setProductCode] = useState("");
   const [originalPrice, setOriginalPrice] = useState("");
+  const [discountStartAt, setDiscountStartAt] = useState("");
+  const [discountEndAt, setDiscountEndAt] = useState("");
   const [description, setDescription] = useState("");
 
   const addPhoto = (file: File, r2Key: string) => {
@@ -40,6 +42,8 @@ export function useReportStep2() {
     price,
     productCode,
     originalPrice,
+    discountStartAt,
+    discountEndAt,
     description,
     addPhoto,
     removePhoto,
@@ -48,6 +52,8 @@ export function useReportStep2() {
     setPrice,
     setProductCode,
     setOriginalPrice,
+    setDiscountStartAt,
+    setDiscountEndAt,
     setDescription,
   };
 }

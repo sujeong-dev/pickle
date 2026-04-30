@@ -22,8 +22,12 @@ export type OcrResult = {
   status: 'waiting' | 'active' | 'completed' | 'failed'
   result?: {
     productName?: string
+    productCode?: string
     price?: number
-    discountRate?: number
+    originalPrice?: number
+    discountAmount?: number
+    discountStartAt?: string
+    discountEndAt?: string
   }
 }
 

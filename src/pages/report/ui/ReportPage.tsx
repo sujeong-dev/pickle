@@ -36,6 +36,8 @@ export function ReportPage() {
     price,
     productCode,
     originalPrice,
+    discountStartAt,
+    discountEndAt,
     description,
     addPhoto,
     removePhoto: removeProductPhoto,
@@ -44,6 +46,8 @@ export function ReportPage() {
     setPrice,
     setProductCode,
     setOriginalPrice,
+    setDiscountStartAt,
+    setDiscountEndAt,
     setDescription,
   } = useReportStep2();
 
@@ -67,6 +71,9 @@ export function ReportPage() {
 
     const numPrice = Number(price);
     const numOriginalPrice = originalPrice ? Number(originalPrice) : undefined;
+    const ocrDiscountAmount = ocrResult?.result?.discountAmount;
+    const fallbackDiscountAmount =
+      numOriginalPrice !== undefined ? numOriginalPrice - numPrice : undefined;
 
     await createReport({
       store: "costco",
@@ -76,7 +83,9 @@ export function ReportPage() {
       imageKeys: orderedKeys,
       productCode: productCode || undefined,
       originalPrice: numOriginalPrice,
-      discountAmount: numOriginalPrice !== undefined ? numOriginalPrice - numPrice : undefined,
+      discountAmount: ocrDiscountAmount ?? fallbackDiscountAmount,
+      discountStartAt: discountStartAt || undefined,
+      discountEndAt: discountEndAt || undefined,
       description: description || undefined,
     });
 
@@ -85,7 +94,7 @@ export function ReportPage() {
 
   const canNext =
     step === 1
-      ? photo !== null
+      ? photo !== null && ocrResult?.status !== "failed"
       : photos.length > 0 && !!productName && !!price;
 
   if (showSuccess) {
@@ -118,6 +127,7 @@ export function ReportPage() {
             onR2KeyChange={setR2Key}
             onJobIdChange={setJobId}
             onOcrResultChange={setOcrResult}
+            onManualEntry={() => setStep(2)}
           />
         )}
         {step === 2 && (
@@ -128,6 +138,8 @@ export function ReportPage() {
             price={price}
             productCode={productCode}
             originalPrice={originalPrice}
+            discountStartAt={discountStartAt}
+            discountEndAt={discountEndAt}
             description={description}
             ocrResult={ocrResult}
             onAddPhoto={addPhoto}
@@ -137,6 +149,8 @@ export function ReportPage() {
             onPriceChange={setPrice}
             onProductCodeChange={setProductCode}
             onOriginalPriceChange={setOriginalPrice}
+            onDiscountStartAtChange={setDiscountStartAt}
+            onDiscountEndAtChange={setDiscountEndAt}
             onDescriptionChange={setDescription}
           />
         )}

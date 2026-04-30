@@ -30,6 +30,8 @@ type ReportStep2Props = {
   price: string;
   productCode: string;
   originalPrice: string;
+  discountStartAt: string;
+  discountEndAt: string;
   description: string;
   ocrResult?: OcrResult | null;
   onAddPhoto: (file: File, r2Key: string) => void;
@@ -39,6 +41,8 @@ type ReportStep2Props = {
   onPriceChange: (v: string) => void;
   onProductCodeChange: (v: string) => void;
   onOriginalPriceChange: (v: string) => void;
+  onDiscountStartAtChange: (v: string) => void;
+  onDiscountEndAtChange: (v: string) => void;
   onDescriptionChange: (v: string) => void;
 };
 
@@ -49,6 +53,8 @@ export function ReportStep2({
   price,
   productCode,
   originalPrice,
+  discountStartAt,
+  discountEndAt,
   description,
   ocrResult,
   onAddPhoto,
@@ -58,6 +64,8 @@ export function ReportStep2({
   onPriceChange,
   onProductCodeChange,
   onOriginalPriceChange,
+  onDiscountStartAtChange,
+  onDiscountEndAtChange,
   onDescriptionChange,
 }: ReportStep2Props) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -65,17 +73,14 @@ export function ReportStep2({
 
   useEffect(() => {
     if (!ocrResult || ocrResult.status !== "completed") return;
-    const result = ocrResult.result;
-    if (result?.productName && !productName) {
-      onProductNameChange(result.productName);
-    }
-    if (result?.price !== undefined && !price) {
-      onPriceChange(String(result.price));
-      if (result.discountRate !== undefined && !originalPrice) {
-        const calcOriginal = Math.round(result.price / (1 - result.discountRate / 100));
-        onOriginalPriceChange(String(calcOriginal));
-      }
-    }
+    const r = ocrResult.result;
+    if (!r) return;
+    if (r.productName && !productName) onProductNameChange(r.productName);
+    if (r.productCode && !productCode) onProductCodeChange(r.productCode);
+    if (r.price !== undefined && !price) onPriceChange(String(r.price));
+    if (r.originalPrice !== undefined && !originalPrice) onOriginalPriceChange(String(r.originalPrice));
+    if (r.discountStartAt && !discountStartAt) onDiscountStartAtChange(r.discountStartAt);
+    if (r.discountEndAt && !discountEndAt) onDiscountEndAtChange(r.discountEndAt);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ocrResult]);
 
@@ -197,6 +202,28 @@ export function ReportStep2({
             onClear={() => onOriginalPriceChange('')}
             placeholder='원가를 입력해주세요'
             inputMode='numeric'
+          />
+        </div>
+        <div className='flex flex-col gap-1'>
+          <label className='text-[14px] font-semibold text-gray-900'>
+            할인 시작일
+          </label>
+          <Input
+            value={discountStartAt}
+            onChange={(e) => onDiscountStartAtChange(e.target.value)}
+            onClear={() => onDiscountStartAtChange('')}
+            placeholder='YYYY-MM-DD'
+          />
+        </div>
+        <div className='flex flex-col gap-1'>
+          <label className='text-[14px] font-semibold text-gray-900'>
+            할인 종료일
+          </label>
+          <Input
+            value={discountEndAt}
+            onChange={(e) => onDiscountEndAtChange(e.target.value)}
+            onClear={() => onDiscountEndAtChange('')}
+            placeholder='YYYY-MM-DD'
           />
         </div>
         <div className='flex flex-col gap-1'>

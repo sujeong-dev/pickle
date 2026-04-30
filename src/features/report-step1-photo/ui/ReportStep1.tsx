@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from "react";
 import Image from "next/image";
-import { RemoveButton } from "@/shared/ui";
+import { Button, RemoveButton } from "@/shared/ui";
 import { ScanIcon } from "@/shared/ui/icons";
 import { useUploadPresigned, useOcrProduct, useOcrStatus } from "../api/useOcr";
 import type { OcrResult } from "@/shared/api/report";
@@ -26,6 +26,7 @@ type ReportStep1Props = {
   onR2KeyChange: (r2Key: string) => void;
   onJobIdChange: (jobId: string) => void;
   onOcrResultChange: (result: OcrResult) => void;
+  onManualEntry: () => void;
 };
 
 export function ReportStep1({
@@ -38,6 +39,7 @@ export function ReportStep1({
   onR2KeyChange,
   onJobIdChange,
   onOcrResultChange,
+  onManualEntry,
 }: ReportStep1Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { mutateAsync: getPresigned, isPending: isPresignedPending } = useUploadPresigned();
@@ -92,7 +94,39 @@ export function ReportStep1({
         <p className="text-[14px] text-gray-600 leading-normal">가격표나 할인 안내문을 촬영해주세요</p>
       </div>
 
-      {photo ? (
+      {photo && ocrResult?.status === "failed" ? (
+        /* ── OCR failed state ── */
+        <div className="flex flex-col items-center justify-center gap-4 py-16">
+          <div className="bg-secondary-50 rounded-full size-[60px] flex items-center justify-center">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-secondary-500" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <h3 className="text-[18px] font-bold text-gray-900">할인표를 인식하지 못했어요</h3>
+            <p className="text-[14px] text-gray-500 text-center leading-normal">
+              사진이 흐리거나 글씨가 잘 안 보일 수 있어요.<br />다시 촬영하거나 직접 입력해주세요.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-2 w-full mt-2">
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={() => {
+                onPhotoRemove();
+                inputRef.current?.click();
+              }}
+            >
+              다시 촬영하기
+            </Button>
+            <Button variant="primary" size="md" onClick={onManualEntry}>
+              직접 입력하기
+            </Button>
+          </div>
+        </div>
+      ) : photo ? (
         /* ── Uploaded state ── */
         <div className="relative w-full aspect-[335/255] bg-gray-200 rounded-[10px] overflow-hidden">
           <Image

@@ -36,9 +36,13 @@ export const reportHandlers = [
         jobId,
         status: 'completed',
         result: {
-          productName: '코카콜라 500ml',
-          price: 1500,
-          discountRate: 30,
+          productName: '척아이롤 1.4kg',
+          productCode: '1234567',
+          price: 49900,
+          originalPrice: 59900,
+          discountAmount: 10000,
+          discountStartAt: '2025-01-01',
+          discountEndAt: '2025-01-31',
         },
       })
     }, 3000)
