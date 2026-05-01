@@ -194,7 +194,6 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
     reportSoldout(undefined, {
       onSuccess: () => {
         localReport();
-        queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) });
       },
     });
   }
