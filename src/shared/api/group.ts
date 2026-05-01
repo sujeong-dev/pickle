@@ -119,6 +119,55 @@ export function updateGroupStatus(
     .json<UpdateGroupStatusResponse>();
 }
 
+export type GroupComment = {
+  id: string;
+  content: string;
+  createdAt: string;
+  authorNickname: string;
+  authorProfileImage: string | null;
+  isMine: boolean;
+};
+
+export type GroupCommentListResponse = {
+  items: GroupComment[];
+  limit: number;
+  hasNext: boolean;
+  nextCursor: string | null;
+};
+
+export function getGroupComments(
+  groupId: string,
+  params?: { limit?: number; cursor?: string },
+): Promise<GroupCommentListResponse> {
+  const searchParams: Record<string, string | number> = {};
+  if (params?.limit !== undefined) searchParams.limit = params.limit;
+  if (params?.cursor !== undefined) searchParams.cursor = params.cursor;
+  return api
+    .get(
+      `groups/${groupId}/comments`,
+      Object.keys(searchParams).length ? { searchParams } : undefined,
+    )
+    .json<GroupCommentListResponse>();
+}
+
+export function createGroupComment(
+  groupId: string,
+  content: string,
+): Promise<GroupComment> {
+  return api
+    .post(`groups/${groupId}/comments`, { json: { content } })
+    .json<GroupComment>();
+}
+
+export function deleteGroupComment(
+  groupId: string,
+  commentId: string,
+): Promise<{ id: string }> {
+  return api
+    .delete(`groups/${groupId}/comments/${commentId}`)
+    .json<{ id: string }>();
+}
+
 export async function getGroupErrorMessage(error: unknown): Promise<string> {
   if (!(error instanceof HTTPError)) return '요청에 실패했어요.';
   let body: Partial<AuthErrorBody> = {};

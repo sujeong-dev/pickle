@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { BackHeader, Button, UserAvatar } from "@/shared/ui";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { BackHeader, Button, TrashIcon, UserAvatar } from "@/shared/ui";
 import { useToastStore } from "@/shared/model";
 import { cn } from "@/shared/lib/utils";
 import { formatRelativeTime } from "@/shared/lib/formatRelativeTime";
@@ -19,10 +19,18 @@ import {
   getGroupDetail,
   groupKeys,
   getGroupErrorMessage,
+  getGroupComments,
+  createGroupComment,
+  deleteGroupComment,
 } from "@/shared/api";
+import type { GroupComment } from "@/shared/api/group";
 import { ROUTES } from "@/shared/config/routes";
 import { GroupActionSheet } from "./GroupActionSheet";
 import { GroupConfirmModal } from "./GroupConfirmModal";
+
+const groupCommentKeys = {
+  list: (id: string) => ["group", "comments", id] as const,
+};
 
 function MoreIcon() {
   return (
@@ -87,6 +95,45 @@ export function GroupDetailPage({ groupId }: Props) {
   const { mutate: toggleParticipation, isPending: isToggling } = useToggleParticipation();
   const { mutate: closeGroup, isPending: isClosing } = useCloseGroup(groupId);
   const { mutate: deleteGroupAction, isPending: isDeleting } = useDeleteGroup(groupId);
+
+  const [commentInput, setCommentInput] = useState("");
+  const queryClient = useQueryClient();
+
+  const { data: commentData } = useQuery({
+    queryKey: groupCommentKeys.list(groupId),
+    queryFn: () => getGroupComments(groupId),
+    enabled: !!groupId,
+  });
+
+  const { mutate: submitComment, isPending: isSubmittingComment } = useMutation({
+    mutationFn: (content: string) => createGroupComment(groupId, content),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: groupCommentKeys.list(groupId) });
+      setCommentInput("");
+    },
+  });
+
+  const { mutate: removeComment, isPending: isDeletingComment } = useMutation({
+    mutationFn: (commentId: string) => deleteGroupComment(groupId, commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: groupCommentKeys.list(groupId) });
+    },
+  });
+
+  const comments = commentData?.items ?? [];
+
+  const handleSubmitComment = () => {
+    const trimmed = commentInput.trim();
+    if (!trimmed || isSubmittingComment) return;
+    submitComment(trimmed);
+  };
+
+  const handleCommentKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+      e.preventDefault();
+      handleSubmitComment();
+    }
+  };
 
   if (isLoading) {
     return (
@@ -263,6 +310,52 @@ export function GroupDetailPage({ groupId }: Props) {
             </div>
           </div>
         )}
+
+        {/* 댓글 영역 */}
+        <div className="px-5 pt-4 pb-2 border-t border-gray-100">
+          <div className="flex items-center gap-1.5">
+            <span className="font-bold text-[15px] text-gray-900">댓글</span>
+            <span className="text-[14px] text-gray-400">{comments.length}</span>
+          </div>
+        </div>
+
+        <div className="px-5 pb-4">
+          {comments.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 py-10">
+              <span className="text-[14px] text-gray-400">첫 번째 댓글을 남겨보세요</span>
+            </div>
+          ) : (
+            comments.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                onDelete={removeComment}
+                isDeleting={isDeletingComment}
+              />
+            ))
+          )}
+        </div>
+
+        {/* 댓글 입력 바 (인라인) */}
+        <div className="px-4 pt-2 pb-4 flex gap-2 items-center">
+          <div className="flex-1 flex items-center bg-gray-100 rounded-full px-4 h-10">
+            <input
+              value={commentInput}
+              onChange={(e) => setCommentInput(e.target.value)}
+              onKeyDown={handleCommentKeyDown}
+              placeholder="댓글을 입력하세요"
+              className="flex-1 bg-transparent text-[14px] text-gray-800 outline-none placeholder:text-gray-400"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleSubmitComment}
+            disabled={!commentInput.trim() || isSubmittingComment}
+            className="size-10 rounded-full bg-primary-500 flex items-center justify-center text-white disabled:bg-gray-200 disabled:text-gray-400 shrink-0"
+          >
+            <SendIcon />
+          </button>
+        </div>
       </main>
 
       {/* 하단 액션 바 */}
@@ -332,6 +425,49 @@ function Meta({ icon, label, value }: { icon: React.ReactNode; label: string; va
       <span className="text-gray-400">{icon}</span>
       <span className="text-body2 text-gray-500 w-12">{label}</span>
       <span className="flex-1 text-body2 text-gray-900">{value}</span>
+    </div>
+  );
+}
+
+function SendIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="22" y1="2" x2="11" y2="13" />
+      <polygon points="22 2 15 22 11 13 2 9 22 2" />
+    </svg>
+  );
+}
+
+type CommentItemProps = {
+  comment: GroupComment;
+  onDelete: (id: string) => void;
+  isDeleting: boolean;
+};
+
+function CommentItem({ comment, onDelete, isDeleting }: CommentItemProps) {
+  return (
+    <div className="flex gap-2.5 py-3 border-b border-gray-100">
+      <UserAvatar src={comment.authorProfileImage} size={32} />
+      <div className="flex flex-col gap-1 flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="font-semibold text-[13px] text-gray-900 truncate">{comment.authorNickname}</span>
+            <span className="text-[11px] text-gray-400 shrink-0">{formatRelativeTime(comment.createdAt)}</span>
+          </div>
+          {comment.isMine && (
+            <button
+              type="button"
+              onClick={() => onDelete(comment.id)}
+              disabled={isDeleting}
+              className="text-gray-400 shrink-0 disabled:opacity-40"
+              aria-label="댓글 삭제"
+            >
+              <TrashIcon />
+            </button>
+          )}
+        </div>
+        <p className="text-[14px] text-gray-700 leading-[21px]">{comment.content}</p>
+      </div>
     </div>
   );
 }

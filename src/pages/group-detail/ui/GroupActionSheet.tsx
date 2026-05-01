@@ -38,13 +38,6 @@ export function GroupActionSheet({ open, canEdit, onClose, onEdit, onClose_, onD
         >
           모집 삭제
         </button>
-        <button
-          type="button"
-          onClick={onClose}
-          className="h-14 px-5 flex items-center text-body1 text-gray-500 mt-2 border-t border-gray-100"
-        >
-          취소
-        </button>
       </div>
     </BottomSheet>
   );

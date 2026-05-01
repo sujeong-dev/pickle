@@ -228,6 +228,62 @@ export const groupHandlers = [
     });
   }),
 
+  // GET /api/groups/:groupId/comments
+  http.get('*/groups/:groupId/comments', () => {
+    return HttpResponse.json({
+      items: [
+        {
+          id: 'gc-1',
+          content: '저도 참여하고 싶은데 자리 있나요?',
+          createdAt: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+          authorNickname: '주말쇼퍼',
+          authorProfileImage: null,
+          isMine: false,
+        },
+        {
+          id: 'gc-2',
+          content: '몇 분 정도 픽업 가능하실까요?',
+          createdAt: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
+          authorNickname: '코스트코단골',
+          authorProfileImage: null,
+          isMine: false,
+        },
+        {
+          id: 'gc-3',
+          content: '저 참여할게요!',
+          createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+          authorNickname: '나',
+          authorProfileImage: null,
+          isMine: true,
+        },
+      ],
+      limit: 20,
+      hasNext: false,
+      nextCursor: null,
+    });
+  }),
+
+  // POST /api/groups/:groupId/comments
+  http.post('*/groups/:groupId/comments', async ({ request }) => {
+    const body = (await request.json()) as { content: string };
+    return HttpResponse.json(
+      {
+        id: `gc-${Date.now()}`,
+        content: body.content,
+        createdAt: new Date().toISOString(),
+        authorNickname: '나',
+        authorProfileImage: null,
+        isMine: true,
+      },
+      { status: 201 },
+    );
+  }),
+
+  // DELETE /api/groups/:groupId/comments/:commentId
+  http.delete('*/groups/:groupId/comments/:commentId', ({ params }) => {
+    return HttpResponse.json({ id: params.commentId });
+  }),
+
   // PATCH /api/groups/:id/status
   http.patch('*/groups/:id/status', async ({ params, request }) => {
     const { id } = params as { id: string };

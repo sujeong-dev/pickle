@@ -108,6 +108,9 @@ export {
   updateGroupParticipation,
   updateGroupStatus,
   getGroupErrorMessage,
+  getGroupComments,
+  createGroupComment,
+  deleteGroupComment,
 } from './group'
 export type {
   GroupListParams,
@@ -119,4 +122,6 @@ export type {
   UpdateGroupStatusBody,
   UpdateGroupStatusResponse,
   DeleteGroupResponse,
+  GroupComment,
+  GroupCommentListResponse,
 } from './group'
