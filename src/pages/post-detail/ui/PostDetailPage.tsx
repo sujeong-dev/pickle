@@ -11,6 +11,7 @@ import { ROUTES } from "@/shared/config/routes";
 import { WishlistButton } from "@/features/wishlist";
 import { ReportSoldoutModal, useReportSoldout, useReportSoldoutMutation } from "@/features/report-soldout";
 import { togglePostLike, createPostComment, deletePostComment, postKeys } from "@/shared/api";
+import type { Comment } from "@/shared/api/product";
 import type { PostImage } from "@/entities/post";
 import { usePostDetail, usePostComments } from "../api/usePostDetail";
 
@@ -169,12 +170,25 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
     },
   });
 
-  const { mutate: removeComment } = useMutation({
+  const { mutate: removeComment, isPending: isDeletingComment } = useMutation({
     mutationFn: (commentId: string) => deletePostComment(postId, commentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: postKeys.comments(postId) });
     },
   });
+
+  const handleSubmitComment = () => {
+    const trimmed = comment.trim();
+    if (!trimmed || isSubmittingComment) return;
+    submitComment(trimmed);
+  };
+
+  const handleCommentKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+      e.preventDefault();
+      handleSubmitComment();
+    }
+  };
 
   function handleReport() {
     reportSoldout(undefined, {
@@ -428,31 +442,28 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
         )}
 
         {/* Comments section */}
-        <div className='flex flex-col gap-2 px-5 py-3 border-t border-gray-100'>
-          <span className='font-bold text-body2 text-black'>
-            댓글 {comments.length}
-          </span>
-          {comments.map((c) => (
-            <div key={c.id} className='flex gap-3 items-start'>
-              <UserAvatar size={32} />
-              <div className='flex flex-col gap-1.5 flex-1'>
-                <span className='font-semibold text-[13.5px] text-gray-800'>
-                  {c.authorNickname}
-                </span>
-                <span className='text-[13.5px] text-gray-700'>{c.content}</span>
-              </div>
-              {c.isMine && (
-                <button
-                  type='button'
-                  aria-label='댓글 삭제'
-                  onClick={() => removeComment(c.id)}
-                  className='text-gray-400 shrink-0'
-                >
-                  <TrashIcon />
-                </button>
-              )}
+        <div className="px-5 pt-4 pb-2 border-t border-gray-100">
+          <div className="flex items-center gap-1.5">
+            <span className="font-bold text-[15px] text-gray-900">댓글</span>
+            <span className="text-[14px] text-gray-400">{comments.length}</span>
+          </div>
+        </div>
+
+        <div className="px-5 pb-4">
+          {comments.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 py-10">
+              <span className="text-[14px] text-gray-400">첫 번째 댓글을 남겨보세요</span>
             </div>
-          ))}
+          ) : (
+            comments.map((c) => (
+              <CommentItem
+                key={c.id}
+                comment={c}
+                onDelete={removeComment}
+                isDeleting={isDeletingComment}
+              />
+            ))
+          )}
         </div>
       </div>
 
@@ -463,34 +474,67 @@ export function PostDetailPage({ postId }: PostDetailPageProps) {
       />
 
       {/* Comment input bar */}
-      <div className='flex items-center gap-3 px-5 py-3 border-t border-gray-200 shrink-0'>
-        <input
-          type='text'
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder='댓글을 입력해주세요'
-          className='flex-1 h-12 rounded-[10px] bg-gray-200 px-3 text-body2 text-gray-900 placeholder:text-gray-400 outline-none'
-        />
+      <div className="shrink-0 px-4 py-2.5 border-t border-gray-100 flex gap-2 items-center bg-white">
+        <div className="flex-1 flex items-center bg-gray-100 rounded-full px-4 h-10">
+          <input
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            onKeyDown={handleCommentKeyDown}
+            placeholder="댓글을 입력하세요"
+            className="flex-1 bg-transparent text-[14px] text-gray-800 outline-none placeholder:text-gray-400"
+          />
+        </div>
         <button
-          type='button'
+          type="button"
+          onClick={handleSubmitComment}
           disabled={!comment.trim() || isSubmittingComment}
-          onClick={() => {
-            if (comment.trim()) submitComment(comment);
-          }}
-          className={cn(
-            'size-12.5 rounded-full flex items-center justify-center shrink-0 transition-colors',
-            comment.trim() ? 'bg-primary-500' : 'bg-gray-200',
-          )}
+          className="size-10 rounded-full bg-primary-500 flex items-center justify-center text-white disabled:bg-gray-200 disabled:text-gray-400 shrink-0"
         >
-          <span
-            className={cn(
-              'text-[15.4px]',
-              comment.trim() ? 'text-white font-semibold' : 'text-gray-400',
-            )}
-          >
-            등록
-          </span>
+          <SendIcon />
         </button>
+      </div>
+    </div>
+  );
+}
+
+function SendIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="22" y1="2" x2="11" y2="13" />
+      <polygon points="22 2 15 22 11 13 2 9 22 2" />
+    </svg>
+  );
+}
+
+type CommentItemProps = {
+  comment: Comment;
+  onDelete: (id: string) => void;
+  isDeleting: boolean;
+};
+
+function CommentItem({ comment, onDelete, isDeleting }: CommentItemProps) {
+  return (
+    <div className="flex gap-2.5 py-3 border-b border-gray-100">
+      <UserAvatar size={32} />
+      <div className="flex flex-col gap-1 flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="font-semibold text-[13px] text-gray-900 truncate">{comment.authorNickname}</span>
+            <span className="text-[11px] text-gray-400 shrink-0">{formatRelativeTime(comment.createdAt)}</span>
+          </div>
+          {comment.isMine && (
+            <button
+              type="button"
+              onClick={() => onDelete(comment.id)}
+              disabled={isDeleting}
+              className="text-gray-400 shrink-0 disabled:opacity-40"
+              aria-label="댓글 삭제"
+            >
+              <TrashIcon />
+            </button>
+          )}
+        </div>
+        <p className="text-[14px] text-gray-700 leading-[21px]">{comment.content}</p>
       </div>
     </div>
   );
