@@ -80,7 +80,6 @@ export const api = ky.create({
         const body = error.data as { message?: string } | undefined
         if (status >= 400 && status < 500) {
           useToastStore.getState().show(body?.message ?? '요청에 실패했어요.')
-          if (status === 403) window.location.href = '/'
         }
         if (status >= 500) {
           useToastStore.getState().show('서버 오류가 발생했어요.')
