@@ -48,4 +48,5 @@ export const useTokenStore = create<TokenStore>()(
 export const getAccessToken = () => useTokenStore.getState().accessToken
 export const getRefreshToken = () => useTokenStore.getState().refreshToken
 export const setAccessToken = (token: string) => useTokenStore.getState().setAccessToken(token)
+export const setRefreshToken = (token: string) => useTokenStore.getState().setRefreshToken(token);
 export const clearTokens = () => useTokenStore.getState().clearTokens()

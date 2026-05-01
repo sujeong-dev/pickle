@@ -1,5 +1,5 @@
 import ky, { isHTTPError } from 'ky'
-import { getAccessToken, getRefreshToken, setAccessToken, clearTokens } from '@/shared/model/tokenStore'
+import { getAccessToken, getRefreshToken, setAccessToken, clearTokens, setRefreshToken } from '@/shared/model/tokenStore'
 import { useToastStore } from '@/shared/model/toastStore'
 
 // 동시에 여러 요청이 401을 받을 때 토큰 갱신을 한 번만 수행하고 나머지는 큐에 대기
@@ -52,11 +52,14 @@ export const api = ky.create({
 
         isRefreshing = true
         try {
-          const refreshed = await ky.post('auth/refresh', {
-            prefix: process.env.NEXT_PUBLIC_API_URL,
-            json: { refreshToken: getRefreshToken() },
-          }).json<{ accessToken: string }>()
+          const refreshed = await ky
+            .post('auth/refresh', {
+              prefix: process.env.NEXT_PUBLIC_API_URL,
+              json: { refreshToken: getRefreshToken() },
+            })
+            .json<{ accessToken: string; refreshToken: string; }>();
           setAccessToken(refreshed.accessToken)
+          setRefreshToken(refreshed.refreshToken)
           // 대기 중인 요청들 새 토큰으로 순차 재시도
           await processQueue(null, refreshed.accessToken)
           // 원래 실패했던 요청 재시도
